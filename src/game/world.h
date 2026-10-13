@@ -1,0 +1,29 @@
+#pragma once
+// Escenario: plaza de pueblo con prado, montes, baserris, valla y público.
+#include "engine/mesh.h"
+#include "game/character.h"
+
+class World {
+public:
+    void build(unsigned seed = 7);
+    void update(float dt);
+    void drawSky();                  // 2D: llamar antes de begin3D
+    void draw();                     // 3D: escenario + público
+    void cheer(float seconds);       // el público salta y aplaude
+    void clapLight(float seconds);   // aplauso suave (solo manos)
+    void drawShadow(const Vec3& pos, float rx, float rz, float alpha = 1.0f);
+
+    static constexpr Color HORIZON = rgba(0xC4, 0xE6, 0xF8);
+
+private:
+    struct Spectator {
+        Vec3 pos;
+        float yaw, phase, jump, jumpV;
+        Appearance look;
+        CharacterModel* model;
+    };
+    Mesh scenery_, clouds_, shadow_, crowdMesh_;
+    Spectator spectators_[28];
+    int numSpectators_ = 0;
+    float time_ = 0, cheerT_ = 0, clapT_ = 0;
+};

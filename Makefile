@@ -10,12 +10,13 @@ endif
 include $(DEVKITPPC)/wii_rules
 
 TARGET   := boot
-BUILD    := build/obj
-SOURCES  := src src/engine src/games/aizkolaritza
+OUTDIR   ?= build
+BUILD    := $(OUTDIR)/obj
+SOURCES  := src src/engine src/game src/scenes src/games/aizkolaritza
 DATA     := data
 INCLUDES := src
 
-CFLAGS   = -g -O2 -Wall $(MACHDEP) $(INCLUDE)
+CFLAGS   = -g -O2 -Wall $(MACHDEP) $(INCLUDE) $(DEFS)
 CXXFLAGS = $(CFLAGS) -std=gnu++17 -fno-exceptions -fno-rtti
 LDFLAGS  = -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 
@@ -26,7 +27,7 @@ LIBDIRS  :=
 ifneq ($(notdir $(BUILD)),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT  := $(CURDIR)/build/$(TARGET)
+export OUTPUT  := $(CURDIR)/$(OUTDIR)/$(TARGET)
 export VPATH   := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
                   $(foreach dir,$(DATA),$(CURDIR)/$(dir))
 export DEPSDIR := $(CURDIR)/$(BUILD)
@@ -59,7 +60,7 @@ $(BUILD):
 
 clean:
 	@echo clean ...
-	@rm -rf build
+	@rm -rf $(OUTDIR)
 
 run:
 	wiiload $(OUTPUT).dol
