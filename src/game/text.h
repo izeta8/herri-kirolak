@@ -95,7 +95,7 @@ constexpr const char* RIGHT = "Eskuina";
 constexpr const char* CONNECT_REMOTE = "Konektatu %d. Wii Remote-a";
 
 constexpr const char* TIP_1 = "Altxatu Wii Remote-a buru gainera, eta jo behera indarrez!";
-constexpr const char* TIP_2 = "Hasi goian eskuinean eta jo erdira; gero ezkerretik: V forma!";
+constexpr const char* TIP_2 = "Jo diagonalean: goitik eskuinetik erdira, gero ezkerretik. V forma!";
 constexpr const char* TIP_3 = "Ez jo azkarregi: nekatuz gero, kolpeak ahulagoak dira.";
 constexpr const char* TIP_4 = "Erdira iristean, eman buelta B botoiarekin.";
 

@@ -54,16 +54,25 @@ static void step(Pad& p, const Vec3& a, float dt) {
     p.raiseDeg = deg;
     p.tiltLive = rollOf(p.grav);
 
+    // Ángulo con la lectura directa (si el mando no se está moviendo con brusquedad)
+    bool rawUp = false;
+    if (m > RAISE_RAW_MIN_G && m < RAISE_RAW_MAX_G) {
+        float rd = atan2f(a.y * RAISE_SIGN * s_raiseSign, a.z) / DEG;
+        if (rd < -90.0f) rd += 360.0f;
+        rawUp = rd > RAISE_ON_DEG;
+    }
+
     switch (p.state) {
         case SW_IDLE:
-            if (p.raiseDeg > RAISE_ON_DEG) {
+            if (rawUp || p.raiseDeg > RAISE_ON_DEG) {
                 p.state = SW_RAISING;
                 p.timer = 0;
             }
             break;
-        case SW_RAISING:  // tiene que mantenerse arriba un momento
-            p.timer += dt;
-            if (p.raiseDeg < RAISE_ON_DEG - 15.0f) p.state = SW_IDLE;
+        case SW_RAISING:  // tiene que estar arriba un momento (tiempo acumulado)
+            if (rawUp || p.raiseDeg > RAISE_ON_DEG) p.timer += dt;
+            else if (m < RAISE_RAW_MAX_G && p.raiseDeg < RAISE_OFF_DEG) p.timer -= dt * 0.5f;
+            if (p.timer < -0.3f) p.state = SW_IDLE;
             else if (p.timer >= RAISE_HOLD) p.state = SW_ARMED;
             break;
         case SW_ARMED:
@@ -74,14 +83,14 @@ static void step(Pad& p, const Vec3& a, float dt) {
                 p.lat = 0;
                 p.rollTop = p.tiltLive;
                 p.gravXTop = p.grav.x;
-            } else if (p.raiseDeg < RAISE_OFF_DEG) {
+            } else if (p.raiseDeg < RAISE_OFF_DEG && !rawUp && fabsf(m - 1.0f) < 0.2f) {
                 p.state = SW_IDLE;  // lo ha bajado despacio: no es un golpe
             }
             break;
         case SW_SWING:
             p.timer += dt;
             p.peak = fmaxf(p.peak, m);
-            p.lat += (a.x - p.gravXTop) * dt;  // empuje lateral acumulado (g·s)
+            p.lat += a.x * dt;  // empuje lateral acumulado (g·s)
             if ((m < SWING_END_G && p.timer > 0.04f) || p.timer > SWING_MAX_TIME) {
                 if (p.peak >= s_chopMinG) {
                     Chop& c = p.chop;
@@ -89,8 +98,9 @@ static void step(Pad& p, const Vec3& a, float dt) {
                     c.peakG = p.peak;
                     c.strength = clampv((p.peak - s_chopMinG) / (CHOP_FULL_G - s_chopMinG) * 0.75f + 0.25f, 0.0f, 1.0f);
                     c.rollPart = p.rollTop;
-                    c.latPart = clampv(p.lat / LAT_FULL_GS, -1.0f, 1.0f) * TILT_SIGN * s_tiltSign * LAT_SIGN;
-                    c.tilt = clampv(c.rollPart * ROLL_WEIGHT + c.latPart * (1 - ROLL_WEIGHT), -1.0f, 1.0f);
+                    c.latPart = p.lat;
+                    // Más negativo que la frontera = desde la derecha (+1)
+                    c.tilt = clampv((LAT_MID_GS - p.lat) / LAT_SCALE_GS, -1.0f, 1.0f) * TILT_SIGN * s_tiltSign;
                     p.state = SW_COOLDOWN;
                     p.timer = CHOP_COOLDOWN;
                 } else {

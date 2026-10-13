@@ -34,23 +34,29 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - `src/games/aizkolaritza/` el juego: tronco, aizkolari (animaciones) y la escena de partida
 - `data/` binarios embebidos en el .dol (fuente, sonidos), generados por `tools/`
 
-## Gesto del hachazo (src/engine/input.cpp)
-1. **Subir**: la punta del Wii Remote hacia arriba (gravedad en +Y, `pitchUp > RAISE_ON`) durante `RAISE_HOLD` → ARMADO.
-   El hacha del personaje sigue la altura del mando (`Pad::raise`).
-2. **Bajar**: desde armado, pico de |a| ≥ `CHOP_MIN_G[sensibilidad]` → HACHAZO. Sin armar, no hay golpe.
-3. **Lado de la V**: `ROLL_WEIGHT` × inclinación del mando arriba (dónde empieza: arriba a la derecha/izquierda)
-   + resto × empuje lateral integrado durante la bajada.
-- Se procesan todas las lecturas del mando (~100/s) con `WPAD_ReadPending`, no una por frame.
-- Ajustes del jugador en save.dat (v2): invertir izquierda/derecha, invertir arriba/abajo, sensibilidad.
-- Dolphin: I/K inclinan adelante/atrás (K = punta arriba → arma), J/L izquierda/derecha, M = swing hacia abajo.
-  Ejemplo: `scripts/keys.ps1 "K>",700,"M+250","K<"` (en Dolphin K = punta arriba; en el mando real arriba = -Y).
-- **Kolpe proba** graba lecturas en `usb:/apps/herri-kirolak/golpeak.csv` (botón 1; etiqueta con ←/→).
-  Columnas: saioa, ms, etiketa (L/Z/R), ax, ay, az, gx, gy, gz (gravedad filtrada), egoera (0 idle, 1 subiendo,
-  2 armado, 3 bajando, 4 enfriando), kolpea (1 = golpe detectado), ajustes. Analizarlo para afinar tuning.h.
+## Gesto del hachazo (src/engine/input.cpp, valores en src/engine/tuning.h)
+Ajustado con gestos reales grabados por telemetría (`tuning-data/`): 28 gestos, todos detectados con el lado bien.
+1. **Subir**: el mando gira sobre su eje X de "apuntando a la tele" (0°) a "por encima del hombro" (240-270°,
+   punta hacia abajo por detrás). Ángulo = atan2(-gy, gz). Se arma si pasa de 120° (lectura directa del
+   acelerómetro cuando |a| está entre 0.5 y 1.6 g, o gravedad filtrada) durante 50 ms acumulados.
+   En el mando real "punta arriba" = gravedad en -Y (`RAISE_SIGN = -1`).
+2. **Bajar**: desde armado, pico |a| ≥ `CHOP_MIN_G` (los hachazos reales dan 7-8.7 g; subir no pasa de 2.4 g).
+3. **Lado de la V**: integral de la aceleración X durante la bajada (de |a| > 2 g a |a| < 1.4 g).
+   Derecha → -0.28..-0.93 g·s; izquierda → -0.21..+0.44. Frontera `LAT_MID_GS = -0.24`.
+- Ajustes del jugador en save.dat (v3): invertir izquierda/derecha, invertir arriba/abajo, sensibilidad.
+
+### Telemetría y herramientas
+- El juego abre el puerto TCP 4300 y envía cada lectura: `mando,ms,ax,ay,az,gx,gy,gz,egoera,kolpea,botoiak`.
+- Recibir: `python tools/telemetry.py <IP de la Wii> build/telemetria.csv` (en segundo plano).
+- Etiquetar gestos en Kolpe proba: pulsar ← (izquierda) o → (derecha) al empezar y al terminar cada gesto
+  (o + al empezar y − al terminar).
+- `python tools/replay_detector.py <csv...>`: réplica del detector de input.cpp; dice cuántos gestos
+  etiquetados se detectan y con qué lado. **Mantenerla igual que input.cpp** al cambiar el detector.
+- `python tools/compare_sides.py <csv>`: compara rasgos de gestos izquierda/derecha.
+- Dolphin: K inclina la punta hacia arriba (arma), M = swing hacia abajo. `scripts/keys.ps1 "K>",700,"M+250","K<"`.
 
 ## Pendiente de probar en Wii
-- **Grabar golpes en Kolpe proba** (unos 10 de cada: ezkerra, zuzen, eskuina) y analizar golpeak.csv para fijar
-  `RAISE_SIGN`, `RAISE_ON`, `CHOP_MIN_G`, `LAT_FULL_GS`, `LAT_SIGN`, `ROLL_WEIGHT`, `TILT_SIGN`.
+- Gestos de otras personas (zurdos, otra forma de coger el mando): grabar con telemetría y pasar replay_detector.
 - Rendimiento a 60 fps con 28 espectadores + astillas (si va lento: menos público).
 - Guardado de jugadores y récords en el USB (`usb:/apps/herri-kirolak/save.dat`).
 - Que los textos no queden cortados por los bordes de la tele (overscan).

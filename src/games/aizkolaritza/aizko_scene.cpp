@@ -508,9 +508,13 @@ void AizkoScene::drawHud() {
         gfx::arc(cx, cy, r - 14, r, ang(-1), ang(-st), cl, 12);
         gfx::arc(cx, cy, r - 14, r, ang(-st), ang(st), rgba(0xD8, 0xD8, 0xD8), 6);
         gfx::arc(cx, cy, r - 14, r, ang(st), ang(1), cr, 12);
-        float na = ang(clampv(input::pad(padFor(cur_)).tiltLive, -1.0f, 1.0f));
-        gfx::triangle(cx + cosf(na) * (r + 6), cy + sinf(na) * (r + 6), cx + cosf(na + 1.57f) * 5, cy + sinf(na + 1.57f) * 5,
-                      cx + cosf(na - 1.57f) * 5, cy + sinf(na - 1.57f) * 5, rgba(0x30, 0x30, 0x38));
+        // La aguja apunta al lado del último golpe (el lado sale de la diagonal del gesto)
+        if (last != HIT_NONE) {
+            float na = ang(last == HIT_LEFT ? -0.75f : last == HIT_RIGHT ? 0.75f : 0.0f);
+            gfx::triangle(cx + cosf(na) * (r + 6), cy + sinf(na) * (r + 6), cx + cosf(na + 1.57f) * 5,
+                          cy + sinf(na + 1.57f) * 5, cx + cosf(na - 1.57f) * 5, cy + sinf(na - 1.57f) * 5,
+                          rgba(0x30, 0x30, 0x38));
+        }
         gfx::circle(cx, cy, 7, rgba(0x30, 0x30, 0x38), 12);
         font::draw(txt::LEFT, cx - r - 12, cy - 30, 22, want == HIT_LEFT ? UI_WHITE : rgba(0xE0, 0xE0, 0xE0), rgba(0x20, 0x30, 0x40), ALIGN_RIGHT);
         font::draw(txt::RIGHT, cx + r + 12, cy - 30, 22, want == HIT_RIGHT ? UI_WHITE : rgba(0xE0, 0xE0, 0xE0), rgba(0x20, 0x30, 0x40), ALIGN_LEFT);

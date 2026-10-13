@@ -17,7 +17,7 @@ static const int RING = 4096;
 static Entry s_ring[RING];
 static volatile int s_head = 0, s_tail = 0;  // un productor (juego) y un consumidor (hilo de red)
 static volatile int s_status = 0;
-static char s_ip[16] = "";
+static char s_ip[24] = "";
 static lwp_t s_thread;
 static u8 s_stack[32 * 1024] ATTRIBUTE_ALIGN(32);
 
