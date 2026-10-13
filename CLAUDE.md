@@ -41,11 +41,15 @@ Ajustado con gestos reales grabados por telemetría (`tuning-data/`): 28 gestos,
    acelerómetro cuando |a| está entre 0.5 y 1.6 g, o gravedad filtrada) durante 50 ms acumulados.
    En el mando real "punta arriba" = gravedad en -Y (`RAISE_SIGN = -1`).
 2. **Bajar**: desde armado, pico |a| ≥ `CHOP_MIN_G` (los hachazos reales dan 7-8.7 g; subir no pasa de 2.4 g).
-3. **Lado de la V**: integral de la aceleración X durante la bajada (de |a| > 2 g a |a| < 1.4 g).
-   Derecha → -0.28..-0.93 g·s; izquierda → -0.21..+0.44. Frontera `LAT_MID_GS = -0.24`.
+3. **Lado de la V**: combinación lineal (LDA) de 4 rasgos de la aceleración X durante la bajada
+   (∫ax, min ax, max ax, ∫ax de la 1ª mitad), `SIDE_W_*` en tuning.h. 47 de 48 golpes etiquetados bien.
+   Golpeando seguido no hay pausa arriba: la bajada puede empezar desde "subiendo".
 - Ajustes del jugador en save.dat (v3): invertir izquierda/derecha, invertir arriba/abajo, sensibilidad.
 
 ### Telemetría y herramientas
+- Red en un único hilo: puertos de escucha NO bloqueantes (accept no espera), conexiones aceptadas
+  bloqueantes con net_poll antes de leer (bits IOS: POLLIN = 0x3). Con accept bloqueante el hilo se colgaba;
+  con envíos no bloqueantes la Wii reenviaba datos viejos.
 - El juego abre el puerto TCP 4300 y envía cada lectura: `mando,ms,ax,ay,az,gx,gy,gz,egoera,kolpea,botoiak`.
 - Recibir: `python tools/telemetry.py <IP de la Wii> build/telemetria.csv` (en segundo plano).
 - Etiquetar gestos en Kolpe proba: pulsar ← (izquierda) o → (derecha) al empezar y al terminar cada gesto

@@ -36,6 +36,21 @@ void setSampleSink(SampleSink sink) { s_sink = sink; }
 void setLabel(char label) { s_label = label; }
 void setRaiseInverted(bool inv) { s_raiseSign = inv ? -1.0f : 1.0f; }
 
+// Lado del golpe a partir de la aceleración X de la bajada (>0 = derecha), en -1..1
+static float sideScore(const float* x, int n, float dt) {
+    using namespace tuning;
+    if (n <= 0) return 0;
+    float ix = 0, ix1 = 0, mn = x[0], mx = x[0];
+    for (int i = 0; i < n; i++) {
+        ix += x[i] * dt;
+        if (i < (n + 1) / 2) ix1 += x[i] * dt;
+        mn = fminf(mn, x[i]);
+        mx = fmaxf(mx, x[i]);
+    }
+    float pts = SIDE_W_IX * ix + SIDE_W_MINX * mn + SIDE_W_MAXX * mx + SIDE_W_IX1 * ix1 - SIDE_CUT;
+    return clampv(pts / SIDE_SCALE, -1.0f, 1.0f) * TILT_SIGN * s_tiltSign;
+}
+
 static float rollOf(const Vec3& g) {
     return clampv(g.x / tuning::TILT_FULL_G, -1.0f, 1.0f) * tuning::TILT_SIGN * s_tiltSign;
 }
@@ -81,6 +96,8 @@ static void step(Pad& p, const Vec3& a, float dt) {
                 p.timer = 0;
                 p.peak = m;
                 p.lat = 0;
+                p.swingX[0] = a.x;
+                p.swingN = 1;
                 p.rollTop = p.tiltLive;
                 p.gravXTop = p.grav.x;
                 break;
@@ -98,6 +115,8 @@ static void step(Pad& p, const Vec3& a, float dt) {
                 p.timer = 0;
                 p.peak = m;
                 p.lat = 0;
+                p.swingX[0] = a.x;
+                p.swingN = 1;
                 p.rollTop = p.tiltLive;
                 p.gravXTop = p.grav.x;
             } else if (p.raiseDeg < RAISE_OFF_DEG && !rawUp && fabsf(m - 1.0f) < 0.2f) {
@@ -108,7 +127,8 @@ static void step(Pad& p, const Vec3& a, float dt) {
             p.timer += dt;
             p.peak = fmaxf(p.peak, m);
             p.lat += a.x * dt;  // empuje lateral acumulado (g·s)
-            p.swingTilt = clampv((LAT_MID_GS - p.lat) / LAT_SCALE_GS, -1.0f, 1.0f) * TILT_SIGN * s_tiltSign;
+            if (p.swingN < 64) p.swingX[p.swingN++] = a.x;
+            p.swingTilt = sideScore(p.swingX, p.swingN, 0.01f);
             if ((m < SWING_END_G && p.timer > 0.04f) || p.timer > SWING_MAX_TIME) {
                 if (p.peak >= s_chopMinG) {
                     Chop& c = p.chop;
@@ -117,8 +137,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
                     c.strength = clampv((p.peak - s_chopMinG) / (CHOP_FULL_G - s_chopMinG) * 0.75f + 0.25f, 0.0f, 1.0f);
                     c.rollPart = p.rollTop;
                     c.latPart = p.lat;
-                    // Más negativo que la frontera = desde la derecha (+1)
-                    c.tilt = clampv((LAT_MID_GS - p.lat) / LAT_SCALE_GS, -1.0f, 1.0f) * TILT_SIGN * s_tiltSign;
+                    c.tilt = sideScore(p.swingX, p.swingN, 0.01f);
                     p.state = SW_COOLDOWN;
                     p.timer = CHOP_COOLDOWN;
                 } else {

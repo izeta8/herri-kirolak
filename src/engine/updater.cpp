@@ -53,14 +53,14 @@ static void dropClient() {
 void poll() {
     if (s_server < 0 || s_ready) return;
     if (s_client < 0) {
-        if (!telemetry::readable(s_server)) return;  // nadie quiere conectar
         struct sockaddr_in client;
         socklen_t len = sizeof(client);
-        s32 c = net_accept(s_server, (struct sockaddr*)&client, &len);
+        s32 c = net_accept(s_server, (struct sockaddr*)&client, &len);  // no bloqueante
+        if (c < 0) return;  // nadie quiere conectar
+        telemetry::setBlocking(c);
         char msg[48];
-        snprintf(msg, sizeof(msg), "eguneratzea: accept -> %d", (int)c);
+        snprintf(msg, sizeof(msg), "eguneratzea: konexioa %d", (int)c);
         telemetry::note(msg);
-        if (c < 0) return;
         s_client = c;
         s_got = 0;
         s_inBody = false;

@@ -40,6 +40,8 @@ struct Pad {
 
     // internos del detector
     float timer = 0, peak = 0, lat = 0, rollTop = 0, gravXTop = 0;
+    float swingX[64];  // aceleración X de la bajada (para decidir el lado)
+    int swingN = 0;
     float rumbleT = 0;
 };
 

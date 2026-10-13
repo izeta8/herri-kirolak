@@ -49,9 +49,17 @@ def angle(y, z):
     return d + 360 if d < -90 else d
 
 
+def side_score(xs, dt=0.01):
+    """Igual que sideScore() en input.cpp: >0 = derecha, en -1..1."""
+    ix = sum(xs) * dt
+    ix1 = sum(xs[: (len(xs) + 1) // 2]) * dt
+    pts = T["SIDE_W_IX"] * ix + T["SIDE_W_MINX"] * min(xs) + T["SIDE_W_MAXX"] * max(xs) + T["SIDE_W_IX1"] * ix1 - T["SIDE_CUT"]
+    return max(-1, min(1, pts / T["SIDE_SCALE"])) * T["TILT_SIGN"]
+
+
 def detect(rows):
     g = [0.0, 0.0, 1.0]
-    state, timer, peak, lat = "IDLE", 0.0, 0.0, 0.0
+    state, timer, peak, lat, xs = "IDLE", 0.0, 0.0, 0.0, []
     prev_ms = rows[0][0]
     chops = []
     for ms, ax, ay, az, _, _l in rows:
@@ -69,7 +77,7 @@ def detect(rows):
                 state, timer = "RAISING", 0
         elif state == "RAISING":
             if m > T["SWING_START_G"]:
-                state, timer, peak, lat = "SWING", 0, m, 0
+                state, timer, peak, lat, xs = "SWING", 0, m, 0, [ax]
                 continue
             if up:
                 timer += dt
@@ -81,16 +89,18 @@ def detect(rows):
                 state = "ARMED"
         elif state == "ARMED":
             if m > T["SWING_START_G"]:
-                state, timer, peak, lat = "SWING", 0, m, 0
+                state, timer, peak, lat, xs = "SWING", 0, m, 0, [ax]
             elif deg < T["RAISE_OFF_DEG"] and not raw_up and abs(m - 1) < 0.2:
                 state = "IDLE"
         elif state == "SWING":
             timer += dt
             peak = max(peak, m)
             lat += ax * dt
+            if len(xs) < 64:
+                xs.append(ax)
             if (m < T["SWING_END_G"] and timer > 0.04) or timer > T["SWING_MAX_TIME"]:
                 if peak >= CHOP_MIN:
-                    tilt = max(-1, min(1, (T["LAT_MID_GS"] - lat) / T["LAT_SCALE_GS"])) * T["TILT_SIGN"]
+                    tilt = side_score(xs)
                     side = "R" if tilt > T["TILT_STRAIGHT"] else "L" if tilt < -T["TILT_STRAIGHT"] else "Z"
                     chops.append((ms, peak, lat, tilt, side))
                     state, timer = "COOLDOWN", T["CHOP_COOLDOWN"]

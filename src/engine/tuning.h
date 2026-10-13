@@ -21,13 +21,22 @@ constexpr float SWING_MAX_TIME = 0.45f; // s
 constexpr float CHOP_MIN_G[3] = {2.6f, 3.6f, 4.6f};  // pico mínimo según sensibilidad (suave/normal/fuerte)
 constexpr float CHOP_FULL_G = 7.5f;     // pico que da fuerza máxima
 constexpr float CHOP_COOLDOWN = 0.2f;   // s
-// Lado de la V: empuje lateral (integral de la aceleración X durante la bajada, en g·s).
+// Lado de la V: combinación de 4 rasgos de la aceleración X durante la bajada (de |a| > 3 g hasta
+// |a| < 1.4 g), ajustada con 39 golpes etiquetados (tools/replay_detector.py):
+//   puntos = W_IX·∫ax + W_MINX·min(ax) + W_MAXX·max(ax) + W_IX1·∫ax(1ª mitad) - CUT   (> 0 = derecha)
+constexpr float SIDE_W_IX = -9.99f;
+constexpr float SIDE_W_MINX = -1.52f;
+constexpr float SIDE_W_MAXX = -1.42f;
+constexpr float SIDE_W_IX1 = 1.27f;
+constexpr float SIDE_CUT = 6.44f;
+constexpr float SIDE_SCALE = 3.0f;      // puntos que cuentan como lado claro
+// (antes: solo el empuje lateral, integral de la aceleración X durante la bajada, en g·s)
 // Datos reales (golpeando seguido): desde la derecha -0.33..-0.94; desde la izquierda -0.24..+0.02
 constexpr float LAT_MID_GS = -0.30f;    // frontera entre izquierda y derecha (37 de 38 bien en tuning-data)
 constexpr float LAT_SCALE_GS = 0.15f;   // distancia a la frontera que cuenta como lado claro
 constexpr float TILT_SIGN = 1.0f;       // signo global izquierda/derecha (también hay ajuste en Kolpe proba)
 constexpr float TILT_FULL_G = 0.5f;     // (indicador en pantalla) g lateral de la gravedad = inclinación completa
-constexpr float TILT_STRAIGHT = 0.1f;   // |tilt| menor = golpe recto (poco eficaz)
+constexpr float TILT_STRAIGHT = 0.03f;  // |tilt| menor = golpe recto (poco eficaz); casi nunca
 
 // --- Aizkolaritza ---
 constexpr float LOG_RADIUS = 0.24f;     // m

@@ -37,7 +37,10 @@ s32 netListen(u16 port) {
             addr.sin_family = AF_INET;
             addr.sin_port = htons(port);
             addr.sin_addr.s_addr = INADDR_ANY;
-            if (net_bind(s, (struct sockaddr*)&addr, sizeof(addr)) >= 0 && net_listen(s, 4) >= 0) return s;
+            if (net_bind(s, (struct sockaddr*)&addr, sizeof(addr)) >= 0 && net_listen(s, 4) >= 0) {
+                setNonBlocking(s);  // accept() nunca se queda esperando
+                return s;
+            }
             net_close(s);
         }
         usleep(250000);
@@ -49,6 +52,11 @@ s32 netListen(u16 port) {
 // aceptar conexiones): todo es bloqueante y antes de leer/aceptar se pregunta con net_poll
 // Bits de poll de IOS: POLLRDNORM 0x01, POLLRDBAND 0x02, POLLERR 0x20, POLLHUP 0x40
 static const u32 IOS_POLLIN = 0x0003, IOS_POLLERR_HUP = 0x0060;
+// Escucha: no bloqueante (accept devuelve error si no hay nadie). Conexiones: bloqueantes, y antes de
+// leer se pregunta con net_poll. (Con todo bloqueante, un accept sin nadie dejaba colgado el hilo.)
+void setNonBlocking(s32 s) { net_fcntl(s, F_SETFL, net_fcntl(s, F_GETFL, 0) | 4); }
+void setBlocking(s32 s) { net_fcntl(s, F_SETFL, net_fcntl(s, F_GETFL, 0) & ~4); }
+
 bool readable(s32 s) {
     struct pollsd p = {s, IOS_POLLIN, 0};
     return net_poll(&p, 1, 0) > 0 && (p.revents & (IOS_POLLIN | IOS_POLLERR_HUP));
@@ -124,11 +132,12 @@ static void* run(void*) {
             usleep(100000);
             continue;
         }
-        if (s_server >= 0 && s_client < 0 && readable(s_server)) {
+        if (s_server >= 0 && s_client < 0) {
             struct sockaddr_in client;
             socklen_t len = sizeof(client);
             s32 sock = net_accept(s_server, (struct sockaddr*)&client, &len);
             if (sock >= 0) {
+                setBlocking(sock);
                 s_client = sock;
                 s_tail = s_head;  // empezar con el búfer vacío
                 s_status = 2;
