@@ -18,6 +18,7 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - Compilar: `scripts/build.ps1` → `build/boot.dol`
 - Ejecutar en Dolphin: `scripts/run.ps1`
 - Captura de Dolphin: `scripts/screenshot.ps1`
+- Copiar al USB de la Wii (`WiiGames`, normalmente E:): `scripts/install-usb.ps1 -Drive E`
 - Mandar a la Wii (el usuario no tiene lector SD; usa USB o red): `scripts/deploy.ps1` (wiiload; IP de la Wii en `$env:WIILOAD = "tcp:192.168.x.x"`)
 
 ## Pendiente de probar en Wii
