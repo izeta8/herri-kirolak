@@ -50,6 +50,12 @@ with open(out, "a", encoding="utf-8") as f:
                     p = t.split(",")
                     if len(p) < 10 or p[0] != "0":
                         continue
+                    try:
+                        float(p[2]); int(p[8]); int(p[9])
+                        if len(p) > 10:
+                            int(p[10], 16)
+                    except ValueError:
+                        continue  # línea rota: se ignora
                     ax, ay, az = float(p[2]), float(p[3]), float(p[4])
                     peak = max(peak, (ax * ax + ay * ay + az * az) ** 0.5)
                     g = (float(p[5]), float(p[6]), float(p[7]))

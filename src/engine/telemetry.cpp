@@ -47,6 +47,7 @@ s32 netListen(u16 port) {
 
 // En la Wii el "no bloqueante" de IOS es el bit 0x04 (no el O_NONBLOCK de newlib)
 void setNonBlocking(s32 s) { net_fcntl(s, F_SETFL, net_fcntl(s, F_GETFL, 0) | 4); }
+static void setBlocking(s32 s) { net_fcntl(s, F_SETFL, net_fcntl(s, F_GETFL, 0) & ~4); }
 
 void stop() {
     if (s_client >= 0) net_close(s_client);
@@ -115,6 +116,9 @@ static void* run(void*) {
             socklen_t len = sizeof(client);
             s32 sock = net_accept(s_server, (struct sockaddr*)&client, &len);
             if (sock >= 0) {
+                // El socket aceptado hereda el "no bloqueante": en la Wii real los envíos no bloqueantes
+                // acaban reenviando datos viejos, así que la conexión con el PC va en modo normal
+                setBlocking(sock);
                 s_client = sock;
                 s_tail = s_head;  // empezar con el búfer vacío
                 s_status = 2;

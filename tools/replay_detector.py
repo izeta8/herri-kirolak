@@ -29,9 +29,16 @@ def load(path):
         if line.startswith("#"):
             continue
         p = line.strip().split(",")
-        if len(p) >= 11 and p[0] == "0":
+        if len(p) not in (11, 12) or p[0] != "0":
+            continue  # línea rota o de otro mando
+        try:
             label = p[11] if len(p) > 11 and p[11] in ("R", "L") else ""
-            rows.append((int(p[1]), float(p[2]), float(p[3]), float(p[4]), int(p[10], 16), label))
+            r = (int(p[1]), float(p[2]), float(p[3]), float(p[4]), int(p[10], 16), label)
+        except ValueError:
+            continue
+        if rows and r[0] < rows[-1][0]:
+            continue  # tiempo hacia atrás: trozo repetido
+        rows.append(r)
     if rows:
         sessions.append(rows)
     return sessions
@@ -61,6 +68,9 @@ def detect(rows):
             if up:
                 state, timer = "RAISING", 0
         elif state == "RAISING":
+            if m > T["SWING_START_G"]:
+                state, timer, peak, lat = "SWING", 0, m, 0
+                continue
             if up:
                 timer += dt
             elif m < T["RAISE_RAW_MAX_G"] and deg < T["RAISE_OFF_DEG"]:

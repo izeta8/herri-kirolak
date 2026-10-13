@@ -12,19 +12,19 @@ constexpr float RAISE_ON_DEG = 120.0f;  // ángulo para considerar el hacha arri
 constexpr float RAISE_OFF_DEG = 70.0f;  // con la gravedad filtrada por debajo: deja de estar armado
 constexpr float RAISE_HOLD = 0.05f;     // s acumulados por encima de RAISE_ON_DEG para armar
 constexpr float RAISE_RAW_MIN_G = 0.5f; // la lectura directa solo cuenta si |a| está entre estos valores
-constexpr float RAISE_RAW_MAX_G = 1.6f;
+constexpr float RAISE_RAW_MAX_G = 3.0f;  // golpeando seguido, arriba del todo el mando ya va a 2-2.5 g
 // Bajar: los hachazos reales dan picos de 7-8.7 g (el mando satura en ~5 g por eje);
 // subir el mando no pasa de ~2.4 g
-constexpr float SWING_START_G = 2.0f;   // |a| que inicia la bajada
+constexpr float SWING_START_G = 3.0f;   // |a| que inicia la bajada (arriba del todo puede haber 2.5 g)
 constexpr float SWING_END_G = 1.4f;     // |a| por debajo del cual la bajada ha terminado
 constexpr float SWING_MAX_TIME = 0.45f; // s
 constexpr float CHOP_MIN_G[3] = {2.6f, 3.6f, 4.6f};  // pico mínimo según sensibilidad (suave/normal/fuerte)
 constexpr float CHOP_FULL_G = 7.5f;     // pico que da fuerza máxima
 constexpr float CHOP_COOLDOWN = 0.2f;   // s
 // Lado de la V: empuje lateral (integral de la aceleración X durante la bajada, en g·s).
-// Datos reales: desde la derecha -0.28..-0.75; desde la izquierda -0.20..+0.05
-constexpr float LAT_MID_GS = -0.24f;    // frontera entre izquierda y derecha
-constexpr float LAT_SCALE_GS = 0.2f;    // distancia a la frontera que cuenta como lado claro
+// Datos reales (golpeando seguido): desde la derecha -0.33..-0.94; desde la izquierda -0.24..+0.02
+constexpr float LAT_MID_GS = -0.30f;    // frontera entre izquierda y derecha (37 de 38 bien en tuning-data)
+constexpr float LAT_SCALE_GS = 0.15f;   // distancia a la frontera que cuenta como lado claro
 constexpr float TILT_SIGN = 1.0f;       // signo global izquierda/derecha (también hay ajuste en Kolpe proba)
 constexpr float TILT_FULL_G = 0.5f;     // (indicador en pantalla) g lateral de la gravedad = inclinación completa
 constexpr float TILT_STRAIGHT = 0.1f;   // |tilt| menor = golpe recto (poco eficaz)

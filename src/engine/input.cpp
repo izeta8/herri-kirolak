@@ -73,6 +73,17 @@ static void step(Pad& p, const Vec3& a, float dt) {
             }
             break;
         case SW_RAISING:  // tiene que estar arriba un momento (tiempo acumulado)
+            // Golpeando seguido no se para arriba: si ya baja con fuerza, es el hachazo
+            if (m > SWING_START_G) {
+                p.state = SW_SWING;
+                p.swingStart = true;
+                p.timer = 0;
+                p.peak = m;
+                p.lat = 0;
+                p.rollTop = p.tiltLive;
+                p.gravXTop = p.grav.x;
+                break;
+            }
             if (rawUp || p.raiseDeg > RAISE_ON_DEG) p.timer += dt;
             else if (m < RAISE_RAW_MAX_G && p.raiseDeg < RAISE_OFF_DEG) p.timer -= dt * 0.5f;
             if (p.timer < -0.3f) p.state = SW_IDLE;
