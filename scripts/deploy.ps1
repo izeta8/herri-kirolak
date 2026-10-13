@@ -1,5 +1,7 @@
-# Envía build/boot.dol a la Wii por red (Homebrew Channel abierto en la Wii).
-# Necesita $env:WIILOAD = "tcp:<IP de la Wii>"
+# Envía build/boot.dol a la Wii por WiFi (el Homebrew Channel tiene que estar abierto en la Wii).
+# IP por defecto: la de la Wii en casa (puede cambiar si el router le da otra; se ve con HOME en el HBC).
+param([string]$Dol = "", [string]$Ip = "192.168.1.155")
 $root = Split-Path $PSScriptRoot -Parent
-if (-not $env:WIILOAD) { throw 'Define antes la IP: $env:WIILOAD = "tcp:192.168.1.XX"' }
-& "C:\devkitPro\tools\bin\wiiload.exe" (Join-Path $root "build\boot.dol")
+if (-not $Dol) { $Dol = Join-Path $root "build\boot.dol" }
+$env:WIILOAD = "tcp:$Ip"
+& "C:\devkitPro\tools\bin\wiiload.exe" $Dol
