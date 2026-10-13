@@ -16,3 +16,4 @@ build/
 .vscode/
 __pycache__/
 build-test/
+build-rec/
