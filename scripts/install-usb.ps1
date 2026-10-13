@@ -1,5 +1,5 @@
 # Copia el juego al USB/SD de la Wii (FAT32) en <unidad>:\apps\herri-kirolak\
-param([string]$Drive = "E")
+param([string]$Drive = "F")
 $root = Split-Path $PSScriptRoot -Parent
 $vol = Get-Volume -DriveLetter $Drive -ErrorAction Stop
 if ($vol.FileSystem -ne "FAT32") { throw "La unidad ${Drive}: es $($vol.FileSystem); el Homebrew Channel necesita FAT32" }
