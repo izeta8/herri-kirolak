@@ -11,6 +11,7 @@ void init();  // arranca un hilo: inicia la red y espera conexiones (no bloquea 
 void push(int chan, const input::Sample& s);
 // 0 = sin red, 1 = red lista (esperando PC), 2 = PC conectado
 int status();
+extern volatile u32 g_netBeat;
 const char* ip();  // IP de la Wii ("" si no hay red)
 s32 netListen(u16 port);     // socket de escucha con reintentos (-1 si falla)
 bool readable(s32 sock);     // ¿hay algo que leer? (net_poll sin esperar)

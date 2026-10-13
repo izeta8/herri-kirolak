@@ -62,6 +62,17 @@ bool readable(s32 s) {
     return net_poll(&p, 1, 0) > 0 && (p.revents & (IOS_POLLIN | IOS_POLLERR_HUP));
 }
 
+// ¿Se puede enviar sin quedarse esperando? -1 = conexión rota
+static const u32 IOS_POLLOUT = 0x0008;
+static int writable(s32 s) {
+    struct pollsd p = {s, IOS_POLLOUT, 0};
+    if (net_poll(&p, 1, 0) <= 0) return 0;
+    if (p.revents & IOS_POLLERR_HUP) return -1;
+    return (p.revents & IOS_POLLOUT) ? 1 : 0;
+}
+
+volatile u32 g_netBeat = 0;  // latido del hilo de red (para ver si se ha colgado)
+
 static char s_notes[8][80];
 static volatile int s_noteHead = 0, s_noteTail = 0;
 void note(const char* text) {
@@ -127,6 +138,7 @@ static void* run(void*) {
 
     static char buf[8192];
     while (true) {
+        g_netBeat++;
         updater::poll();
         if (updater::ready()) {
             usleep(100000);
@@ -149,13 +161,20 @@ static void* run(void*) {
                 }
             }
         }
-        if (s_client >= 0) {
+        int w = s_client >= 0 ? writable(s_client) : 0;
+        if (w < 0) {
+            net_close(s_client);
+            s_client = -1;
+            s_status = 1;
+        }
+        // Solo se envía si la conexión lo admite ya: con la WiFi lenta, un envío bloqueante colgaba el hilo
+        if (s_client >= 0 && w > 0) {
             while (s_noteTail != s_noteHead) {
                 if (!sendAll(s_client, s_notes[s_noteTail], strlen(s_notes[s_noteTail]))) break;
                 s_noteTail = (s_noteTail + 1) % 8;
             }
             int n = 0;
-            while (s_tail != s_head && n < (int)sizeof(buf) - 128) {
+            while (s_tail != s_head && n < 2048) {
                 const Entry& e = s_ring[s_tail];
                 n += snprintf(buf + n, sizeof(buf) - n, "%d,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,%04x,%c\n", (int)e.chan,
                               e.s.ms, e.s.ax, e.s.ay, e.s.az, e.s.gx, e.s.gy, e.s.gz, e.s.state, e.s.chop, e.s.btns,

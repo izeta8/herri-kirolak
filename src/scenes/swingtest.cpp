@@ -455,6 +455,13 @@ void SwingTestScene::draw() {
     }
     const char* net[3] = {"WiFi: - %s", "WiFi: %s", "WiFi: %s  (PC konektatuta)"};
     snprintf(buf, sizeof(buf), net[clampv(telemetry::status(), 0, 2)], telemetry::ip());
+    static u32 lastBeat = 0;
+    static float beatT = 0;
+    if (telemetry::g_netBeat != lastBeat) {
+        lastBeat = telemetry::g_netBeat;
+        beatT = t_;
+    }
+    if (telemetry::status() > 0 && t_ - beatT > 2.0f) strncat(buf, "  (sarea geldirik!)", sizeof(buf) - strlen(buf) - 1);
     font::plain(buf, 40, 446, 20, telemetry::status() == 2 ? UI_GREEN : UI_TEXT);
     ui::hints(nullptr, txt::BACK);
 }
