@@ -22,12 +22,20 @@ struct Record {
     char name[NAME_LEN + 1];
 };
 
+struct Settings {
+    u8 tiltInverted;  // 1 = cambiar izquierda/derecha
+    u8 sensitivity;   // 0 suave, 1 normal, 2 fuerte
+    u8 raiseInverted; // 1 = "arriba" es -Y en vez de +Y
+    u8 pad[13];
+};
+
 struct SaveData {
     u32 magic;
     u16 version;
     u16 pad;
     Profile profiles[MAX_PROFILES];
     Record records[REC_COUNT];
+    Settings settings;  // desde la versión 2
 };
 
 namespace save {
@@ -36,4 +44,6 @@ SaveData& data();
 bool write();
 bool available();
 const char* location();  // para mostrarlo en pantalla
+const char* directory(); // carpeta del juego en USB/SD ("" si no hay)
+void applySettings();    // pasa los ajustes al detector de golpes
 }  // namespace save

@@ -7,6 +7,7 @@ static Mesh s_axe;
 
 static const float PHI_RAISED = 3.55f;   // hacha por encima de la cabeza, un poco hacia atrás
 static const float PHI_REST = 0.55f;     // apoyada delante
+static const float PHI_LOW = 1.25f;      // sujeta delante, lista para subirla
 static const float HEAD_DIST = 0.66f;    // de la empuñadura a la cabeza del hacha
 static const float SWING_TIME = 0.13f;
 static const float STUCK_TIME = 0.09f;
@@ -91,6 +92,8 @@ void Aizkolari::celebrate() {
     queued_ = false;
 }
 
+float Aizkolari::readyPhi() const { return lerpf(PHI_LOW, PHI_RAISED, clampv(raise_, 0.0f, 1.0f)); }
+
 float Aizkolari::impactAngle() {
     // Ángulo con el que la cabeza del hacha llega al punto de impacto
     if (!log_) return 0.15f;
@@ -111,7 +114,7 @@ void Aizkolari::update(float dt) {
             tilt_ = approach(tilt_, 0, 6, dt);
             break;
         case READY:
-            phi_ = approach(phi_, PHI_RAISED + sinf(time_ * 2.2f) * 0.04f, 10, dt);
+            phi_ = approach(phi_, readyPhi() + sinf(time_ * 2.2f) * 0.04f, 16, dt);
             tilt_ = approach(tilt_, liveTilt_, 12, dt);
             if (queued_) {
                 queued_ = false;
@@ -140,7 +143,7 @@ void Aizkolari::update(float dt) {
             break;
         case RECOVER: {
             float k = easeOutCubic(t_ / RECOVER_TIME);
-            phi_ = lerpf(phiFrom_, PHI_RAISED, k);
+            phi_ = lerpf(phiFrom_, readyPhi(), k);
             tilt_ = approach(tilt_, liveTilt_, 8, dt);
             if (queued_ && t_ > RECOVER_TIME * 0.45f) {
                 queued_ = false;

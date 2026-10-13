@@ -31,6 +31,8 @@ public:
     Vec3 feet() const { return feet_; }
     float yaw() const { return yaw_; }
     void setLiveTilt(float t) { liveTilt_ = t; }
+    // Altura del hacha en reposo (0 = delante, 1 = en alto); el jugador la controla con el mando
+    void setRaise(float r) { raise_ = r; }
     float fatigueLook = 0;  // 0..1, para animar el cansancio
 
 private:
@@ -42,7 +44,8 @@ private:
     Phase phase_ = IDLE;
     float t_ = 0;
     float phi_ = 0.3f, phiFrom_ = 0;
-    float tilt_ = 0, liveTilt_ = 0;
+    float tilt_ = 0, liveTilt_ = 0, raise_ = 1.0f;
+    float readyPhi() const;
     float yaw_ = 0, yawFrom_ = 0;
     int side_ = 0;
     Vec3 feet_;

@@ -50,6 +50,7 @@ int main(int argc, char** argv) {
     audio::init();
     font::init();
     save::init(argc > 0 ? argv[0] : nullptr);
+    save::applySettings();
     SYS_SetResetCallback(onReset);
     SYS_SetPowerCallback(onPower);
     WPAD_SetPowerButtonCallback(onPadPower);

@@ -88,6 +88,8 @@ private:
     float shake_ = 0;
     Vec3 camEye_, camTarget_;
     float botT_ = 1.0f;
+    float botRaise_ = 0.0f;
+    float idleT_ = 0;  // tiempo sin subir el hacha (para el aviso)
     float tipT_ = 0;
     int tip_ = 0;
     float time_ = 0;
@@ -207,9 +209,14 @@ void AizkoScene::handleImpact() {
 }
 
 void AizkoScene::updateBot(float dt) {
-    if (aizk_.phase() != Aizkolari::READY) return;
+    if (aizk_.phase() != Aizkolari::READY) {
+        botRaise_ = approach(botRaise_, 0.0f, 10, dt);
+        return;
+    }
     botT_ -= dt;
-    if (botT_ > 0) return;
+    // Como un jugador: primero sube el hacha y luego golpea
+    botRaise_ = approach(botRaise_, botT_ < 0.25f ? 1.0f : 0.15f, 9, dt);
+    if (botT_ > 0 || botRaise_ < 0.9f) return;
     const float R = LOG_RADIUS;
     if (aizk_.side() == 0 && log_.depth[0] >= TURN_PROMPT * R) {
         aizk_.turnAround();
@@ -224,7 +231,7 @@ void AizkoScene::updateBot(float dt) {
     float tilt = last == HIT_LEFT ? 1.0f : -1.0f;
     if (frand() < 0.07f) tilt = -tilt;
     aizk_.chop(frand(0.7f, 1.0f), tilt);
-    botT_ = frand(0.12f, 0.35f);
+    botT_ = frand(0.3f, 0.5f);
 }
 
 void AizkoScene::finishPlayer() {
@@ -291,6 +298,8 @@ void AizkoScene::update(float dt) {
     const input::Pad& p = input::pad(pad);
     bool human = !cfg_.bot[cur_];
     aizk_.setLiveTilt(human ? p.tiltLive : 0.0f);
+    if (human) aizk_.setRaise(p.raise);
+    else aizk_.setRaise(botRaise_);
 
     switch (state_) {
         case ST_INTRO:
@@ -314,6 +323,7 @@ void AizkoScene::update(float dt) {
             const float R = LOG_RADIUS;
             if (human) {
                 if (p.chop.happened) aizk_.chop(p.chop.strength, p.chop.tilt);
+                idleT_ = (p.raise < 0.45f && aizk_.phase() == Aizkolari::READY) ? idleT_ + dt : 0;
                 if ((p.down & WPAD_BUTTON_B) && aizk_.side() == 0 && log_.depth[0] >= TURN_ALLOWED * R && !aizk_.busy())
                     aizk_.turnAround();
             } else {
@@ -511,6 +521,12 @@ void AizkoScene::drawHud() {
         const char* tips[4] = {txt::TIP_1, txt::TIP_2, txt::TIP_3, txt::TIP_4};
         float a = smooth01(tipT_ / 0.4f) * (1 - smooth01((tipT_ - 4.6f) / 0.4f));
         font::draw(tips[tip_], W / 2, 330, 22, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_CENTER, a);
+    }
+
+    // Recordatorio de subir el hacha
+    if (state_ == ST_PLAY && idleT_ > 2.5f && !cfg_.bot[cur_]) {
+        float a = smooth01((idleT_ - 2.5f) / 0.4f);
+        font::draw(txt::RAISE_AXE, W / 2, 200, 40, UI_WHITE, UI_BLUE_DARK, ALIGN_CENTER, a);
     }
 
     // Aviso de darse la vuelta

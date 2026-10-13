@@ -34,9 +34,23 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - `src/games/aizkolaritza/` el juego: tronco, aizkolari (animaciones) y la escena de partida
 - `data/` binarios embebidos en el .dol (fuente, sonidos), generados por `tools/`
 
+## Gesto del hachazo (src/engine/input.cpp)
+1. **Subir**: la punta del Wii Remote hacia arriba (gravedad en +Y, `pitchUp > RAISE_ON`) durante `RAISE_HOLD` → ARMADO.
+   El hacha del personaje sigue la altura del mando (`Pad::raise`).
+2. **Bajar**: desde armado, pico de |a| ≥ `CHOP_MIN_G[sensibilidad]` → HACHAZO. Sin armar, no hay golpe.
+3. **Lado de la V**: `ROLL_WEIGHT` × inclinación del mando arriba (dónde empieza: arriba a la derecha/izquierda)
+   + resto × empuje lateral integrado durante la bajada.
+- Se procesan todas las lecturas del mando (~100/s) con `WPAD_ReadPending`, no una por frame.
+- Ajustes del jugador en save.dat (v2): invertir izquierda/derecha, invertir arriba/abajo, sensibilidad.
+- Dolphin: I/K inclinan adelante/atrás (I = punta arriba → arma), J/L izquierda/derecha, M = swing hacia abajo.
+  Ejemplo: `scripts/keys.ps1 "I>",700,"M+250","I<"`.
+- **Kolpe proba** graba lecturas en `usb:/apps/herri-kirolak/golpeak.csv` (botón 1; etiqueta con ←/→).
+  Columnas: saioa, ms, etiketa (L/Z/R), ax, ay, az, gx, gy, gz (gravedad filtrada), egoera (0 idle, 1 subiendo,
+  2 armado, 3 bajando, 4 enfriando), kolpea (1 = golpe detectado), ajustes. Analizarlo para afinar tuning.h.
+
 ## Pendiente de probar en Wii
-- Detector de hachazo con mando real (usar la pantalla "Kolpe proba"): umbrales en `src/engine/tuning.h` (`SWING_START_G`, `CHOP_MIN_G`, `CHOP_FULL_G`).
-- Inclinación de muñeca para ezkerra/eskuina: si sale al revés, `TILT_SIGN = -1`. Ajustar `TILT_FULL_G` si cuesta inclinar.
+- **Grabar golpes en Kolpe proba** (unos 10 de cada: ezkerra, zuzen, eskuina) y analizar golpeak.csv para fijar
+  `RAISE_SIGN`, `RAISE_ON`, `CHOP_MIN_G`, `LAT_FULL_GS`, `LAT_SIGN`, `ROLL_WEIGHT`, `TILT_SIGN`.
 - Rendimiento a 60 fps con 28 espectadores + astillas (si va lento: menos público).
 - Guardado de jugadores y récords en el USB (`usb:/apps/herri-kirolak/save.dat`).
 - Que los textos no queden cortados por los bordes de la tele (overscan).
