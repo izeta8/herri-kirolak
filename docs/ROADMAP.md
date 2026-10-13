@@ -35,17 +35,26 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Mecánica de golpe (fuerza, lado ezker/eskuin, calidad, cansancio)
 - [x] "Buelta eman!" y segunda V, el tronco se parte
 - [x] Modo Entrenamendua (con consejos)
-- [x] Modo Lehiaketa 1–4 jugadores por turnos (+ CPU) + resultados + récords
-- [ ] **Ajuste fino en Wii real con mandos de verdad** (ver "Pendiente de probar en Wii" en CLAUDE.md)
+- [x] Modo Lehiaketa 1–4 jugadores A LA VEZ (cada uno con su mando y su tronco) + CPU + resultados + récords
+- [x] Ajuste fino del gesto con mandos reales (telemetría + grabación guiada + replay_detector)
+- [x] Gesto definido: pulgar en 1-2, subir por un lado ("JO!"), bajar en diagonal sin girar la muñeca
+- [x] Golpe resuelto en el pico del gesto; hacha que entra en la madera a la vez
+- [x] Sensación de impacto: pausa breve, temblor según la fuerza, astillas según la calidad
+- [x] La fuerza cuenta (medidor de fuerza)
+- [x] Actualización en caliente por WiFi (scripts/deploy.ps1)
+- [ ] Probar la competición con 2-4 mandos reales
 - [x] Icono del Homebrew Channel (`hbc/herri-kirolak/icon.png`, 128×48)
 
 ## Mejoras posibles (Aizkolaritza)
 - [x] Pantalla "Kolpe proba" para ver fuerza e inclinación en vivo (Jokatu → Aizkolaritza → Kolpe proba)
-- [ ] 2 jugadores a la vez a pantalla partida
+- [x] Varios jugadores a la vez (en fila, cámara compartida)
 - [ ] Troncos de distinto grosor
 - [ ] Rival fantasma (mejor tiempo)
 
 ## Más adelante
+- [ ] Cansancio bien diseñado (desactivado ahora)
+- [ ] Música
+- [ ] Final de tronco más espectacular, público que reacciona a cada golpe
 - [ ] Miis reales
 - [ ] Música
 - [ ] Siguientes juegos (ver SPEC §6)

@@ -82,6 +82,7 @@ public:
         cam.target = log_.center() + Vec3(0, 0.55f, 0);
         cam.eye = cam.target + Vec3(sinf(a) * 4.2f, 1.1f + sinf(t_ * 0.3f) * 0.2f, cosf(a) * 4.2f);
         gfx::begin3D(cam);
+        world.setCameraHide(cam.eye, false);
         world.draw();
         world.drawShadow(log_.center(), tuning::LOG_LENGTH * 0.55f, tuning::LOG_RADIUS * 1.6f);
         log_.draw();

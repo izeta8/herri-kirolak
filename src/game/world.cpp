@@ -193,6 +193,12 @@ void World::drawShadow(const Vec3& pos, float rx, float rz, float alpha) {
     gfx::setLighting(true);
 }
 
+bool World::hidden(const Spectator& s) const {
+    if (!hideOn_) return false;
+    Vec3 c(hideCam_.x, 0, hideCam_.z), p(s.pos.x, 0, s.pos.z);
+    return length(c) > 4.5f && dot(normalize(p), normalize(c)) > 0.55f;
+}
+
 void World::draw() {
     gfx::setFog(true, 35.0f, 140.0f, HORIZON);
     gfx::drawMesh(scenery_, Xf());
@@ -202,10 +208,12 @@ void World::draw() {
     for (int i = 0; i < numSpectators_; i++) {
         Spectator& s = spectators_[i];
         if (!s.model) s.model = characterCache(s.look);
+        if (hidden(s)) continue;
         drawShadow(s.pos, 0.3f, 0.3f);
     }
     for (int i = 0; i < numSpectators_; i++) {
         Spectator& s = spectators_[i];
+        if (hidden(s)) continue;
         CharacterPose p;
         p.pos = s.pos + Vec3(0, s.jump, 0);
         p.yaw = s.yaw;

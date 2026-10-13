@@ -71,7 +71,7 @@ El aizkolari se sube **encima de un tronco tumbado** y corta **entre sus pies**.
 
 ### Modos (MVP)
 1. **Entrenamendua** (práctica): 1 tronco, sin límite, con consejos en pantalla.
-2. **Lehiaketa** (competición): 1–4 jugadores **por turnos** (como los bolos de Wii Sports). Cada uno corta N troncos (configurable 1–3) contrarreloj. Gana el mejor tiempo. Hay récord personal.
+2. **Lehiaketa** (competición): 1–4 jugadores **a la vez**, cada uno con su Wii Remote, su aizkolari y su tronco en fila en la plaza (como en las competiciones reales). Cada uno corta N troncos (1–3); gana quien acabe antes. Cámara fija que encuadra a todos y un panel por jugador abajo. Puede haber jugadores CPU. Récord por número de troncos.
 
 ### Futuro (no MVP)
 - 2 jugadores a la vez a pantalla partida.

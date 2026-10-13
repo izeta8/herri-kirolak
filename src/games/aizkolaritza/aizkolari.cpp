@@ -44,7 +44,7 @@ void Aizkolari::reset() {
     hop_ = 0;
     queued_ = false;
     impact_ = false;
-    feet_ = Vec3(0, log_ ? log_->topY() - 0.02f : 0, 0);
+    feet_ = log_ ? Vec3(log_->pos.x, log_->topY() - 0.02f, log_->pos.z) : Vec3(0, 0, 0);
 }
 
 void Aizkolari::setReady() {
@@ -176,7 +176,8 @@ void Aizkolari::update(float dt) {
                 k = clampv(t_ / SWING_TIME, 0.0f, 1.0f);
                 phi_ = lerpf(phiFrom_, target, k * k);
             }
-            tilt_ = approach(tilt_, chopTilt_, 25, dt);
+            // Antes de saber el resultado, el hacha se inclina hacia donde va la diagonal del jugador
+            tilt_ = approach(tilt_, resolved_ ? chopTilt_ : liveTilt_, 22, dt);
             if (k >= 1.0f && resolved_) {
                 phase_ = STUCK;
                 t_ = 0;

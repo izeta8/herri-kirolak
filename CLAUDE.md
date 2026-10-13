@@ -19,7 +19,7 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - Compilar versión de prueba: `scripts/build.ps1 -Test -Scene N` → `build-test/boot.dol`
   - Activa `DEBUG_INPUT` (botones 1 = golpe ezkerra, 2 = golpe eskuina, − = golpe recto)
   - `START_SCENE`: 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords, 5 entrenamiento,
-    6 lehiaketa CPU contra CPU (resultados), 7 entrenamiento con la CPU, 8 kolpe proba
+    6 lehiaketa 4 CPU a la vez (resultados), 7 entrenamiento con la CPU, 8 kolpe proba
 - Ejecutar en Dolphin: `scripts/run.ps1 [-Dol ruta]`
 - Captura de Dolphin: `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png`
 - Pulsar teclas en Dolphin: `scripts/keys.ps1 X,DOWN,X,1,2` (X = A, Z = B, flechas = cruceta, 1/2, Q = −, E = +, ENTER = HOME; un número = pausa en ms)
@@ -69,5 +69,7 @@ Ajustado con gestos reales grabados por telemetría (`tuning-data/`): 28 gestos,
 - Caras en orden antihorario (como OpenGL) → `GX_SetCullMode(GX_CULL_FRONT)`. `MeshBuilder::tri()` orienta solo.
 - 2D en coordenadas virtuales: 854×480 en 16:9, 640×480 en 4:3 (`gfx::screenW()`).
 - Personaje: mira hacia +Z con yaw 0. El tronco está tumbado sobre el eje X; la V de delante es +Z.
+- Lehiaketa: jugadores a la vez, troncos en fila sobre X separados SPACING (2.1 m); estado por jugador en `Player` (aizko_scene.cpp).
+  El público entre la cámara y la plaza se oculta (`World::setCameraHide`).
 - Las mallas de personajes se cachean por aspecto (`characterCache`, 32 huecos); el público usa 10 aspectos.
 - Dolphin: config en `D:\Tools\Dolphin\Dolphin-x64\User\Config\` (estadísticas desactivadas; A también con X, B con Z).

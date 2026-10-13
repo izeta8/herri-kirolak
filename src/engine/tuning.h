@@ -19,7 +19,7 @@ constexpr float SWING_START_G = 3.0f;   // |a| que inicia la bajada (arriba del 
 constexpr float SWING_END_G = 1.4f;     // |a| por debajo del cual la bajada ha terminado
 constexpr float SWING_MAX_TIME = 0.45f; // s
 constexpr float CHOP_MIN_G[3] = {2.6f, 3.6f, 4.6f};  // pico mínimo según sensibilidad (suave/normal/fuerte)
-constexpr float CHOP_FULL_G = 7.5f;     // pico que da fuerza máxima
+constexpr float CHOP_FULL_G = 8.5f;     // pico que da fuerza máxima (los hachazos reales dan 5-8.8 g)
 constexpr float CHOP_COOLDOWN = 0.2f;   // s
 // El golpe se resuelve en el pico de fuerza (cuando |a| baja de PEAK_DROP × pico), que es cuando el
 // jugador "golpea" (≈170 ms tras empezar a bajar); esperar al final de la bajada metía ≈180 ms de retraso.
