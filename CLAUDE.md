@@ -24,7 +24,7 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - Captura de Dolphin: `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png`
 - Pulsar teclas en Dolphin: `scripts/keys.ps1 X,DOWN,X,1,2` (X = A, Z = B, flechas = cruceta, 1/2, Q = −, E = +, ENTER = HOME; un número = pausa en ms)
 - Copiar al USB de la Wii (`ESD-USB`, normalmente F:; el `WiiGames` tiene mal el conector): `scripts/install-usb.ps1 -Drive F`
-- **Mandar a la Wii por WiFi (lo normal)**: `scripts/deploy.ps1` (wiiload a 192.168.1.155, MAC 78-a2-a0-91-11-36; con el Homebrew Channel abierto). Si la IP cambia, buscarla por la MAC con un barrido de ping + `Get-NetNeighbor`. Torre: 192.168.1.129
+- **Mandar a la Wii por WiFi (lo normal)**: `scripts/deploy.ps1 [-Dol ruta]`. Si el juego está abierto se actualiza en caliente (puerto 4301, `src/engine/updater.cpp` + cargador `tools/booter/` → `data/booter.bin`); si no, va por wiiload al Homebrew Channel (wiiload a 192.168.1.155, MAC 78-a2-a0-91-11-36; con el Homebrew Channel abierto). Si la IP cambia, buscarla por la MAC con un barrido de ping + `Get-NetNeighbor`. Torre: 192.168.1.129
 - Regenerar recursos: `python tools/bake_font.py assets/fonts/Nunito-Variable.ttf data/font.bin`, `python tools/gen_sfx.py data`
 
 ## Estructura

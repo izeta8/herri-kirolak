@@ -10,6 +10,10 @@
 #include "engine/save.h"
 #include "engine/scene.h"
 #include "engine/telemetry.h"
+#include "engine/updater.h"
+#include "engine/font.h"
+#include "engine/ui.h"
+#include "game/palette.h"
 #include "scenes/scenes.h"
 
 // START_SCENE (solo para pruebas): 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords,
@@ -67,6 +71,17 @@ int main(int argc, char** argv) {
         float dt = clampv(diff_usec(last, now) / 1000000.0f, 1.0f / 120.0f, 1.0f / 20.0f);
         last = now;
         input::update(dt);
+        if (updater::ready()) {
+            // Versión nueva recibida por WiFi: aviso de un par de frames y salto a ella
+            for (int i = 0; i < 3; i++) {
+                gfx::beginFrame();
+                gfx::begin2D();
+                ui::background(0);
+                font::draw("Eguneratzen...", gfx::screenW() / 2, 210, 48, UI_WHITE, UI_BLUE_DARK, ALIGN_CENTER);
+                gfx::endFrame();
+            }
+            updater::launch();
+        }
         if (!scenes::frame(dt)) break;
     }
 

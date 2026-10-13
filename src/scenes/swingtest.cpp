@@ -159,10 +159,12 @@ void drawRemote3D(const Vec3& g, float screenX, float screenY) {
     Camera cam;
     float W = gfx::screenW();
     // Desplazar la cámara para que el mando aparezca en (screenX, screenY)
-    float ox = (screenX / W - 0.5f) * 6.0f, oy = (screenY / 480.0f - 0.5f) * -3.3f;
-    cam.eye = Vec3(-ox, -oy + 0.8f, 5.6f);
-    cam.target = Vec3(-ox, -oy, 0);
     cam.fov = 45;
+    const float dist = 6.5f;
+    float halfH = tanf(cam.fov * 0.5f * DEG) * dist, halfW = halfH * (gfx::widescreen() ? 16.0f / 9.0f : 4.0f / 3.0f);
+    float ox = (screenX / W - 0.5f) * 2 * halfW, oy = (0.5f - screenY / 480.0f) * 2 * halfH;
+    cam.eye = Vec3(-ox, -oy, dist);
+    cam.target = Vec3(-ox, -oy, 0);
     gfx::begin3D(cam);
     // En un mando real, con la punta hacia arriba la gravedad sale en -Y: la lectura = "arriba" en ejes del mando
     // salvo el eje Y, que va al revés. Usamos la lectura tal cual y la punta en -Y.
@@ -181,7 +183,7 @@ void drawRemote3D(const Vec3& g, float screenX, float screenY) {
 class SwingTestScene : public Scene {
 public:
     SwingTestScene() {
-        memset(g_hist, 0, sizeof(g_hist));
+        for (Vec3& v : g_hist) v = Vec3();
         g_histPos = 0;
         g_recording = false;
         g_recCount = 0;

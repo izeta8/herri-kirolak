@@ -1,4 +1,5 @@
 #include "engine/telemetry.h"
+#include "engine/updater.h"
 #include <gccore.h>
 #include <network.h>
 #include <stdio.h>
@@ -19,7 +20,35 @@ static volatile int s_head = 0, s_tail = 0;  // un productor (juego) y un consum
 static volatile int s_status = 0;
 static char s_ip[24] = "";
 static lwp_t s_thread;
+static volatile s32 s_server = -1, s_client = -1;
 static u8 s_stack[32 * 1024] ATTRIBUTE_ALIGN(32);
+
+// Abre un socket de escucha en `port`. Reintenta: tras una actualización en caliente el puerto
+// de la versión anterior puede tardar en liberarse.
+s32 netListen(u16 port) {
+    for (int tries = 0; tries < 40; tries++) {
+        s32 s = net_socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+        if (s >= 0) {
+            int one = 1;
+            net_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+            struct sockaddr_in addr;
+            memset(&addr, 0, sizeof(addr));
+            addr.sin_family = AF_INET;
+            addr.sin_port = htons(port);
+            addr.sin_addr.s_addr = INADDR_ANY;
+            if (net_bind(s, (struct sockaddr*)&addr, sizeof(addr)) >= 0 && net_listen(s, 1) >= 0) return s;
+            net_close(s);
+        }
+        usleep(250000);
+    }
+    return -1;
+}
+
+void closeSockets() {
+    if (s_client >= 0) net_close(s_client);
+    if (s_server >= 0) net_close(s_server);
+    s_client = s_server = -1;
+}
 
 void push(int chan, const input::Sample& s) {
     if (s_status != 2) return;
@@ -54,24 +83,16 @@ static void* run(void*) {
         snprintf(s_ip, sizeof(s_ip), "err %d", (int)r);
         return nullptr;
     }
+    updater::startServer();
     u32 ip = net_gethostip();
     snprintf(s_ip, sizeof(s_ip), "%u.%u.%u.%u", (ip >> 24) & 255, (ip >> 16) & 255, (ip >> 8) & 255, ip & 255);
 
-    s32 server = net_socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+    s32 server = netListen(PORT);
     if (server < 0) {
-        snprintf(s_ip, sizeof(s_ip), "socket %d", (int)server);
+        snprintf(s_ip + strlen(s_ip), sizeof(s_ip) - strlen(s_ip), " (bind?)");
         return nullptr;
     }
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(PORT);
-    addr.sin_addr.s_addr = INADDR_ANY;
-    if (net_bind(server, (struct sockaddr*)&addr, sizeof(addr)) < 0 || net_listen(server, 1) < 0) {
-        snprintf(s_ip, sizeof(s_ip), "bind err");
-        net_close(server);
-        return nullptr;
-    }
+    s_server = server;
     s_status = 1;
 
     static char buf[8192];
@@ -83,6 +104,7 @@ static void* run(void*) {
             usleep(200000);
             continue;
         }
+        s_client = sock;
         s_tail = s_head;  // empezar con el búfer vacío
         s_status = 2;
         const char* hello = "# herri-kirolak telemetria: mando,ms,ax,ay,az,gx,gy,gz,egoera,kolpea,botoiak\n";
@@ -99,6 +121,7 @@ static void* run(void*) {
             else usleep(15000);
         }
         net_close(sock);
+        s_client = -1;
         s_status = 1;
     }
     return nullptr;
