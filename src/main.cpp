@@ -33,7 +33,7 @@ static Scene* firstScene() {
         case 6:
             cfg.training = false;
             cfg.numPlayers = 2;
-            cfg.numLogs = 2;
+            cfg.numLogs = 1;
             cfg.bot[0] = cfg.bot[1] = true;
             return makeAizkoScene(cfg);
         case 7:

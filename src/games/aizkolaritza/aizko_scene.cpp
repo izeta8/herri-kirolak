@@ -383,8 +383,8 @@ void AizkoScene::update(float dt) {
 
     // Cámara: tres cuartos por delante del aizkolari, gira con él al darse la vuelta
     float camYaw = aizk_.yaw() + 1.0f;
-    float dist = 3.1f, height = 1.25f;
-    Vec3 target = log_.center() + Vec3(0, 0.62f, 0);
+    float dist = 4.0f, height = 1.2f;
+    Vec3 target = log_.center() + Vec3(0, 0.9f, 0);
     if (state_ == ST_INTRO) {
         float k = smooth01(stateT_ / 2.2f);
         camYaw += (1 - k) * 1.3f;
@@ -444,21 +444,21 @@ void AizkoScene::drawHud() {
     const Profile& pr = profile(cur_);
 
     // Jugador y número de tronco
-    ui::panel(16, 14, 250, 74);
-    ui::colorDot(44, 40, 11, FAV_COLORS[pr.color % NUM_COLORS]);
-    font::plain(pr.name, 64, 22, 28, UI_TEXT);
-    if (cfg_.bot[cur_]) font::plain(txt::CPU, 250, 26, 20, UI_TEXT_LIGHT, ALIGN_RIGHT);
+    ui::panel(34, 26, 250, 74);
+    ui::colorDot(62, 52, 11, FAV_COLORS[pr.color % NUM_COLORS]);
+    font::plain(pr.name, 82, 34, 28, UI_TEXT);
+    if (cfg_.bot[cur_]) font::plain(txt::CPU, 268, 38, 20, UI_TEXT_LIGHT, ALIGN_RIGHT);
     snprintf(buf, sizeof(buf), txt::LOG_N_OF, clampv(logIndex_ + 1, 1, cfg_.numLogs), cfg_.numLogs);
-    font::plain(buf, 32, 56, 22, UI_TEXT_LIGHT);
+    font::plain(buf, 50, 68, 22, UI_TEXT_LIGHT);
 
     // Tiempo
     ui::formatTime((unsigned)(timer_ * 1000), buf, sizeof(buf));
-    font::plain(txt::TIME, W - 24, 12, 20, rgba(0x30, 0x40, 0x50), ALIGN_RIGHT);
-    font::draw(buf, W - 24, 32, 46, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_RIGHT);
+    font::plain(txt::TIME, W - 40, 24, 20, rgba(0x30, 0x40, 0x50), ALIGN_RIGHT);
+    font::draw(buf, W - 40, 44, 46, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_RIGHT);
 
     // Esquema del tronco visto desde arriba con las dos V
     {
-        float cx = W / 2, top = 20, w = 170, h = 54;
+        float w = 150, h = 48, cx = W - 40 - w / 2, top = 112;
         gfx::roundRect(cx - w / 2 - 6, top - 6, w + 12, h + 12, 12, rgba(255, 255, 255, 190));
         gfx::rect(cx - w / 2, top, w, h, BARK);
         gfx::rect(cx - w / 2, top + 4, w, h - 8, WOOD_MID);
@@ -474,7 +474,7 @@ void AizkoScene::drawHud() {
 
     // Cansancio
     {
-        float x = 24, y = 400, w = 170, h = 18;
+        float x = 44, y = 396, w = 170, h = 18;
         font::plain(txt::FATIGUE, x, y - 28, 22, UI_WHITE);
         gfx::roundRect(x - 3, y - 3, w + 6, h + 6, 11, rgba(0, 0, 0, 90));
         gfx::roundRect(x, y, w, h, 9, rgba(255, 255, 255, 140));
