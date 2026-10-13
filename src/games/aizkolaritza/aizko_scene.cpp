@@ -585,7 +585,7 @@ void AizkoScene::drawHud() {
     }
 
     // Consejos del entrenamiento
-    if (cfg_.training && state_ == ST_PLAY) {
+    if (false && cfg_.training && state_ == ST_PLAY) {  // quitado: el usuario prefiere solo la flecha
         const char* tips[4] = {txt::TIP_1, txt::TIP_2, FATIGUE_ON ? txt::TIP_3 : txt::TIP_1, txt::TIP_4};
         float a = smooth01(tipT_ / 0.4f) * (1 - smooth01((tipT_ - 4.6f) / 0.4f));
         font::draw(tips[tip_], W / 2, 330, 22, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_CENTER, a);

@@ -22,7 +22,7 @@ with open(out, "a", encoding="utf-8") as f:
             continue
         print("conectado", flush=True)
         f.write(f"# conexion {time.strftime('%H:%M:%S')}\n")
-        s.settimeout(10)
+        s.settimeout(40)  # la WiFi de la Wii a veces se atasca unos segundos
         buf = b""
         last = time.time()
         peak = 0.0
