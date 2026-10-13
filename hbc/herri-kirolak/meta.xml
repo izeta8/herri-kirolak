@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>Herri Kirolak</name>
+  <coder>izeta8</coder>
+  <version>0.0.1</version>
+  <release_date>20261013</release_date>
+  <short_description>Euskal herri kirolak Wiirako</short_description>
+  <long_description>Wii Sports estiloko jokoa, euskal herri kirolekin. Lehenengo proba: Aizkolaritza.</long_description>
+</app>

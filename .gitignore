@@ -1,0 +1,17 @@
+build/
+*.dol
+*.elf
+*.o
+*.d
+*.map
+# Disk images / dumps must never be committed
+*.iso
+*.wbfs
+*.rvz
+*.wad
+# Blender backups
+*.blend1
+*.blend2
+.vs/
+.vscode/
+__pycache__/
