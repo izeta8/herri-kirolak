@@ -19,7 +19,7 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - Compilar versión de prueba: `scripts/build.ps1 -Test -Scene N` → `build-test/boot.dol`
   - Activa `DEBUG_INPUT` (botones 1 = golpe ezkerra, 2 = golpe eskuina, − = golpe recto)
   - `START_SCENE`: 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords, 5 entrenamiento,
-    6 lehiaketa CPU contra CPU (resultados), 7 entrenamiento con la CPU
+    6 lehiaketa CPU contra CPU (resultados), 7 entrenamiento con la CPU, 8 kolpe proba
 - Ejecutar en Dolphin: `scripts/run.ps1 [-Dol ruta]`
 - Captura de Dolphin: `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png`
 - Pulsar teclas en Dolphin: `scripts/keys.ps1 X,DOWN,X,1,2` (X = A, Z = B, flechas = cruceta, 1/2, Q = −, E = +, ENTER = HOME; un número = pausa en ms)
@@ -35,7 +35,7 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - `data/` binarios embebidos en el .dol (fuente, sonidos), generados por `tools/`
 
 ## Pendiente de probar en Wii
-- Detector de hachazo con mando real: umbrales en `src/engine/tuning.h` (`SWING_START_G`, `CHOP_MIN_G`, `CHOP_FULL_G`).
+- Detector de hachazo con mando real (usar la pantalla "Kolpe proba"): umbrales en `src/engine/tuning.h` (`SWING_START_G`, `CHOP_MIN_G`, `CHOP_FULL_G`).
 - Inclinación de muñeca para ezkerra/eskuina: si sale al revés, `TILT_SIGN = -1`. Ajustar `TILT_FULL_G` si cuesta inclinar.
 - Rendimiento a 60 fps con 28 espectadores + astillas (si va lento: menos público).
 - Guardado de jugadores y récords en el USB (`usb:/apps/herri-kirolak/save.dat`).

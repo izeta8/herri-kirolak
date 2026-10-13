@@ -37,10 +37,10 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Modo Entrenamendua (con consejos)
 - [x] Modo Lehiaketa 1–4 jugadores por turnos (+ CPU) + resultados + récords
 - [ ] **Ajuste fino en Wii real con mandos de verdad** (ver "Pendiente de probar en Wii" en CLAUDE.md)
-- [ ] Icono del Homebrew Channel (`hbc/herri-kirolak/icon.png`, 128×48)
+- [x] Icono del Homebrew Channel (`hbc/herri-kirolak/icon.png`, 128×48)
 
 ## Mejoras posibles (Aizkolaritza)
-- [ ] Pantalla de calibración / prueba del mando (ver fuerza e inclinación en vivo)
+- [x] Pantalla "Kolpe proba" para ver fuerza e inclinación en vivo (Jokatu → Aizkolaritza → Kolpe proba)
 - [ ] 2 jugadores a la vez a pantalla partida
 - [ ] Troncos de distinto grosor
 - [ ] Rival fantasma (mejor tiempo)

@@ -16,6 +16,7 @@ Scene* makeMainMenu(int sel = 0);
 Scene* makeSetupScene();
 Scene* makeProfilesScene();
 Scene* makeRecordsScene();
+Scene* makeSwingTestScene();
 Scene* makeAizkoScene(const AizkoConfig& cfg);
 
 // Escenario compartido (se construye una vez)

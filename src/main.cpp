@@ -12,7 +12,7 @@
 #include "scenes/scenes.h"
 
 // START_SCENE (solo para pruebas): 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords,
-// 5 entrenamiento, 6 lehiaketa CPU contra CPU, 7 entrenamiento con la CPU
+// 5 entrenamiento, 6 lehiaketa CPU contra CPU, 7 entrenamiento con la CPU, 8 kolpe proba
 #ifndef START_SCENE
 #define START_SCENE 0
 #endif
@@ -36,6 +36,7 @@ static Scene* firstScene() {
             cfg.numLogs = 1;
             cfg.bot[0] = cfg.bot[1] = true;
             return makeAizkoScene(cfg);
+        case 8: return makeSwingTestScene();
         case 7:
             cfg.bot[0] = true;
             return makeAizkoScene(cfg);

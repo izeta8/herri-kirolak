@@ -38,6 +38,10 @@ public:
                 enter(STEP_MODE);
                 break;
             case STEP_MODE:
+                if (r == 2) {
+                    scenes::go(makeSwingTestScene());
+                    break;
+                }
                 cfg_.training = r == 0;
                 if (cfg_.training) {
                     cfg_.numPlayers = 1;
@@ -73,7 +77,7 @@ private:
                 for (int i = 1; i < 4; i++) menu_.enabled[i] = false;
                 break;
             case STEP_MODE:
-                menu_.count = 2;
+                menu_.count = 3;
                 menu_.sel = cfg_.training ? 0 : 1;
                 break;
             case STEP_PLAYERS:
@@ -183,8 +187,9 @@ void SetupScene::draw() {
         }
         case STEP_MODE: {
             ui::header(txt::CHOOSE_MODE);
-            ui::button(W / 2 + slide, 180, 520, 96, txt::TRAINING, menu_.anim[0], true, txt::TRAINING_DESC);
-            ui::button(W / 2 + slide, 300, 520, 96, txt::COMPETITION, menu_.anim[1], true, txt::COMPETITION_DESC);
+            ui::button(W / 2 + slide, 150, 540, 84, txt::TRAINING, menu_.anim[0], true, txt::TRAINING_DESC);
+            ui::button(W / 2 + slide, 255, 540, 84, txt::COMPETITION, menu_.anim[1], true, txt::COMPETITION_DESC);
+            ui::button(W / 2 + slide, 360, 540, 84, txt::SWING_TEST, menu_.anim[2], true, txt::SWING_TEST_DESC);
             break;
         }
         case STEP_PLAYERS: {
