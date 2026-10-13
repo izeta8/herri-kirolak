@@ -42,8 +42,8 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
    + resto × empuje lateral integrado durante la bajada.
 - Se procesan todas las lecturas del mando (~100/s) con `WPAD_ReadPending`, no una por frame.
 - Ajustes del jugador en save.dat (v2): invertir izquierda/derecha, invertir arriba/abajo, sensibilidad.
-- Dolphin: I/K inclinan adelante/atrás (I = punta arriba → arma), J/L izquierda/derecha, M = swing hacia abajo.
-  Ejemplo: `scripts/keys.ps1 "I>",700,"M+250","I<"`.
+- Dolphin: I/K inclinan adelante/atrás (K = punta arriba → arma), J/L izquierda/derecha, M = swing hacia abajo.
+  Ejemplo: `scripts/keys.ps1 "K>",700,"M+250","K<"` (en Dolphin K = punta arriba; en el mando real arriba = -Y).
 - **Kolpe proba** graba lecturas en `usb:/apps/herri-kirolak/golpeak.csv` (botón 1; etiqueta con ←/→).
   Columnas: saioa, ms, etiketa (L/Z/R), ax, ay, az, gx, gy, gz (gravedad filtrada), egoera (0 idle, 1 subiendo,
   2 armado, 3 bajando, 4 enfriando), kolpea (1 = golpe detectado), ajustes. Analizarlo para afinar tuning.h.

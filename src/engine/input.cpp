@@ -1,5 +1,6 @@
 #include "engine/input.h"
 #include <ogc/lwp_watchdog.h>
+#include "engine/telemetry.h"
 #include "engine/tuning.h"
 
 namespace input {
@@ -46,18 +47,23 @@ static void step(Pad& p, const Vec3& a, float dt) {
     if (fabsf(m - 1.0f) < 0.3f) p.grav = approachv(p.grav, a, 10.0f, dt);
     float gl = fmaxf(length(p.grav), 0.5f);
     p.pitchUp = clampv(p.grav.y / gl * RAISE_SIGN * s_raiseSign, -1.0f, 1.0f);
+    // Ángulo de subida (giro sobre el eje X): 0° = apuntando a la tele, 90° = punta arriba,
+    // ~180° = por encima del hombro con los botones hacia abajo (así se sube un hacha)
+    float deg = atan2f(p.grav.y * RAISE_SIGN * s_raiseSign, p.grav.z) / DEG;
+    if (deg < -90.0f) deg += 360.0f;
+    p.raiseDeg = deg;
     p.tiltLive = rollOf(p.grav);
 
     switch (p.state) {
         case SW_IDLE:
-            if (p.pitchUp > RAISE_ON) {
+            if (p.raiseDeg > RAISE_ON_DEG) {
                 p.state = SW_RAISING;
                 p.timer = 0;
             }
             break;
         case SW_RAISING:  // tiene que mantenerse arriba un momento
             p.timer += dt;
-            if (p.pitchUp < RAISE_ON - 0.1f) p.state = SW_IDLE;
+            if (p.raiseDeg < RAISE_ON_DEG - 15.0f) p.state = SW_IDLE;
             else if (p.timer >= RAISE_HOLD) p.state = SW_ARMED;
             break;
         case SW_ARMED:
@@ -68,7 +74,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
                 p.lat = 0;
                 p.rollTop = p.tiltLive;
                 p.gravXTop = p.grav.x;
-            } else if (p.pitchUp < RAISE_OFF) {
+            } else if (p.raiseDeg < RAISE_OFF_DEG) {
                 p.state = SW_IDLE;  // lo ha bajado despacio: no es un golpe
             }
             break;
@@ -98,7 +104,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
             break;
     }
     // Altura del hacha para la animación
-    float target = (p.state == SW_ARMED || p.state == SW_RAISING) ? 1.0f : clampv(p.pitchUp / RAISE_ON, 0.0f, 1.0f);
+    float target = (p.state == SW_ARMED || p.state == SW_RAISING) ? 1.0f : clampv(p.raiseDeg / RAISE_ON_DEG, 0.0f, 1.0f);
     if (p.state == SW_SWING || p.state == SW_COOLDOWN) target = 0;
     p.raise = approach(p.raise, target, 14.0f, dt);
 }
@@ -130,12 +136,11 @@ void update(float dt) {
         for (int k = 0; k < n; k++) {
             bool before = p.chop.happened;
             step(p, s_queue[i][k], dt / n);
-            if (s_sink) {
-                const Vec3& a = s_queue[i][k];
-                Sample s = {ms - (u32)((n - 1 - k) * dt * 1000 / n), a.x, a.y, a.z, p.grav.x, p.grav.y, p.grav.z,
-                            (u8)p.state, (u8)(p.chop.happened && !before)};
-                s_sink(i, s);
-            }
+            const Vec3& a = s_queue[i][k];
+            Sample s = {ms - (u32)((n - 1 - k) * dt * 1000 / n), a.x, a.y, a.z, p.grav.x, p.grav.y, p.grav.z,
+                        (u8)p.state, (u8)(p.chop.happened && !before), (u16)(p.held & 0xFFFF)};
+            if (s_sink) s_sink(i, s);
+            telemetry::push(i, s);
         }
 
 #ifdef DEBUG_INPUT

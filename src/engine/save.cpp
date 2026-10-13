@@ -8,7 +8,7 @@
 namespace save {
 
 static const u32 MAGIC = 0x484B5331;  // "HKS1"
-static const u16 VERSION = 2;
+static const u16 VERSION = 3;
 
 static SaveData s_data;
 static char s_path[256] = "";
@@ -75,6 +75,11 @@ void init(const char* argv0) {
     const size_t v1Size = sizeof(SaveData) - sizeof(Settings);
     if (tmp.magic != MAGIC) return;
     if (tmp.version == VERSION && got == sizeof(tmp)) s_data = tmp;
+    else if (tmp.version == 2 && got == sizeof(tmp)) {
+        s_data = tmp;  // en la v2 "arriba" estaba invertido por defecto
+        s_data.version = VERSION;
+        s_data.settings.raiseInverted = 0;
+    }
     else if (tmp.version == 1 && got >= v1Size) {
         memcpy(&s_data, &tmp, v1Size);  // la versión 1 no tenía ajustes
         s_data.version = VERSION;

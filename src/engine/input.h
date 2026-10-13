@@ -28,6 +28,7 @@ struct Pad {
     Vec3 accel;            // fuerza g de la última lectura
     Vec3 grav{0, 0, 1};    // gravedad filtrada (orientación cuando el mando va despacio)
     float pitchUp = 0;     // -1..1: 1 = la punta apunta hacia arriba
+    float raiseDeg = 0;    // 0° = apunta a la tele, 90° = punta arriba, 180° = por encima del hombro
     float raise = 0;       // 0..1 cuánto está subida el hacha (para animar)
     float tiltLive = 0;    // inclinación lateral actual, -1..1 (con signo de ajustes)
     Chop chop;             // evento de este frame
@@ -44,6 +45,7 @@ struct Sample {
     float ax, ay, az, gx, gy, gz;
     u8 state;
     u8 chop;
+    u16 btns;  // botones mantenidos (marcas de inicio/fin de gesto en Kolpe proba)
 };
 typedef void (*SampleSink)(int chan, const Sample& s);
 

@@ -9,6 +9,7 @@
 #include "engine/input.h"
 #include "engine/save.h"
 #include "engine/scene.h"
+#include "engine/telemetry.h"
 #include "scenes/scenes.h"
 
 // START_SCENE (solo para pruebas): 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords,
@@ -51,6 +52,7 @@ int main(int argc, char** argv) {
     font::init();
     save::init(argc > 0 ? argv[0] : nullptr);
     save::applySettings();
+    telemetry::init();
     SYS_SetResetCallback(onReset);
     SYS_SetPowerCallback(onPower);
     WPAD_SetPowerButtonCallback(onPadPower);
