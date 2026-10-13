@@ -51,6 +51,17 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [ ] Troncos de distinto grosor
 - [ ] Rival fantasma (mejor tiempo)
 
+## Harness y estructura
+- [x] Documentación para IA: CLAUDE.md índice + docs/ARQUITECTURA, NUEVO-JUEGO, GESTOS, DECISIONES, WII-NOTAS, HARNESS
+- [x] Skills del proyecto (.claude/skills): probar-en-dolphin, mandar-a-wii, calibrar-gesto, nuevo-juego
+- [x] Registro de deportes (`src/game/sports.cpp`) y `MatchConfig` común
+- [ ] Récords por deporte en save.dat (ahora son de aizkolaritza)
+
+## Próximo
+- [ ] **Puntero IR en los menús** (además de la cruceta)
+- [ ] Probar la lehiaketa con 2-4 mandos reales
+- [ ] Siguiente deporte (skill `nuevo-juego`)
+
 ## Más adelante
 - [ ] Cansancio bien diseñado (desactivado ahora)
 - [ ] Música

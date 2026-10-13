@@ -65,7 +65,7 @@ struct Player {
 
 class AizkoScene : public Scene {
 public:
-    explicit AizkoScene(const AizkoConfig& cfg) : cfg_(cfg) {
+    explicit AizkoScene(const MatchConfig& cfg) : cfg_(cfg) {
         n_ = cfg_.training ? 1 : clampv(cfg_.numPlayers, 1, MAXP);
         for (int i = 0; i < n_; i++) {
             Player& p = pl_[i];
@@ -103,7 +103,7 @@ private:
     void drawPause();
     void drawHowTo();
 
-    AizkoConfig cfg_;
+    MatchConfig cfg_;
     int n_ = 1;
     Player pl_[MAXP];
     State state_ = ST_INTRO;
@@ -273,7 +273,7 @@ void AizkoScene::updatePlayer(Player& p, float dt, u32 downAll) {
         case P_SPLIT:
             if (p.stT > 2.3f) {
                 p.logIndex++;
-                if (p.logIndex < cfg_.numLogs) {
+                if (p.logIndex < cfg_.rounds) {
                     p.st = P_NEXTLOG;
                     p.stT = 0;
                 } else {
@@ -329,7 +329,7 @@ void AizkoScene::enterResults() {
     for (int i = 0; i < n_; i++)
         for (int j = i + 1; j < n_; j++)
             if (pl_[order_[j]].timeMs < pl_[order_[i]].timeMs) std::swap(order_[i], order_[j]);
-    int slot = cfg_.training ? REC_TRAINING : (REC_COMP_1 + clampv(cfg_.numLogs, 1, 3) - 1);
+    int slot = cfg_.training ? REC_TRAINING : (REC_COMP_1 + clampv(cfg_.rounds, 1, 3) - 1);
     Record& rec = save::data().records[slot];
     Player& best = pl_[order_[0]];
     if (!best.bot && (rec.timeMs == 0 || best.timeMs < rec.timeMs)) {
@@ -524,8 +524,8 @@ void AizkoScene::drawCommon() {
         float a = smooth01(stateT_ / 0.4f) * (1 - smooth01((stateT_ - 2.2f) / 0.4f));
         float y = 120 + (1 - easeOutCubic(stateT_ / 0.5f)) * -40;
         font::draw(cfg_.training ? txt::TRAINING : txt::COMPETITION, W / 2, y, 56, UI_WHITE, UI_BLUE_DARK, ALIGN_CENTER, a);
-        if (cfg_.numLogs == 1) snprintf(buf, sizeof(buf), "%s", txt::LOG_1);
-        else snprintf(buf, sizeof(buf), txt::LOGS_N, cfg_.numLogs);
+        if (cfg_.rounds == 1) snprintf(buf, sizeof(buf), "%s", txt::LOG_1);
+        else snprintf(buf, sizeof(buf), txt::LOGS_N, cfg_.rounds);
         font::draw(buf, W / 2, y + 66, 30, UI_WHITE, UI_BLUE_DARK, ALIGN_CENTER, a);
     } else if (state_ == ST_COUNTDOWN) {
         float s = easeOutBack(clampv(stateT_ / 0.3f, 0.0f, 1.0f));
@@ -584,7 +584,7 @@ void AizkoScene::drawTrainingHud() {
     ui::colorDot(62, 52, 11, FAV_COLORS[pr.color % NUM_COLORS]);
     font::plain(pr.name, 82, 34, 28, UI_TEXT);
     if (p.bot) font::plain(txt::CPU, 268, 38, 20, UI_TEXT_LIGHT, ALIGN_RIGHT);
-    snprintf(buf, sizeof(buf), txt::LOG_N_OF, clampv(p.logIndex + 1, 1, cfg_.numLogs), cfg_.numLogs);
+    snprintf(buf, sizeof(buf), txt::LOG_N_OF, clampv(p.logIndex + 1, 1, cfg_.rounds), cfg_.rounds);
     font::plain(buf, 50, 68, 22, UI_TEXT_LIGHT);
     notchDiagram(W - 40 - 75, 112, 150, 48, p.log, p.aizk.side());
 
@@ -676,7 +676,7 @@ void AizkoScene::drawMultiHud() {
             font::plain(buf, px + pw - 12, py + 50, 30, UI_TEXT, ALIGN_RIGHT);
             continue;
         }
-        snprintf(buf, sizeof(buf), "%d/%d", clampv(p.logIndex + 1, 1, cfg_.numLogs), cfg_.numLogs);
+        snprintf(buf, sizeof(buf), "%d/%d", clampv(p.logIndex + 1, 1, cfg_.rounds), cfg_.rounds);
         font::plain(buf, px + 12, py + 40, 18, UI_TEXT_LIGHT);
         notchDiagram(px + 30 + 12, py + 66, 56, 20, p.log, p.aizk.side());
         if (!p.bot && state_ == ST_PLAY && p.st == P_PLAY) {
@@ -823,4 +823,4 @@ void AizkoScene::drawPause() {
 
 }  // namespace
 
-Scene* makeAizkoScene(const AizkoConfig& cfg) { return new AizkoScene(cfg); }
+Scene* makeAizkoScene(const MatchConfig& cfg) { return new AizkoScene(cfg); }

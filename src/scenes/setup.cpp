@@ -9,11 +9,12 @@
 #include "game/palette.h"
 #include "game/text.h"
 #include "scenes/common.h"
+#include "game/sports.h"
 #include "scenes/scenes.h"
 
 namespace {
 
-enum Step { STEP_SPORT, STEP_MODE, STEP_PLAYERS, STEP_LOGS, STEP_CHARS };
+enum Step { STEP_SPORT, STEP_MODE, STEP_PLAYERS, STEP_ROUNDS, STEP_CHARS };
 
 class SetupScene : public Scene {
 public:
@@ -35,17 +36,18 @@ public:
         if (r < 0) return;
         switch (step_) {
             case STEP_SPORT:
+                cfg_.sport = r;
                 enter(STEP_MODE);
                 break;
             case STEP_MODE:
                 if (r == 2) {
-                    scenes::go(makeSwingTestScene());
+                    scenes::go(sport(cfg_.sport).makeGestureTest());
                     break;
                 }
                 cfg_.training = r == 0;
                 if (cfg_.training) {
                     cfg_.numPlayers = 1;
-                    cfg_.numLogs = 1;
+                    cfg_.rounds = 1;
                     enter(STEP_CHARS);
                 } else {
                     enter(STEP_PLAYERS);
@@ -53,10 +55,10 @@ public:
                 break;
             case STEP_PLAYERS:
                 cfg_.numPlayers = r + 1;
-                enter(STEP_LOGS);
+                enter(STEP_ROUNDS);
                 break;
-            case STEP_LOGS:
-                cfg_.numLogs = r + 1;
+            case STEP_ROUNDS:
+                cfg_.rounds = r + 1;
                 enter(STEP_CHARS);
                 break;
             default:
@@ -73,11 +75,12 @@ private:
         menu_ = ui::ListMenu();
         switch (s) {
             case STEP_SPORT:
-                menu_.count = 4;
-                for (int i = 1; i < 4; i++) menu_.enabled[i] = false;
+                menu_.count = sportCount();
+                menu_.sel = cfg_.sport;
+                for (int i = 0; i < sportCount(); i++) menu_.enabled[i] = sport(i).makeMatch != nullptr;
                 break;
             case STEP_MODE:
-                menu_.count = 3;
+                menu_.count = sport(cfg_.sport).makeGestureTest ? 3 : 2;
                 menu_.sel = cfg_.training ? 0 : 1;
                 break;
             case STEP_PLAYERS:
@@ -85,10 +88,10 @@ private:
                 menu_.horizontal = true;
                 menu_.sel = cfg_.numPlayers - 1;
                 break;
-            case STEP_LOGS:
-                menu_.count = 3;
+            case STEP_ROUNDS:
+                menu_.count = clampv(sport(cfg_.sport).maxRounds, 1, 3);
                 menu_.horizontal = true;
-                menu_.sel = cfg_.numLogs - 1;
+                menu_.sel = cfg_.rounds - 1;
                 break;
             case STEP_CHARS:
                 charIdx_ = 0;
@@ -105,10 +108,10 @@ private:
             case STEP_SPORT: scenes::go(makeMainMenu(0)); break;
             case STEP_MODE: enter(STEP_SPORT); break;
             case STEP_PLAYERS: enter(STEP_MODE); break;
-            case STEP_LOGS: enter(STEP_PLAYERS); break;
+            case STEP_ROUNDS: enter(STEP_PLAYERS); break;
             case STEP_CHARS:
                 if (charIdx_ > 0) charIdx_--;
-                else enter(cfg_.training ? STEP_MODE : STEP_LOGS);
+                else enter(cfg_.training ? STEP_MODE : STEP_ROUNDS);
                 break;
         }
     }
@@ -153,7 +156,7 @@ private:
                 cfg_.profile[charIdx_] = nextFree(charIdx_, -1, 1);
                 spin_ = 1;
             } else {
-                scenes::go(makeAizkoScene(cfg_));
+                scenes::go(sport(cfg_.sport).makeMatch(cfg_));
             }
         } else if (down & WPAD_BUTTON_B) {
             audio::play(SFX_BACK, 0.7f);
@@ -161,7 +164,7 @@ private:
         }
     }
 
-    AizkoConfig cfg_;
+    MatchConfig cfg_;
     Step step_ = STEP_SPORT;
     ui::ListMenu menu_;
     float t_ = 0, stepT_ = 0, spin_ = 0;
@@ -179,17 +182,17 @@ void SetupScene::draw() {
     switch (step_) {
         case STEP_SPORT: {
             ui::header(txt::CHOOSE_SPORT);
-            const char* names[4] = {txt::AIZKOLARITZA, txt::HARRI, txt::SOKATIRA, txt::TRONTZA};
-            for (int i = 0; i < 4; i++)
-                ui::button(W / 2 + slide, 140 + i * 78, 470, 64, names[i], menu_.anim[i], menu_.enabled[i],
-                           i == 0 ? txt::AIZKO_DESC : txt::SOON);
+            for (int i = 0; i < sportCount(); i++)
+                ui::button(W / 2 + slide, 140 + i * 78, 470, 64, sport(i).name, menu_.anim[i], menu_.enabled[i],
+                           sport(i).desc);
             break;
         }
         case STEP_MODE: {
             ui::header(txt::CHOOSE_MODE);
             ui::button(W / 2 + slide, 150, 540, 84, txt::TRAINING, menu_.anim[0], true, txt::TRAINING_DESC);
             ui::button(W / 2 + slide, 255, 540, 84, txt::COMPETITION, menu_.anim[1], true, txt::COMPETITION_DESC);
-            ui::button(W / 2 + slide, 360, 540, 84, txt::SWING_TEST, menu_.anim[2], true, txt::SWING_TEST_DESC);
+            if (menu_.count > 2)
+                ui::button(W / 2 + slide, 360, 540, 84, txt::SWING_TEST, menu_.anim[2], true, txt::SWING_TEST_DESC);
             break;
         }
         case STEP_PLAYERS: {
@@ -203,12 +206,12 @@ void SetupScene::draw() {
             }
             break;
         }
-        case STEP_LOGS: {
+        case STEP_ROUNDS: {
             ui::header(txt::COMPETITION);
-            font::plain(txt::HOW_MANY_LOGS, W / 2, 130, 36, UI_TEXT, ALIGN_CENTER);
-            for (int i = 0; i < 3; i++) {
+            font::plain(sport(cfg_.sport).roundsQuestion, W / 2, 130, 36, UI_TEXT, ALIGN_CENTER);
+            for (int i = 0; i < menu_.count; i++) {
                 snprintf(buf, sizeof(buf), "%d", i + 1);
-                ui::button(W / 2 + (i - 1) * 180 + slide, 270, 140, 120, buf, menu_.anim[i]);
+                ui::button(W / 2 + (i - (menu_.count - 1) * 0.5f) * 180 + slide, 270, 140, 120, buf, menu_.anim[i]);
             }
             break;
         }

@@ -28,7 +28,7 @@ static void onPower() { s_power = true; }
 static void onPadPower(s32) { s_power = true; }
 
 static Scene* firstScene() {
-    AizkoConfig cfg;
+    MatchConfig cfg;
     switch (START_SCENE) {
         case 1: return makeMainMenu();
         case 2: return makeSetupScene();
@@ -38,7 +38,7 @@ static Scene* firstScene() {
         case 6:
             cfg.training = false;
             cfg.numPlayers = 4;
-            cfg.numLogs = 1;
+            cfg.rounds = 1;
             cfg.bot[0] = cfg.bot[1] = cfg.bot[2] = cfg.bot[3] = true;
             return makeAizkoScene(cfg);
         case 8: return makeSwingTestScene();

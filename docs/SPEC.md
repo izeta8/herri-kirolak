@@ -21,7 +21,7 @@ Juego homebrew para **Nintendo Wii real** (vía Homebrew Channel), estilo **Wii 
 ## 2. Controles
 
 - **Mando**: Wiimote solo (acelerómetro). Nunchuk opcional en futuros juegos.
-- **Sin puntero IR**: toda la navegación de menús con **cruceta + A (aceptar) + B (atrás)**. Selección resaltada estilo Wii (botón que crece/brilla).
+- **Menús con cruceta y puntero IR**: ahora funciona la **cruceta + A (aceptar) + B (atrás)**; el **puntero** se añadirá (las dos formas a la vez, como en Wii Sports). Selección resaltada estilo Wii (botón que crece/brilla).
 - **Sin MotionPlus**.
 - Hasta **4 jugadores**, cada uno con su Wiimote.
 - **Modo debug de entrada** (para probar en Dolphin sin mando real): con un botón/tecla se simula un golpe completo con fuerza y ángulo configurables. Activable por flag de compilación y por menú oculto.
@@ -82,4 +82,4 @@ El aizkolari se sube **encima de un tronco tumbado** y corta **entre sus pies**.
 Harri-jasotzea, Sokatira, Trontza, Txingak, Lasto altxatzea, Estropadak, Segalariak.
 
 ## 7. Fuera de alcance por ahora
-Puntero IR, MotionPlus, música, Miis reales, online, otros idiomas.
+MotionPlus, online, otros idiomas. (El puntero IR, la música y los Miis reales están planificados en el ROADMAP.)
