@@ -16,6 +16,9 @@ public:
     void setReady();
     void setIdle();
     bool chop(float strength, float tilt);  // false si no puede golpear ahora (se guarda uno en cola)
+    // El jugador empieza a bajar: el hacha baja ya y espera en la madera a que llegue chop()
+    void startSwing();
+    void cancelSwing();  // la bajada no fue hachazo: vuelve a subir sin cortar
     void turnAround();
     void celebrate();
 
@@ -53,6 +56,7 @@ private:
     bool impact_ = false;
     float strength_ = 0, chopTilt_ = 0, impStrength_ = 0, impTilt_ = 0;
     bool queued_ = false;
+    bool resolved_ = true;  // en SWING: ya se sabe fuerza y lado del golpe
     float qStrength_ = 0, qTilt_ = 0;
     float blinkT_ = 2;
     float time_ = 0;

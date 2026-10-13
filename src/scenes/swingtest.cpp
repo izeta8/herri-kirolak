@@ -61,6 +61,12 @@ int g_postLeft = 0;
 Stroke g_building, g_stroke;
 bool g_hasStroke = false;
 int g_strokeCount = 0;
+// Grabación guiada: la pantalla pide golpes alternando derecha / izquierda
+char g_guide = 'R';
+int g_guideCount[2] = {0, 0};  // [0] = derecha, [1] = izquierda
+bool g_guideInSwing = false;
+int g_guideCalm = 0;
+float g_guideFlash = 0;
 
 void onSample(int chan, const input::Sample& s) {
     if (chan != g_pad) return;
@@ -99,6 +105,20 @@ void onSample(int chan, const input::Sample& s) {
         g_rec[g_recCount].label = (u8)g_label;
         g_recCount++;
         if (s.chop) g_recChops++;
+        // Un golpe = pico fuerte y luego 0.3 s de calma; entonces se pide el otro lado
+        if (!g_guideInSwing && m > 3.0f) {
+            g_guideInSwing = true;
+            g_guideCalm = 0;
+        } else if (g_guideInSwing) {
+            g_guideCalm = m < 1.4f ? g_guideCalm + 1 : 0;
+            if (g_guideCalm >= 30) {
+                g_guideInSwing = false;
+                g_guideCount[g_guide == 'R' ? 0 : 1]++;
+                g_guide = g_guide == 'R' ? 'L' : 'R';
+                input::setLabel(g_guide);
+                g_guideFlash = 1;
+            }
+        }
     }
 }
 
@@ -195,6 +215,7 @@ public:
     }
     ~SwingTestScene() override {
         input::setSampleSink(nullptr);
+        input::setLabel(0);
         g_recording = false;
         free(g_rec);
         g_rec = nullptr;
@@ -216,6 +237,10 @@ public:
             input::rumble(g_pad, 0.08f);
         }
         flash_ = fmaxf(0.0f, flash_ - dt * 3);
+        if (g_guideFlash > 0) {
+            if (g_guideFlash >= 1.0f) audio::play(SFX_BEEP, 0.5f);
+            g_guideFlash = fmaxf(0.0f, g_guideFlash - dt * 2 - 0.001f);
+        }
         msgT_ = fmaxf(0.0f, msgT_ - dt);
 
         if (down & WPAD_BUTTON_LEFT) g_label = g_label == LBL_RIGHT ? LBL_STRAIGHT : LBL_LEFT;
@@ -258,20 +283,20 @@ public:
 
     void toggleRecording() {
         if (!g_recording) {
-            if (!save::available()) {
-                showMsg(txt::NO_SAVE);
-                audio::play(SFX_BAD, 0.6f);
-                return;
-            }
             g_recCount = 0;
             g_recChops = 0;
+            g_guide = 'R';
+            g_guideCount[0] = g_guideCount[1] = 0;
+            g_guideInSwing = false;
+            input::setLabel(g_guide);
             g_recording = true;
             audio::play(SFX_BEEP, 0.6f);
             return;
         }
         g_recording = false;
+        input::setLabel(0);
         audio::play(SFX_OK, 0.6f);
-        writeCsv();
+        if (save::available()) writeCsv();  // sin USB/SD los datos solo van por la telemetría
     }
 
     void writeCsv() {
@@ -290,7 +315,7 @@ public:
         u32 sessionId = (u32)(t_ * 1000) ^ ((u32)g_recCount << 8);
         for (int i = 0; i < g_recCount; i++) {
             const RecSample& r = g_rec[i];
-            fprintf(f, "%u,%u,%c,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,%u,%u,%u\n", sessionId, r.s.ms, "LZR"[r.label], r.s.ax,
+            fprintf(f, "%u,%u,%c,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,%u,%u,%u\n", sessionId, r.s.ms, r.s.label ? r.s.label : '-', r.s.ax,
                     r.s.ay, r.s.az, r.s.gx, r.s.gy, r.s.gz, r.s.state, r.s.chop, st.sensitivity, st.tiltInverted,
                     st.raiseInverted);
         }
@@ -411,6 +436,17 @@ void SwingTestScene::draw() {
     snprintf(buf, sizeof(buf), "</>:  %s", labelName(g_label));
     font::plain(buf, sx, sy + 90, 17, UI_TEXT);
 
+    if (g_recording) {
+        // Aviso grande de qué golpe toca
+        float bw = 420, bh = 96, bx = (rx - 100) / 2 + 12 - bw / 2, by = 270;
+        float pop = 1.0f + 0.15f * g_guideFlash;
+        gfx::roundRect(bx - 4, by - 4, bw + 8, bh + 8, 28, rgba(0, 0, 0, 60));
+        gfx::roundRect(bx, by, bw, bh, 26, g_guide == 'R' ? UI_BLUE : rgba(0xE8, 0x7A, 0x1E));
+        font::draw(g_guide == 'R' ? "ESKUINA  >>" : "<<  EZKERRA", bx + bw / 2, by + 12, 52 * pop, UI_WHITE,
+                   rgba(0x20, 0x30, 0x40), ALIGN_CENTER);
+        snprintf(buf, sizeof(buf), "%s: %d   %s: %d", txt::RIGHT, g_guideCount[0], txt::LEFT, g_guideCount[1]);
+        font::plain(buf, bx + bw / 2, by + bh + 10, 20, UI_TEXT, ALIGN_CENTER);
+    }
     if (msgT_ > 0) {
         float a = clampv(msgT_ * 2, 0.0f, 1.0f);
         float tw = font::width(msg_, 22) + 40;

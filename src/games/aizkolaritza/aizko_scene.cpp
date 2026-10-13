@@ -322,7 +322,9 @@ void AizkoScene::update(float dt) {
         case ST_PLAY: {
             const float R = LOG_RADIUS;
             if (human) {
+                if (p.swingStart) aizk_.startSwing();
                 if (p.chop.happened) aizk_.chop(p.chop.strength, p.chop.tilt);
+                else if (p.swingAbort) aizk_.cancelSwing();
                 idleT_ = (p.raise < 0.45f && aizk_.phase() == Aizkolari::READY) ? idleT_ + dt : 0;
                 if ((p.down & WPAD_BUTTON_B) && aizk_.side() == 0 && log_.depth[0] >= TURN_ALLOWED * R && !aizk_.busy())
                     aizk_.turnAround();

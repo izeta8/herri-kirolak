@@ -30,7 +30,8 @@ def load(path):
             continue
         p = line.strip().split(",")
         if len(p) >= 11 and p[0] == "0":
-            rows.append((int(p[1]), float(p[2]), float(p[3]), float(p[4]), int(p[10], 16)))
+            label = p[11] if len(p) > 11 and p[11] in ("R", "L") else ""
+            rows.append((int(p[1]), float(p[2]), float(p[3]), float(p[4]), int(p[10], 16), label))
     if rows:
         sessions.append(rows)
     return sessions
@@ -46,7 +47,7 @@ def detect(rows):
     state, timer, peak, lat = "IDLE", 0.0, 0.0, 0.0
     prev_ms = rows[0][0]
     chops = []
-    for ms, ax, ay, az, _ in rows:
+    for ms, ax, ay, az, _, _l in rows:
         dt = max((ms - prev_ms) / 1000.0, 0.001)
         prev_ms = ms
         m = math.sqrt(ax * ax + ay * ay + az * az)
@@ -95,7 +96,16 @@ def detect(rows):
 def segments(rows):
     """Gestos etiquetados: entre dos pulsaciones de la misma flecha (L/R) o de + y − (?)."""
     segs, open_, prev = [], {}, 0
-    for ms, *_, btn in rows:
+    # Grabación guiada: cada tramo con la misma etiqueta es un golpe de ese lado
+    guided = [(r[0], r[5]) for r in rows if r[5]]
+    if guided:
+        start, lab = guided[0]
+        for ms, l in guided[1:]:
+            if l != lab:
+                segs.append((lab, start, ms))
+                start, lab = ms, l
+        return segs
+    for ms, *_, btn, _l in rows:
         for bit, lab in ((0x0100, "L"), (0x0200, "R")):
             if btn & bit and not prev & bit:
                 if lab in open_:

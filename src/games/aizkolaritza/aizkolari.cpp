@@ -58,7 +58,33 @@ void Aizkolari::setIdle() {
     t_ = 0;
 }
 
+void Aizkolari::startSwing() {
+    bool canNow = phase_ == READY || (phase_ == RECOVER && t_ > RECOVER_TIME * 0.3f);
+    if (!canNow) return;
+    phase_ = SWING;
+    t_ = 0;
+    phiFrom_ = phi_;
+    strength_ = 0.8f;
+    chopTilt_ = 0;
+    resolved_ = false;
+    audio::play(SFX_WHOOSH, 0.55f, frand(0.9f, 1.1f));
+}
+
+void Aizkolari::cancelSwing() {
+    if (phase_ == SWING && !resolved_) {
+        phase_ = RECOVER;
+        t_ = 0;
+        phiFrom_ = phi_;
+    }
+}
+
 bool Aizkolari::chop(float strength, float tilt) {
+    if (phase_ == SWING && !resolved_) {  // la bajada ya está en marcha: ahora sabemos cómo fue
+        strength_ = strength;
+        chopTilt_ = tilt;
+        resolved_ = true;
+        return true;
+    }
     bool canNow = phase_ == READY || (phase_ == RECOVER && t_ > RECOVER_TIME * 0.45f);
     if (!canNow) {
         if (phase_ == SWING || phase_ == STUCK || phase_ == RECOVER) {
@@ -73,6 +99,7 @@ bool Aizkolari::chop(float strength, float tilt) {
     phiFrom_ = phi_;
     strength_ = strength;
     chopTilt_ = tilt;
+    resolved_ = true;
     audio::play(SFX_WHOOSH, 0.35f + 0.3f * strength, frand(0.9f, 1.1f));
     return true;
 }
@@ -125,7 +152,11 @@ void Aizkolari::update(float dt) {
             float k = clampv(t_ / SWING_TIME, 0.0f, 1.0f);
             phi_ = lerpf(phiFrom_, impactAngle(), k * k);
             tilt_ = approach(tilt_, chopTilt_, 25, dt);
-            if (k >= 1.0f) {
+            if (k >= 1.0f && !resolved_ && t_ > SWING_TIME + 0.6f) {
+                phase_ = RECOVER;  // nunca llegó el resultado del golpe
+                t_ = 0;
+                phiFrom_ = phi_;
+            } else if (k >= 1.0f && resolved_) {
                 phase_ = STUCK;
                 t_ = 0;
                 impact_ = true;

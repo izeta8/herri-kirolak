@@ -32,6 +32,9 @@ struct Pad {
     float raise = 0;       // 0..1 cuánto está subida el hacha (para animar)
     float tiltLive = 0;    // inclinación lateral actual, -1..1 (con signo de ajustes)
     Chop chop;             // evento de este frame
+    bool swingStart = false;  // evento: empieza la bajada (para animar sin esperar al final del golpe)
+    bool swingAbort = false;  // evento: la bajada no llegó a ser hachazo
+    float rawDeg = 0;         // ángulo de subida con la lectura directa (rápido, para animar)
     SwingState state = SW_IDLE;
 
     // internos del detector
@@ -46,6 +49,7 @@ struct Sample {
     u8 state;
     u8 chop;
     u16 btns;  // botones mantenidos (marcas de inicio/fin de gesto en Kolpe proba)
+    char label;  // etiqueta de la grabación guiada ('R', 'L' o 0)
 };
 typedef void (*SampleSink)(int chan, const Sample& s);
 
@@ -62,5 +66,6 @@ void setTiltInverted(bool inv);
 void setSensitivity(int level);  // 0 = suave (golpes flojos cuentan), 1 = normal, 2 = hay que dar fuerte
 void setRaiseInverted(bool inv);  // "arriba" = -Y en vez de +Y
 void setSampleSink(SampleSink sink);
+void setLabel(char label);  // etiqueta que se añade a cada lectura (grabación guiada)
 
 }  // namespace input

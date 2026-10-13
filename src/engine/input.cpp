@@ -10,6 +10,7 @@ static float s_tiltSign = 1.0f;
 static float s_raiseSign = 1.0f;
 static float s_chopMinG = tuning::CHOP_MIN_G[1];
 static SampleSink s_sink = nullptr;
+static char s_label = 0;
 static u64 s_t0 = 0;
 
 // Lecturas recibidas desde el último frame (el mando manda ~100 por segundo)
@@ -32,6 +33,7 @@ void init() {
 void setTiltInverted(bool inv) { s_tiltSign = inv ? -1.0f : 1.0f; }
 void setSensitivity(int level) { s_chopMinG = tuning::CHOP_MIN_G[clampv(level, 0, 2)]; }
 void setSampleSink(SampleSink sink) { s_sink = sink; }
+void setLabel(char label) { s_label = label; }
 void setRaiseInverted(bool inv) { s_raiseSign = inv ? -1.0f : 1.0f; }
 
 static float rollOf(const Vec3& g) {
@@ -60,6 +62,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
         float rd = atan2f(a.y * RAISE_SIGN * s_raiseSign, a.z) / DEG;
         if (rd < -90.0f) rd += 360.0f;
         rawUp = rd > RAISE_ON_DEG;
+        p.rawDeg = approach(p.rawDeg, rd, 30.0f, dt);
     }
 
     switch (p.state) {
@@ -78,6 +81,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
         case SW_ARMED:
             if (m > SWING_START_G) {
                 p.state = SW_SWING;
+                p.swingStart = true;
                 p.timer = 0;
                 p.peak = m;
                 p.lat = 0;
@@ -105,6 +109,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
                     p.timer = CHOP_COOLDOWN;
                 } else {
                     p.state = SW_ARMED;  // amago: sigue armado
+                    p.swingAbort = true;
                 }
             }
             break;
@@ -113,10 +118,11 @@ static void step(Pad& p, const Vec3& a, float dt) {
             if (p.timer <= 0 && m < SWING_END_G) p.state = SW_IDLE;
             break;
     }
-    // Altura del hacha para la animación
-    float target = (p.state == SW_ARMED || p.state == SW_RAISING) ? 1.0f : clampv(p.raiseDeg / RAISE_ON_DEG, 0.0f, 1.0f);
+    // Altura del hacha para la animación: sigue al mando casi sin retraso
+    float target = clampv(fmaxf(p.rawDeg, p.raiseDeg) / RAISE_ON_DEG, 0.0f, 1.0f);
+    if (p.state == SW_ARMED) target = 1.0f;
     if (p.state == SW_SWING || p.state == SW_COOLDOWN) target = 0;
-    p.raise = approach(p.raise, target, 14.0f, dt);
+    p.raise = approach(p.raise, target, 25.0f, dt);
 }
 
 void update(float dt) {
@@ -126,6 +132,7 @@ void update(float dt) {
     for (int i = 0; i < MAX_PADS; i++) {
         Pad& p = s_pads[i];
         p.chop = Chop();
+        p.swingStart = p.swingAbort = false;
         u32 type;
         p.connected = WPAD_Probe(i, &type) == WPAD_ERR_NONE;
         if (!p.connected) {
@@ -148,7 +155,7 @@ void update(float dt) {
             step(p, s_queue[i][k], dt / n);
             const Vec3& a = s_queue[i][k];
             Sample s = {ms - (u32)((n - 1 - k) * dt * 1000 / n), a.x, a.y, a.z, p.grav.x, p.grav.y, p.grav.z,
-                        (u8)p.state, (u8)(p.chop.happened && !before), (u16)(p.held & 0xFFFF)};
+                        (u8)p.state, (u8)(p.chop.happened && !before), (u16)(p.held & 0xFFFF), s_label};
             if (s_sink) s_sink(i, s);
             telemetry::push(i, s);
         }

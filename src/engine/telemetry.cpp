@@ -107,14 +107,15 @@ static void* run(void*) {
         s_client = sock;
         s_tail = s_head;  // empezar con el búfer vacío
         s_status = 2;
-        const char* hello = "# herri-kirolak telemetria: mando,ms,ax,ay,az,gx,gy,gz,egoera,kolpea,botoiak\n";
+        const char* hello = "# herri-kirolak telemetria: mando,ms,ax,ay,az,gx,gy,gz,egoera,kolpea,botoiak,etiketa\n";
         bool ok = sendAll(sock, hello, strlen(hello));
         while (ok) {
             int n = 0;
             while (s_tail != s_head && n < (int)sizeof(buf) - 128) {
                 const Entry& e = s_ring[s_tail];
-                n += snprintf(buf + n, sizeof(buf) - n, "%d,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,%04x\n", (int)e.chan,
-                              e.s.ms, e.s.ax, e.s.ay, e.s.az, e.s.gx, e.s.gy, e.s.gz, e.s.state, e.s.chop, e.s.btns);
+                n += snprintf(buf + n, sizeof(buf) - n, "%d,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,%04x,%c\n", (int)e.chan,
+                              e.s.ms, e.s.ax, e.s.ay, e.s.az, e.s.gx, e.s.gy, e.s.gz, e.s.state, e.s.chop, e.s.btns,
+                              e.s.label ? e.s.label : '-');
                 s_tail = (s_tail + 1) % RING;
             }
             if (n > 0) ok = sendAll(sock, buf, n);
