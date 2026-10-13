@@ -5,7 +5,7 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 ## Fase 0 — Entorno
 - [ ] devkitPro (wii-dev) instalado en `D:\devkitPro`, variables `DEVKITPRO`/`DEVKITPPC` configuradas
 - [x] Dolphin portable en `D:\Tools\Dolphin\Dolphin-x64`
-- [ ] Repo público `izeta8/herri-kirolak` creado y con push
+- [x] Repo público `izeta8/herri-kirolak` creado y con push
 - [ ] Scripts: `scripts/build.ps1`, `scripts/run.ps1` (Dolphin), `scripts/screenshot.ps1`, `scripts/deploy.ps1` (wiiload)
 
 ## Fase 1 — Hola mundo
