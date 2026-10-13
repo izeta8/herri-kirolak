@@ -34,6 +34,8 @@
 - `-b -e boot.dol` arranca directamente. Las teclas se inyectan con `scripts/keys.ps1` (necesita el foco).
 - **El overlay de Discord** ("Usa Discord desde el overlay…") se queda con el foco y las teclas no llegan: desactivar
   el overlay de Discord para Dolphin o cerrarlo antes de probar.
+- Si el usuario está usando el PC, capturar copiando la pantalla saca **su** ventana: `screenshot.ps1` usa PrintWindow
+  (funciona con Dolphin tapado). Las teclas de `keys.ps1` no llegan si Dolphin no tiene el foco: no robárselo.
 - La primera vez que el juego abre puertos de red, Windows pregunta por el cortafuegos para Dolphin: no hace falta.
 - La SD virtual sincronizada con carpeta no se rellena al arrancar un .dol suelto: el guardado en Dolphin no funciona.
 

@@ -12,7 +12,8 @@ struct Profile {
     u8 skin;     // tono de piel
     u8 hair;     // color de pelo
     u8 txapela;  // 1 = con txapela
-    u8 pad[3];
+    u8 hairStyle;  // peinado (0 en partidas guardadas antes de existir)
+    u8 pad[2];
 };
 
 enum RecordSlot { REC_TRAINING, REC_COMP_1, REC_COMP_2, REC_COMP_3, REC_COUNT };

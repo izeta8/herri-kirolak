@@ -28,6 +28,14 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-13 | Indicadores: barra *Altuera* con "JO!" al estar arriba; aguja que se mueve durante la bajada; destello del lado detectado | Saber cuándo bajar |
 | 2026-10-13 | La fuerza tiene que contar (medidor *Indarra*) y el golpe tiene que "pesar" (pausa, temblor, astillas) | — |
 
+## Estilo gráfico y escenarios
+| Fecha | Decisión | Motivo / detalle |
+|---|---|---|
+| 2026-10-13 | Descarta 4 estilos propios (pop, cómic, juguete de madera, cartel vasco) | "Lo que teníamos, mucho mejor" |
+| 2026-10-13 | UI, menús y Miis con el estilo de **Wii Sports Resort**; **no** su ubicación ni su ambiente (nada de isla/playa) | Copiar el estilo gráfico, no el sitio |
+| 2026-10-14 | **Cada deporte en un sitio real** que él dirá. Aizkolaritza = **probaleku de Usurbil** (zona empedrada entre Etxebeste e Irazu) | Que lo reconozca alguien de Usurbil |
+| 2026-10-14 | Miis **calcados a los de la Wii** (cabeza de huevo, cara de línea, pelo de casco con picos, brazos) | Mandó capturas; mis versiones anteriores no le valían |
+
 ## Desarrollo
 | Fecha | Decisión | Motivo / detalle |
 |---|---|---|

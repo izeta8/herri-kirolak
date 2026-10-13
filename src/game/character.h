@@ -1,14 +1,19 @@
 #pragma once
-// Personaje "tipo Mii" de Wii Sports Resort: cabeza grande, cuerpo cápsula, brazos finos y manos de bola.
+// Personaje calcado a los Miis de la Wii: cabeza de huevo con la cara de línea, pelo de casco, cuerpo estrecho y brazos.
 #include "engine/mesh.h"
 #include "engine/save.h"
 
+// Peinados: 0 corto con raya, 1 de punta, 2 melena larga, 3 media melena
+constexpr int NUM_HAIR_STYLES = 4;
+
 struct Appearance {
     u8 color = 0, skin = 0, hair = 0, txapela = 0;
-    u8 casual = 0;  // 1 = ropa de calle (pantalón gris de Mii, sin gerriko): el público
-    static Appearance from(const Profile& p) { return {p.color, p.skin, p.hair, p.txapela, 0}; }
+    u8 casual = 0;  // 1 = público: ropa de calle (pantalón gris de Mii, sin gerriko) y menos polígonos
+    u8 style = 0;   // peinado
+    static Appearance from(const Profile& p) { return {p.color, p.skin, p.hair, p.txapela, 0, p.hairStyle}; }
     bool operator==(const Appearance& o) const {
-        return color == o.color && skin == o.skin && hair == o.hair && txapela == o.txapela && casual == o.casual;
+        return color == o.color && skin == o.skin && hair == o.hair && txapela == o.txapela && casual == o.casual &&
+               style == o.style;
     }
 };
 

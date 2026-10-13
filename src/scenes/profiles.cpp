@@ -15,7 +15,7 @@
 namespace {
 
 enum Mode { MODE_LIST, MODE_EDIT, MODE_KEYBOARD };
-enum Field { F_NAME, F_COLOR, F_SKIN, F_HAIR, F_TXAPELA, F_SAVE, F_DELETE, F_COUNT };
+enum Field { F_NAME, F_COLOR, F_SKIN, F_HAIR, F_STYLE, F_TXAPELA, F_SAVE, F_DELETE, F_COUNT };
 
 // Teclado en pantalla: 4 filas de 10 teclas; la última fila son teclas especiales
 static const char* KEYS[3][10] = {
@@ -97,6 +97,7 @@ private:
                 case F_COLOR: work_.color = (u8)((work_.color + dir + NUM_COLORS) % NUM_COLORS); break;
                 case F_SKIN: work_.skin = (u8)((work_.skin + dir + NUM_SKINS) % NUM_SKINS); break;
                 case F_HAIR: work_.hair = (u8)((work_.hair + dir + NUM_HAIRS) % NUM_HAIRS); break;
+                case F_STYLE: work_.hairStyle = (u8)((work_.hairStyle + dir + NUM_HAIR_STYLES) % NUM_HAIR_STYLES); break;
                 case F_TXAPELA: work_.txapela = !work_.txapela; break;
                 default: break;
             }
@@ -229,12 +230,12 @@ void ProfilesScene::draw() {
         ui::hints(txt::EDIT, txt::BACK);
     } else if (mode_ == MODE_EDIT) {
         float px = 40, py = 100;
-        ui::panel(px, py, 380, 330);
-        const char* labels[F_COUNT] = {txt::NAME, txt::COLOR, txt::SKIN, txt::HAIR, txt::TXAPELA, txt::SAVE, txt::DELETE};
+        ui::panel(px, py, 380, 328);
+        const char* labels[F_COUNT] = {txt::NAME, txt::COLOR, txt::SKIN, txt::HAIR, txt::HAIR_STYLE, txt::TXAPELA, txt::SAVE, txt::DELETE};
         for (int i = 0; i < F_COUNT; i++) {
-            float y = py + 14 + i * 44;
+            float y = py + 12 + i * 38;
             float a = edit_.anim[i];
-            if (a > 0.05f) gfx::roundRect(px + 10, y - 2, 360, 40, 20, withAlpha(rgba(0xC8, 0xE6, 0xFF), a));
+            if (a > 0.05f) gfx::roundRect(px + 10, y - 2, 360, 38, 19, withAlpha(rgba(0xC8, 0xE6, 0xFF), a));
             Color tc = edit_.enabled[i] ? UI_TEXT : UI_TEXT_LIGHT;
             if (i >= F_SAVE) {
                 font::plain(labels[i], px + 190, y + 4, 26, i == F_SAVE ? UI_BLUE_DARK : (edit_.enabled[i] ? UI_RED : UI_TEXT_LIGHT), ALIGN_CENTER);
@@ -247,6 +248,9 @@ void ProfilesScene::draw() {
                 case F_COLOR: ui::colorDot(vx, y + 18, 12, FAV_COLORS[work_.color]); break;
                 case F_SKIN: ui::colorDot(vx, y + 18, 12, SKIN_COLORS[work_.skin]); break;
                 case F_HAIR: ui::colorDot(vx, y + 18, 12, HAIR_COLORS[work_.hair]); break;
+                case F_STYLE:
+                    font::plain(txt::HAIR_STYLES[work_.hairStyle % NUM_HAIR_STYLES], vx, y + 6, 22, UI_TEXT, ALIGN_CENTER);
+                    break;
                 case F_TXAPELA: font::plain(work_.txapela ? txt::YES : txt::NO, vx, y + 4, 25, UI_TEXT, ALIGN_CENTER); break;
             }
             if (i >= F_COLOR && i <= F_TXAPELA && a > 0.5f) {

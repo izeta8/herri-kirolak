@@ -17,11 +17,13 @@ editar código ─► compilar ─► probar en Dolphin (capturas + teclas) ─�
 | make directo (bash de devkitPro) | `make OUTDIR=build-rec DEFS='-DSTART_SCENE=8'`: escena N **sin** DEBUG_INPUT (para mandar a la Wii) |
 
 `START_SCENE` (en `main.cpp`): 0 título · 1 menú · 2 preparar partida · 3 jugadores · 4 récords · 5 entrenamiento ·
-6 lehiaketa 4 CPU a la vez · 7 entrenamiento con la CPU · 8 Kolpe proba. **Al crear algo nuevo, añadir su número.**
+6 lehiaketa 4 CPU a la vez · 7 entrenamiento con la CPU · 8 Kolpe proba · 9 galería de Miis (de cerca; el zoom cambia
+solo cada 4 s). **Al crear algo nuevo, añadir su número.**
 
 ## 2. Probar en Dolphin
 - `scripts/run.ps1 [-Dol ruta]` cierra Dolphin si estaba abierto y arranca el .dol.
-- `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png` (leerla con la herramienta Read para verla).
+- `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png` (leerla con la herramienta Read para verla). Usa
+  PrintWindow: captura aunque Dolphin esté tapado y **no le quita el foco** al usuario (`-Focus` = método antiguo).
 - `scripts/keys.ps1 X,DOWN,X,"K>",700,"M+250","K<"` pulsa teclas: X=A, Z=B, flechas, 1, 2, Q=−, E=+, ENTER=HOME,
   I/K/J/L inclinar, M/N/O swing; `"K+800"` mantener; `"K>"`/`"K<"` pulsar/soltar; un número = pausa en ms.
 - Para varias capturas seguidas, unir en una cuadrícula con PIL y mirar una sola imagen.

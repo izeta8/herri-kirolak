@@ -1,6 +1,9 @@
 # Cómo crear un deporte nuevo
 
-Objetivo: que cada deporte sea una carpeta y una línea en el registro, reutilizando motor, personajes, plaza y UI.
+Objetivo: que cada deporte sea una carpeta y una línea en el registro, reutilizando motor, personajes y UI.
+**Cada deporte va en un sitio real que elige el usuario** (aizkolaritza = probaleku de Usurbil, `src/game/world.cpp`):
+preguntarle dónde, mirar satélite y Street View (las miniaturas `streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=…&yaw=…`
+se ven en el navegador aunque el visor 3D no cargue) y modelar lo reconocible desde donde mira la cámara.
 Referencia completa: Aizkolaritza (`src/games/aizkolaritza/`).
 
 ## 0. Antes de programar (con el usuario)

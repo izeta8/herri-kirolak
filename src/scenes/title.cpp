@@ -79,9 +79,9 @@ public:
         world.drawSky();
         Camera cam;
         float a = t_ * 0.12f + 0.4f;
-        cam.target = log_.center() + Vec3(0, 0.55f, 0);
-        // Algo más alta y lejos que antes para que se vea el mar de la isla detrás de la plaza
-        cam.eye = cam.target + Vec3(sinf(a) * 5.2f, 1.7f + sinf(t_ * 0.3f) * 0.2f, cosf(a) * 5.2f);
+        cam.target = log_.center() + Vec3(0, 1.3f, 0);
+        // Casi horizontal y algo lejos para que se vean las casas, las gradas y la iglesia alrededor
+        cam.eye = cam.target + Vec3(sinf(a) * 6.0f, 0.9f + sinf(t_ * 0.3f) * 0.2f, cosf(a) * 6.0f);
         gfx::begin3D(cam);
         world.setCameraHide(cam.eye, false);
         world.draw();

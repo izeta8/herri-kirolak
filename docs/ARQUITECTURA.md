@@ -41,9 +41,16 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 ## Común a los deportes (`src/game/`)
 - **`sports.h/.cpp`** — registro de deportes y `MatchConfig` (deporte, entrenamiento/lehiaketa, jugadores, rondas,
   perfiles, CPU). El menú "preparar partida" se construye con esta lista. Ver `docs/NUEVO-JUEGO.md`.
-- **`character`** — personaje tipo Mii (cabeza con cara, cuerpo, manos flotantes, txapela). `characterCache(Appearance)`
-  (32 huecos), `drawCharacter(model, CharacterPose)`. Mira hacia +Z con yaw 0.
-- **`world`** — la plaza (prado en anillos, valla, montes, baserris, ikurriña, nubes, 28 espectadores con 10 aspectos).
+- **`character`** — Mii calcado a los de la Wii: cabeza de huevo con barbilla en punta, cara pintada con trazos sobre la
+  superficie (`decalStroke`/`decalEllipse`: ojos, cejas, nariz de gancho, boca de raya), pelo de casco con flequillo en
+  picos (4 peinados, `Profile::hairStyle`), cuerpo estrecho con brazos de manga larga y manos de bola, txapela.
+  `Appearance::casual` = público (pantalón gris, menos polígonos). `characterCache(Appearance)` (32 huecos),
+  `drawCharacter(model, CharacterPose)`. Mira hacia +Z con yaw 0.
+- **`world`** — escenario de aizkolaritza: **el probaleku de Usurbil** (empedrado, muros de cantos con albardilla, gradas
+  con toldo, porterías, iglesia de San Salvador con la torre, frontón cubierto, casas de Etxebeste e Irazu, montes;
+  29 espectadores con 10 aspectos). −Z = sur (iglesia), +X = oeste (Etxebeste); la plataforma a y = 0, calles a −1.
+- **Fondo de menús**: `ui::setBackground(drawMenuBackdrop)` (en `main.cpp`) pinta el escenario 3D detrás de los paneles
+  de cristal (estilo Wii Sports Resort); `gfx::clearDepth()` borra el Z antes del personaje de vista previa.
   `sharedWorld()` (una sola instancia), `drawSky()` (2D, antes de 3D), `draw()`, `cheer(s)`, `clapLight(s)`,
   `drawShadow(pos, rx, rz)`, `setCameraHide(eye, on)` (oculta el público entre una cámara lejana y la plaza).
 - **`palette.h`** — colores favoritos, piel, pelo, colores de UI y madera.

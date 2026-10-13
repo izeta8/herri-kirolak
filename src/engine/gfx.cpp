@@ -275,6 +275,22 @@ void begin2D() {
     setup2D(false);
 }
 
+void clearDepth() {
+    setup2D(false);
+    // Un rectángulo a pantalla completa casi en el plano lejano que solo escribe profundidad
+    GX_SetColorUpdate(GX_FALSE);
+    GX_SetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+    const float w = screenW(), z = -8.95f;  // con la traslación −1 de la vista queda a −9.95 (lejos = 10)
+    GX_Begin(GX_QUADS, GX_VTXFMT1, 4);
+    GX_Position3f32(0, 0, z); GX_Color1u32(0);
+    GX_Position3f32(w, 0, z); GX_Color1u32(0);
+    GX_Position3f32(w, SCREEN_H, z); GX_Color1u32(0);
+    GX_Position3f32(0, SCREEN_H, z); GX_Color1u32(0);
+    GX_End();
+    GX_SetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    GX_SetColorUpdate(GX_TRUE);
+}
+
 static inline void v2(float x, float y, Color c) {
     GX_Position3f32(x, y, 0);
     GX_Color1u32(c);

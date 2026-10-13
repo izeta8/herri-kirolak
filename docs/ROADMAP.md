@@ -57,6 +57,15 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Registro de deportes (`src/game/sports.cpp`) y `MatchConfig` común
 - [ ] Récords por deporte en save.dat (ahora son de aizkolaritza)
 
+## Estilo Wii (rama `estilo-wii-sports-resort`, pendiente de que el usuario lo vea en la Wii)
+- [x] UI y menús estilo Wii Sports Resort; fondo de menús = escenario 3D
+- [x] Aizkolaritza en el probaleku de Usurbil (iglesia, frontón, gradas, porterías, casas, empedrado, muros de cantos)
+- [x] Miis calcados a los de la Wii + peinado en el editor (Orrazkera); escena 9 = galería de Miis
+- [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
+- [ ] Marcador de la partida al estilo Resort
+- [ ] Más caras a elegir (ojos, cejas, bocas, narices) como en el editor de Miis
+- [ ] Juntar con `main` cuando lo apruebe
+
 ## Próximo
 - [ ] **Puntero IR en los menús** (además de la cruceta)
 - [ ] Probar la lehiaketa con 2-4 mandos reales

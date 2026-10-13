@@ -14,10 +14,11 @@
 #include "engine/font.h"
 #include "engine/ui.h"
 #include "game/palette.h"
+#include "scenes/common.h"
 #include "scenes/scenes.h"
 
 // START_SCENE (solo para pruebas): 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords,
-// 5 entrenamiento, 6 lehiaketa 4 CPU a la vez, 7 entrenamiento con la CPU, 8 kolpe proba
+// 5 entrenamiento, 6 lehiaketa 4 CPU a la vez, 7 entrenamiento con la CPU, 8 kolpe proba, 9 galería de Miis
 #ifndef START_SCENE
 #define START_SCENE 0
 #endif
@@ -42,6 +43,7 @@ static Scene* firstScene() {
             cfg.bot[0] = cfg.bot[1] = cfg.bot[2] = cfg.bot[3] = true;
             return makeAizkoScene(cfg);
         case 8: return makeSwingTestScene();
+        case 9: return makeMiiGalleryScene();
         case 7:
             cfg.bot[0] = true;
             return makeAizkoScene(cfg);
@@ -63,6 +65,7 @@ int main(int argc, char** argv) {
     srand(gettime());
 
     sharedWorld();
+    ui::setBackground(drawMenuBackdrop);
     scenes::start(firstScene());
 
     u64 last = gettime();

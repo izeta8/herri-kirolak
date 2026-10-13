@@ -17,62 +17,28 @@ static void cloud2D(float cx, float cy, float s, Color c) {
     gfx::roundRect(cx - 56 * s, cy - 6 * s, 112 * s, 24 * s, 12 * s, c);
 }
 
-// Palmera de dibujo: tronco curvado de base (bx, by) a la copa (tx, ty)
-static void palm2D(float bx, float by, float tx, float ty, float s) {
-    const int n = 10;
-    float px = bx, py = by;
-    for (int i = 1; i <= n; i++) {
-        float t = i / (float)n;
-        float x = bx + (tx - bx) * t * t, y = by + (ty - by) * t;
-        float w0 = 11 * s * (1 - 0.4f * (t - 1.0f / n)), w1 = 11 * s * (1 - 0.4f * t);
-        Color c = (i & 1) ? rgba(0x9E, 0x7A, 0x50) : rgba(0x88, 0x66, 0x42);
-        gfx::triangle(px - w0, py, px + w0, py, x + w1, y, c);
-        gfx::triangle(px - w0, py, x + w1, y, x - w1, y, c);
-        px = x;
-        py = y;
-    }
-    for (int k = 0; k < 7; k++) {
-        float a = -PI * 0.05f - k * PI * 0.15f;  // de la derecha a la izquierda, hacia arriba
-        float len = (k & 1) ? 95 * s : 120 * s;
-        float ex = tx + cosf(a) * len, ey = ty + sinf(a) * len * 0.45f + len * 0.42f;
-        float mx = tx + cosf(a) * len * 0.5f, my = ty + sinf(a) * len * 0.5f - 6 * s;
-        float nx = -sinf(a) * 16 * s, ny = cosf(a) * 16 * s;
-        Color g = (k & 1) ? rgba(0x2E, 0x96, 0x3A) : rgba(0x3A, 0xAA, 0x40);
-        gfx::triangle(tx, ty, mx + nx, my + ny, ex, ey, g);
-        gfx::triangle(tx, ty, mx - nx, my - ny, ex, ey, shade(g, 0.85f));
-    }
-}
+static void (*s_background)(float) = nullptr;
+
+void setBackground(void (*draw)(float t)) { s_background = draw; }
 
 void background(float t) {
-    // Playa de Wii Sports Resort: cielo intenso, nubes, mar turquesa, arena y palmeras
     float w = gfx::screenW();
-    gfx::rectGrad(0, 0, w, 190, rgba(0x14, 0x78, 0xE0), rgba(0x5C, 0xB4, 0xF2));
-    gfx::rectGrad(0, 190, w, 100, rgba(0x5C, 0xB4, 0xF2), rgba(0xC4, 0xE8, 0xFA));
+    if (s_background) {
+        // Fondo del juego (el escenario en 3D) con un velo claro para que destaquen los paneles
+        s_background(t);
+        gfx::begin2D();
+        gfx::clearDepth();
+        gfx::rectGrad(0, 0, w, 480, rgba(255, 255, 255, 40), rgba(255, 255, 255, 90));
+        return;
+    }
+    // Sin escenario: cielo con nubes
+    gfx::rectGrad(0, 0, w, 480, rgba(0x2C, 0x84, 0xE0), rgba(0xC8, 0xE2, 0xF2));
     for (int i = 0; i < 6; i++) {
         float s = 0.7f + (i % 3) * 0.3f;
         float cx = fmodf(i * 211.0f + t * (5 + (i % 3) * 3), w + 320) - 160;
-        float cy = 70 + (i * 67) % 160;
+        float cy = 70 + (i * 67) % 300;
         cloud2D(cx, cy, s, rgba(255, 255, 255, 235));
     }
-    // Islas en el horizonte: colina verde y el volcán
-    gfx::circle(w * 0.16f, 318, 46, rgba(0x58, 0xA8, 0x4C), 32);
-    gfx::circle(w * 0.24f, 314, 30, rgba(0x4C, 0x9A, 0x44), 28);
-    gfx::triangle(w * 0.62f, 292, w * 0.7f, 236, w * 0.79f, 292, rgba(0xA8, 0x86, 0x60));
-    gfx::triangle(w * 0.7f, 236, w * 0.79f, 292, w * 0.72f, 292, rgba(0x8A, 0x6C, 0x4C));
-    gfx::rect(w * 0.6f, 284, w * 0.21f, 8, rgba(0x58, 0xA8, 0x44));
-    // Mar
-    gfx::rectGrad(0, 290, w, 36, rgba(0x18, 0x84, 0xD8), rgba(0x2A, 0xAE, 0xE2));
-    gfx::rectGrad(0, 326, w, 34, rgba(0x2A, 0xAE, 0xE2), rgba(0x70, 0xDC, 0xE6));
-    for (int i = 0; i < 8; i++) {
-        float lx = fmodf(i * 137.0f + t * 10, w + 80) - 40, ly = 300 + (i * 23) % 52;
-        gfx::rect(lx, ly, 26 + (i % 3) * 10, 2, rgba(255, 255, 255, 110));
-    }
-    // Orilla con espuma y arena
-    float foam = sinf(t * 1.2f) * 3;
-    gfx::rect(0, 356 + foam, w, 8, rgba(0xF4, 0xFC, 0xFC, 230));
-    gfx::rectGrad(0, 362 + foam, w, 118 - foam, rgba(0xF6, 0xEA, 0xC6), rgba(0xEC, 0xD8, 0xA8));
-    palm2D(w - 70, 470, w - 120, 236, 1.0f);
-    palm2D(w - 10, 470, w - 30, 300, 0.75f);
 }
 
 // Panel de cristal de Resort: borde blanco, relleno blanco-azulado translúcido

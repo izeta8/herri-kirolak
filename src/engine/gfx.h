@@ -59,6 +59,8 @@ void use3DFormat();  // deja el formato de vértice 3D activo (para construir di
 
 // ---------- 2D ----------
 void begin2D();
+// Borra el Z-buffer (para dibujar 3D encima de una escena 3D ya pintada, p. ej. el fondo de los menús)
+void clearDepth();
 void rect(float x, float y, float w, float h, Color c);
 void rectGrad(float x, float y, float w, float h, Color top, Color bottom);
 void roundRect(float x, float y, float w, float h, float r, Color c);
