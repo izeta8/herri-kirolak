@@ -9,7 +9,9 @@ static const float PHI_RAISED = 3.55f;   // hacha por encima de la cabeza, un po
 static const float PHI_REST = 0.55f;     // apoyada delante
 static const float PHI_LOW = 1.25f;      // sujeta delante, lista para subirla
 static const float HEAD_DIST = 0.66f;    // de la empuñadura a la cabeza del hacha
-static const float SWING_TIME = 0.13f;
+static const float SWING_TIME = 0.13f;     // bajada completa (CPU y golpes con botón)
+static const float PENDING_TIME = 0.17f;   // bajada del jugador hasta quedar justo encima de la madera
+static const float FINISH_TIME = 0.05f;    // de "justo encima" a dentro de la madera al llegar el resultado
 static const float STUCK_TIME = 0.09f;
 static const float RECOVER_TIME = 0.34f;
 static const float TURN_TIME = 0.75f;
@@ -67,6 +69,7 @@ void Aizkolari::startSwing() {
     strength_ = 0.8f;
     chopTilt_ = 0;
     resolved_ = false;
+    resolvedAt_ = -1;
     audio::play(SFX_WHOOSH, 0.55f, frand(0.9f, 1.1f));
 }
 
@@ -83,6 +86,8 @@ bool Aizkolari::chop(float strength, float tilt) {
         strength_ = strength;
         chopTilt_ = tilt;
         resolved_ = true;
+        resolvedAt_ = t_;
+        phiResolve_ = phi_;
         return true;
     }
     bool canNow = phase_ == READY || (phase_ == RECOVER && t_ > RECOVER_TIME * 0.45f);
@@ -100,6 +105,7 @@ bool Aizkolari::chop(float strength, float tilt) {
     strength_ = strength;
     chopTilt_ = tilt;
     resolved_ = true;
+    resolvedAt_ = -1;
     audio::play(SFX_WHOOSH, 0.35f + 0.3f * strength, frand(0.9f, 1.1f));
     return true;
 }
@@ -149,14 +155,29 @@ void Aizkolari::update(float dt) {
             }
             break;
         case SWING: {
-            float k = clampv(t_ / SWING_TIME, 0.0f, 1.0f);
-            phi_ = lerpf(phiFrom_, impactAngle(), k * k);
+            float target = impactAngle();
+            float k;
+            if (!resolved_) {
+                // Baja con el jugador y espera justo encima de la madera
+                float q = clampv(t_ / PENDING_TIME, 0.0f, 1.0f);
+                phi_ = lerpf(phiFrom_, target, 0.86f * q * q);
+                k = 0;
+                if (t_ > 0.8f) {
+                    phase_ = RECOVER;  // nunca llegó el resultado del golpe
+                    t_ = 0;
+                    phiFrom_ = phi_;
+                    break;
+                }
+            } else if (resolvedAt_ >= 0) {
+                // Ya se sabe el golpe: entra en la madera enseguida
+                k = clampv((t_ - resolvedAt_) / FINISH_TIME, 0.0f, 1.0f);
+                phi_ = lerpf(phiResolve_, target, k);
+            } else {
+                k = clampv(t_ / SWING_TIME, 0.0f, 1.0f);
+                phi_ = lerpf(phiFrom_, target, k * k);
+            }
             tilt_ = approach(tilt_, chopTilt_, 25, dt);
-            if (k >= 1.0f && !resolved_ && t_ > SWING_TIME + 0.6f) {
-                phase_ = RECOVER;  // nunca llegó el resultado del golpe
-                t_ = 0;
-                phiFrom_ = phi_;
-            } else if (k >= 1.0f && resolved_) {
+            if (k >= 1.0f && resolved_) {
                 phase_ = STUCK;
                 t_ = 0;
                 impact_ = true;

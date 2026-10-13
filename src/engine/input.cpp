@@ -123,13 +123,15 @@ static void step(Pad& p, const Vec3& a, float dt) {
                 p.state = SW_IDLE;  // lo ha bajado despacio: no es un golpe
             }
             break;
-        case SW_SWING:
+        case SW_SWING: {
             p.timer += dt;
             p.peak = fmaxf(p.peak, m);
             p.lat += a.x * dt;  // empuje lateral acumulado (g·s)
             if (p.swingN < 64) p.swingX[p.swingN++] = a.x;
             p.swingTilt = sideScore(p.swingX, p.swingN, 0.01f);
-            if ((m < SWING_END_G && p.timer > 0.04f) || p.timer > SWING_MAX_TIME) {
+            // Se resuelve en el pico (cuando la fuerza empieza a bajar): es cuando el jugador "golpea"
+            bool atPeak = p.peak >= s_chopMinG && m < PEAK_DROP * p.peak;
+            if (atPeak || (m < SWING_END_G && p.timer > 0.04f) || p.timer > SWING_MAX_TIME) {
                 if (p.peak >= s_chopMinG) {
                     Chop& c = p.chop;
                     c.happened = true;
@@ -146,6 +148,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
                 }
             }
             break;
+        }
         case SW_COOLDOWN:
             p.timer -= dt;
             if (p.timer <= 0 && m < SWING_END_G) p.state = SW_IDLE;

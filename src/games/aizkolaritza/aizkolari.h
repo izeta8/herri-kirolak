@@ -57,6 +57,8 @@ private:
     float strength_ = 0, chopTilt_ = 0, impStrength_ = 0, impTilt_ = 0;
     bool queued_ = false;
     bool resolved_ = true;  // en SWING: ya se sabe fuerza y lado del golpe
+    float resolvedAt_ = -1; // t_ en el que llegó el resultado (-1 = se sabía desde el principio)
+    float phiResolve_ = 0;
     float qStrength_ = 0, qTilt_ = 0;
     float blinkT_ = 2;
     float time_ = 0;

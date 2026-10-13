@@ -21,16 +21,19 @@ constexpr float SWING_MAX_TIME = 0.45f; // s
 constexpr float CHOP_MIN_G[3] = {2.6f, 3.6f, 4.6f};  // pico mínimo según sensibilidad (suave/normal/fuerte)
 constexpr float CHOP_FULL_G = 7.5f;     // pico que da fuerza máxima
 constexpr float CHOP_COOLDOWN = 0.2f;   // s
-// Lado de la V con el gesto oficial (pulgar en 1-2, bajar en diagonal sin girar la muñeca).
-// Se mira la aceleración X durante la bajada (de |a| > 3 g hasta |a| < 1.4 g): desde la derecha la mano
-// primero acelera hacia un lado y luego frena; desde la izquierda al revés. Ajustado con la grabación
-// guiada tuning-data/2026-10-13-gidatua3.csv (15 de 16 en validación cruzada):
+// El golpe se resuelve en el pico de fuerza (cuando |a| baja de PEAK_DROP × pico), que es cuando el
+// jugador "golpea" (≈170 ms tras empezar a bajar); esperar al final de la bajada metía ≈180 ms de retraso.
+constexpr float PEAK_DROP = 0.85f;
+// Lado de la V con el gesto oficial (pulgar en 1-2, bajar en diagonal sin girar la muñeca), con la
+// aceleración X desde que empieza la bajada (|a| > 3 g) hasta el pico. Desde la derecha la mano acelera
+// primero hacia un lado; desde la izquierda, hacia el otro. Ajustado con tuning-data/2026-10-13-gidatua3.csv
+// (15 de 16 en validación cruzada):
 //   puntos = W_IX·∫ax + W_IX1·∫ax(1ª mitad) + W_MINX·min(ax) + W_MAXX·max(ax) - CUT   (> 0 = derecha)
-constexpr float SIDE_W_IX = 3.97f;
-constexpr float SIDE_W_IX1 = -6.80f;
+constexpr float SIDE_W_IX = -1.72f;
+constexpr float SIDE_W_IX1 = -10.74f;
 constexpr float SIDE_W_MINX = 0.0f;
 constexpr float SIDE_W_MAXX = 0.0f;
-constexpr float SIDE_CUT = 0.19f;
+constexpr float SIDE_CUT = 1.32f;
 constexpr float SIDE_SCALE = 1.0f;      // puntos que cuentan como lado claro
 // (antes: solo el empuje lateral, integral de la aceleración X durante la bajada, en g·s)
 // Datos reales (golpeando seguido): desde la derecha -0.33..-0.94; desde la izquierda -0.24..+0.02

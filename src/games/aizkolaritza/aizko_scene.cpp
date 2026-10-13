@@ -49,7 +49,7 @@ public:
         chips_.init();
         log_.pos = Vec3(0, 0, 0);
         startPlayer(0);
-        showHowTo_ = cfg_.training;
+        showHowTo_ = cfg_.training && !cfg_.bot[0];
         camEye_ = Vec3(6, 3.5f, 7);
         camTarget_ = log_.center();
     }

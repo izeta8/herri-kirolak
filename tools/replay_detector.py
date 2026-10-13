@@ -98,7 +98,8 @@ def detect(rows):
             lat += ax * dt
             if len(xs) < 64:
                 xs.append(ax)
-            if (m < T["SWING_END_G"] and timer > 0.04) or timer > T["SWING_MAX_TIME"]:
+            at_peak = peak >= CHOP_MIN and m < T["PEAK_DROP"] * peak
+            if at_peak or (m < T["SWING_END_G"] and timer > 0.04) or timer > T["SWING_MAX_TIME"]:
                 if peak >= CHOP_MIN:
                     tilt = side_score(xs)
                     side = "R" if tilt > T["TILT_STRAIGHT"] else "L" if tilt < -T["TILT_STRAIGHT"] else "Z"
