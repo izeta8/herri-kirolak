@@ -80,7 +80,8 @@ public:
         Camera cam;
         float a = t_ * 0.12f + 0.4f;
         cam.target = log_.center() + Vec3(0, 0.55f, 0);
-        cam.eye = cam.target + Vec3(sinf(a) * 4.2f, 1.1f + sinf(t_ * 0.3f) * 0.2f, cosf(a) * 4.2f);
+        // Algo más alta y lejos que antes para que se vea el mar de la isla detrás de la plaza
+        cam.eye = cam.target + Vec3(sinf(a) * 5.2f, 1.7f + sinf(t_ * 0.3f) * 0.2f, cosf(a) * 5.2f);
         gfx::begin3D(cam);
         world.setCameraHide(cam.eye, false);
         world.draw();
@@ -93,10 +94,12 @@ public:
         const float W = gfx::screenW();
         float in = easeOutBack(clampv((t_ - 0.2f) / 0.6f, 0.0f, 1.0f));
         float y = 70 + (1 - in) * -120;
-        font::draw(txt::GAME_TITLE, W / 2 + 4, y + 6, 78, rgba(0, 0, 0, 70), rgba(0, 0, 0, 70), ALIGN_CENTER);
-        font::draw(txt::GAME_TITLE, W / 2, y, 78, UI_WHITE, rgba(0xC8, 0x1E, 0x1E), ALIGN_CENTER);
-        font::draw("Wii", W / 2 + font::width(txt::GAME_TITLE, 78) / 2 - 10, y + 76, 30, rgba(0x2C, 0x9C, 0xE8), UI_WHITE,
-                   ALIGN_RIGHT);
+        // Logo a lo Wii Sports Resort: "Wii" gris encima y el nombre en azul con borde blanco
+        float titleW = font::width(txt::GAME_TITLE, 78);
+        font::draw("Wii", W / 2 - titleW / 2 + 6, y - 34, 36, rgba(0x9C, 0xA2, 0xAA), UI_WHITE, ALIGN_LEFT);
+        font::draw(txt::GAME_TITLE, W / 2 + 3, y + 6, 78, rgba(0x08, 0x3C, 0x78, 110), rgba(0x08, 0x3C, 0x78, 110),
+                   ALIGN_CENTER);
+        font::draw(txt::GAME_TITLE, W / 2, y, 78, rgba(0x18, 0x8C, 0xDC), UI_WHITE, ALIGN_CENTER);
         float blink = 0.55f + 0.45f * sinf(t_ * 4);
         if (t_ > 0.8f) {
             float tw = font::width(txt::PRESS, 30) + font::width(txt::PRESS_A_TAIL, 30) + 48;

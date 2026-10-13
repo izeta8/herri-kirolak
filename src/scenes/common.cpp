@@ -28,12 +28,12 @@ void drawCharacterPreview(const Appearance& look, float offsetX, float yaw, floa
     p.headPitch = -0.05f;
     Xf root = Xf().translate(p.pos).rotateY(yaw);
     float sway = sinf(time * 1.6f) * 0.02f;
-    p.handL = root.apply(Vec3(-0.26f, 0.5f + sway, 0.05f));
+    p.handL = root.apply(Vec3(-0.31f, 0.5f + sway, 0.05f));
     if (wave > 0) {
         float w = sinf(time * 10) * 0.08f;
         p.handR = root.apply(Vec3(0.3f + w, 1.15f, 0.1f));
     } else {
-        p.handR = root.apply(Vec3(0.26f, 0.5f - sway, 0.05f));
+        p.handR = root.apply(Vec3(0.31f, 0.5f - sway, 0.05f));
     }
     // Pequeña peana circular
     static Mesh base;

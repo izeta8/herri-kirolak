@@ -15,7 +15,7 @@ public:
     void clapLight(float seconds);   // aplauso suave (solo manos)
     void drawShadow(const Vec3& pos, float rx, float rz, float alpha = 1.0f);
 
-    static constexpr Color HORIZON = rgba(0xC4, 0xE6, 0xF8);
+    static constexpr Color HORIZON = rgba(0xBC, 0xE4, 0xF8);
 
 private:
     struct Spectator {

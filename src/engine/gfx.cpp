@@ -168,9 +168,9 @@ void begin3D(const Camera& cam) {
     guLookAt(s_view, &eye, &up, &at);
 
     // Luz principal cálida desde arriba-delante y luz de relleno azulada desde el lado contrario
-    loadLight(GX_LIGHT0, Vec3(0.45f, 1.0f, 0.65f), (GXColor){0xE8, 0xE4, 0xD8, 0xFF});
-    loadLight(GX_LIGHT1, Vec3(-0.6f, 0.2f, -0.7f), (GXColor){0x38, 0x40, 0x58, 0xFF});
-    GX_SetChanAmbColor(GX_COLOR0, (GXColor){0x5A, 0x5C, 0x68, 0xFF});
+    loadLight(GX_LIGHT0, Vec3(0.45f, 1.0f, 0.65f), (GXColor){0xF0, 0xEC, 0xE2, 0xFF});
+    loadLight(GX_LIGHT1, Vec3(-0.6f, 0.2f, -0.7f), (GXColor){0x44, 0x52, 0x70, 0xFF});
+    GX_SetChanAmbColor(GX_COLOR0, (GXColor){0x6E, 0x74, 0x84, 0xFF});
     s_lit = true;
     setChannels(true);
     GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);

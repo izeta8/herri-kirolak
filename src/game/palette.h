@@ -31,6 +31,11 @@ constexpr Color UI_WHITE = rgba(0xFF, 0xFF, 0xFF);
 constexpr Color UI_GOLD = rgba(0xFF, 0xC8, 0x20);
 constexpr Color UI_RED = rgba(0xE8, 0x3A, 0x3A);
 constexpr Color UI_GREEN = rgba(0x3C, 0xB8, 0x48);
+// Wii Sports Resort: texto turquesa con borde blanco sobre paneles de cristal
+constexpr Color UI_TEAL = rgba(0x10, 0x9A, 0xC8);
+constexpr Color UI_TEAL_GLOW = rgba(0x3C, 0xCC, 0xF4);
+constexpr Color UI_GLASS_TOP = rgba(0xF2, 0xFB, 0xFF, 0xE0);
+constexpr Color UI_GLASS_BOTTOM = rgba(0xC4, 0xEA, 0xF8, 0xD8);
 
 // Madera
 constexpr Color WOOD_LIGHT = rgba(0xEC, 0xCE, 0x96);
