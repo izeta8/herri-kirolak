@@ -1,5 +1,6 @@
 #include "engine/updater.h"
 #include <asndlib.h>
+#include <errno.h>
 #include <fat.h>
 #include <gccore.h>
 #include <malloc.h>
@@ -18,21 +19,11 @@ static u8* const BOOTER_ADDR = (u8*)0x93000000;  // donde vive el cargador (tool
 static const u32 MAX_DOL = 12 * 1024 * 1024;
 
 static volatile bool s_ready = false;
+static s32 s_server = -1, s_client = -1;
+static u8 s_header[8];
 static u8* s_buf = nullptr;
-static u32 s_size = 0;
-static lwp_t s_thread;
-static volatile s32 s_server = -1;
-static u8 s_stack[16 * 1024] ATTRIBUTE_ALIGN(32);
-
-static bool recvAll(s32 sock, u8* dst, u32 len) {
-    while (len > 0) {
-        s32 n = net_recv(sock, dst, len > 32768 ? 32768 : len, 0);
-        if (n <= 0) return false;
-        dst += n;
-        len -= n;
-    }
-    return true;
-}
+static u32 s_size = 0, s_got = 0;
+static bool s_inBody = false;
 
 // Comprobación básica de que lo recibido parece un DOL
 static bool looksLikeDol(const u8* d, u32 size) {
@@ -42,38 +33,73 @@ static bool looksLikeDol(const u8* d, u32 size) {
     return entry >= 0x80000000 && entry < 0x81800000;
 }
 
-static void* run(void*) {
-    s32 server = telemetry::netListen(PORT);
-    if (server < 0) return nullptr;
-    s_server = server;
-    while (!s_ready) {
-        struct sockaddr_in client;
-        socklen_t len = sizeof(client);
-        s32 sock = net_accept(server, (struct sockaddr*)&client, &len);
-        if (sock < 0) {
-            usleep(200000);
-            continue;
-        }
-        u8 header[8];
-        if (recvAll(sock, header, 8) && memcmp(header, "HKUP", 4) == 0) {
-            u32 size = (header[4] << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
-            u8* buf = size <= MAX_DOL ? (u8*)memalign(32, size) : nullptr;
-            if (buf && recvAll(sock, buf, size) && looksLikeDol(buf, size)) {
-                net_send(sock, "OK\n", 3, 0);
-                s_buf = buf;
-                s_size = size;
-                s_ready = true;
-            } else {
-                net_send(sock, "ERR\n", 4, 0);
-                free(buf);
-            }
-        }
-        net_close(sock);
-    }
-    return nullptr;
+void open() {
+    s_server = telemetry::netListen(PORT);
+    if (s_server >= 0) telemetry::setNonBlocking(s_server);
 }
 
-void startServer() { LWP_CreateThread(&s_thread, run, nullptr, s_stack, sizeof(s_stack), 40); }
+static void dropClient() {
+    if (s_client >= 0) net_close(s_client);
+    s_client = -1;
+    if (!s_ready) {
+        free(s_buf);
+        s_buf = nullptr;
+    }
+}
+
+void poll() {
+    if (s_server < 0 || s_ready) return;
+    if (s_client < 0) {
+        struct sockaddr_in client;
+        socklen_t len = sizeof(client);
+        s32 c = net_accept(s_server, (struct sockaddr*)&client, &len);
+        if (c < 0) return;  // nadie (EAGAIN)
+        s_client = c;
+        telemetry::setNonBlocking(s_client);
+        s_got = 0;
+        s_inBody = false;
+    }
+    // Lee lo que haya, sin bloquear
+    for (int chunk = 0; chunk < 64; chunk++) {
+        u8* dst;
+        u32 want;
+        if (!s_inBody) {
+            dst = s_header + s_got;
+            want = 8 - s_got;
+        } else {
+            dst = s_buf + s_got;
+            want = s_size - s_got;
+            if (want > 32768) want = 32768;
+        }
+        s32 n = net_recv(s_client, dst, want, 0);
+        if (n == -EAGAIN) return;  // de momento no hay más
+        if (n <= 0) {
+            dropClient();
+            return;
+        }
+        s_got += n;
+        if (!s_inBody && s_got == 8) {
+            s_size = (s_header[4] << 24) | (s_header[5] << 16) | (s_header[6] << 8) | s_header[7];
+            if (memcmp(s_header, "HKUP", 4) != 0 || s_size > MAX_DOL || !(s_buf = (u8*)memalign(32, s_size))) {
+                dropClient();
+                return;
+            }
+            s_inBody = true;
+            s_got = 0;
+        } else if (s_inBody && s_got == s_size) {
+            if (looksLikeDol(s_buf, s_size)) {
+                net_send(s_client, "OK\n", 3, 0);
+                s_ready = true;
+            } else {
+                net_send(s_client, "ERR\n", 4, 0);
+            }
+            usleep(50000);
+            dropClient();
+            return;
+        }
+    }
+}
+
 bool ready() { return s_ready; }
 
 void launch() {
@@ -81,7 +107,7 @@ void launch() {
     for (int i = 0; i < 4; i++) WPAD_Rumble(i, 0);
     fatUnmount("sd:/");
     fatUnmount("usb:/");
-    telemetry::closeSockets();
+    telemetry::stop();
     if (s_server >= 0) net_close(s_server);
     usleep(100000);
     net_deinit();

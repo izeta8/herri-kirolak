@@ -12,7 +12,8 @@ void push(int chan, const input::Sample& s);
 // 0 = sin red, 1 = red lista (esperando PC), 2 = PC conectado
 int status();
 const char* ip();  // IP de la Wii ("" si no hay red)
-s32 netListen(u16 port);  // socket de escucha con reintentos (-1 si falla)
-void closeSockets();      // antes de saltar a otra versión
+s32 netListen(u16 port);     // socket de escucha con reintentos (-1 si falla)
+void setNonBlocking(s32 sock);
+void stop();                 // cierra los sockets (antes de saltar a otra versión)
 
 }  // namespace telemetry

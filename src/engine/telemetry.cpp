@@ -1,11 +1,12 @@
 #include "engine/telemetry.h"
 #include "engine/updater.h"
+#include <errno.h>
+#include <fcntl.h>
 #include <gccore.h>
 #include <network.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 
 namespace telemetry {
 
@@ -44,7 +45,10 @@ s32 netListen(u16 port) {
     return -1;
 }
 
-void closeSockets() {
+// En la Wii el "no bloqueante" de IOS es el bit 0x04 (no el O_NONBLOCK de newlib)
+void setNonBlocking(s32 s) { net_fcntl(s, F_SETFL, net_fcntl(s, F_GETFL, 0) | 4); }
+
+void stop() {
     if (s_client >= 0) net_close(s_client);
     if (s_server >= 0) net_close(s_server);
     s_client = s_server = -1;
@@ -62,9 +66,14 @@ void push(int chan, const input::Sample& s) {
 int status() { return s_status; }
 const char* ip() { return s_ip; }
 
+// Envía todo (el socket del PC es bloqueante; el PC lee continuamente)
 static bool sendAll(s32 sock, const char* buf, int len) {
     while (len > 0) {
         s32 n = net_send(sock, buf, len, 0);
+        if (n == -EAGAIN) {
+            usleep(2000);
+            continue;
+        }
         if (n <= 0) return false;
         buf += n;
         len -= n;
@@ -72,6 +81,7 @@ static bool sendAll(s32 sock, const char* buf, int len) {
     return true;
 }
 
+// Único hilo de red: telemetría (puerto 4300) y actualizaciones (4301), sin llamadas que bloqueen
 static void* run(void*) {
     // net_init suele devolver -EAGAIN varias veces mientras el módulo WiFi arranca
     s32 r = -1;
@@ -83,33 +93,40 @@ static void* run(void*) {
         snprintf(s_ip, sizeof(s_ip), "err %d", (int)r);
         return nullptr;
     }
-    updater::startServer();
     u32 ip = net_gethostip();
     snprintf(s_ip, sizeof(s_ip), "%u.%u.%u.%u", (ip >> 24) & 255, (ip >> 16) & 255, (ip >> 8) & 255, ip & 255);
 
+    updater::open();
     s32 server = netListen(PORT);
-    if (server < 0) {
-        snprintf(s_ip + strlen(s_ip), sizeof(s_ip) - strlen(s_ip), " (bind?)");
-        return nullptr;
-    }
+    if (server < 0) snprintf(s_ip + strlen(s_ip), sizeof(s_ip) - strlen(s_ip), " (bind?)");
+    else setNonBlocking(server);
     s_server = server;
     s_status = 1;
 
     static char buf[8192];
     while (true) {
-        struct sockaddr_in client;
-        socklen_t len = sizeof(client);
-        s32 sock = net_accept(server, (struct sockaddr*)&client, &len);
-        if (sock < 0) {
-            usleep(200000);
+        updater::poll();
+        if (updater::ready()) {
+            usleep(100000);
             continue;
         }
-        s_client = sock;
-        s_tail = s_head;  // empezar con el búfer vacío
-        s_status = 2;
-        const char* hello = "# herri-kirolak telemetria: mando,ms,ax,ay,az,gx,gy,gz,egoera,kolpea,botoiak,etiketa\n";
-        bool ok = sendAll(sock, hello, strlen(hello));
-        while (ok) {
+        if (s_server >= 0 && s_client < 0) {
+            struct sockaddr_in client;
+            socklen_t len = sizeof(client);
+            s32 sock = net_accept(s_server, (struct sockaddr*)&client, &len);
+            if (sock >= 0) {
+                s_client = sock;
+                s_tail = s_head;  // empezar con el búfer vacío
+                s_status = 2;
+                const char* hello = "# herri-kirolak telemetria: mando,ms,ax,ay,az,gx,gy,gz,egoera,kolpea,botoiak,etiketa\n";
+                if (!sendAll(sock, hello, strlen(hello))) {
+                    net_close(sock);
+                    s_client = -1;
+                    s_status = 1;
+                }
+            }
+        }
+        if (s_client >= 0) {
             int n = 0;
             while (s_tail != s_head && n < (int)sizeof(buf) - 128) {
                 const Entry& e = s_ring[s_tail];
@@ -118,12 +135,13 @@ static void* run(void*) {
                               e.s.label ? e.s.label : '-');
                 s_tail = (s_tail + 1) % RING;
             }
-            if (n > 0) ok = sendAll(sock, buf, n);
-            else usleep(15000);
+            if (n > 0 && !sendAll(s_client, buf, n)) {
+                net_close(s_client);
+                s_client = -1;
+                s_status = 1;
+            }
         }
-        net_close(sock);
-        s_client = -1;
-        s_status = 1;
+        usleep(10000);
     }
     return nullptr;
 }
