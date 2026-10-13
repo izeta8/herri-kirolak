@@ -184,7 +184,7 @@ void AizkoScene::handleImpact() {
         log_.addDepth(notch, fmaxf(0.0f, gain));
         chips_.spawn(at, outward, 2 + (int)(factor * 9), 0.5f + factor * 0.6f);
     }
-    fatigue_ = fminf(1.0f, fatigue_ + FATIGUE_PER_CHOP);
+    if (FATIGUE_ON) fatigue_ = fminf(1.0f, fatigue_ + FATIGUE_PER_CHOP);
     if (hit != HIT_STRAIGHT) lastSide_[notch] = hit;
 
     float pan = clampv(at.x * 0.5f, -1.0f, 1.0f);
@@ -491,8 +491,8 @@ void AizkoScene::drawHud() {
         gfx::triangle(cx - 9, ay, cx + 9, ay, cx, ay - dir * 9, UI_RED);
     }
 
-    // Cansancio
-    {
+    // Cansancio (desactivado de momento)
+    if (FATIGUE_ON) {
         float x = 44, y = 396, w = 170, h = 18;
         font::plain(txt::FATIGUE, x, y - 28, 22, UI_WHITE);
         gfx::roundRect(x - 3, y - 3, w + 6, h + 6, 11, rgba(0, 0, 0, 90));
@@ -549,7 +549,7 @@ void AizkoScene::drawHud() {
 
     // Consejos del entrenamiento
     if (cfg_.training && state_ == ST_PLAY) {
-        const char* tips[4] = {txt::TIP_1, txt::TIP_2, txt::TIP_3, txt::TIP_4};
+        const char* tips[4] = {txt::TIP_1, txt::TIP_2, FATIGUE_ON ? txt::TIP_3 : txt::TIP_1, txt::TIP_4};
         float a = smooth01(tipT_ / 0.4f) * (1 - smooth01((tipT_ - 4.6f) / 0.4f));
         font::draw(tips[tip_], W / 2, 330, 22, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_CENTER, a);
     }

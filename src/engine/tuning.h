@@ -44,6 +44,7 @@ constexpr float LOG_LENGTH = 1.5f;      // m
 constexpr float CUT_PER_CHOP = 0.105f;  // fracción del radio por golpe perfecto
 constexpr float REPEAT_SIDE_FACTOR = 0.35f;  // golpe por el mismo lado de la V que el anterior
 constexpr float STRAIGHT_FACTOR = 0.5f;      // golpe sin inclinar
+constexpr bool FATIGUE_ON = false;          // de momento sin cansancio (se recuperaba demasiado rápido)
 constexpr float FATIGUE_PER_CHOP = 0.1f;
 constexpr float FATIGUE_RECOVER = 0.14f;     // por segundo
 constexpr float FATIGUE_HEAVY = 0.7f;        // a partir de aquí los golpes pierden fuerza
