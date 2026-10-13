@@ -95,10 +95,19 @@ constexpr const char* LEFT = "Ezkerra";
 constexpr const char* RIGHT = "Eskuina";
 constexpr const char* CONNECT_REMOTE = "Konektatu %d. Wii Remote-a";
 
-constexpr const char* TIP_1 = "Altxatu Wii Remote-a buru gainera, eta jo behera indarrez!";
-constexpr const char* TIP_2 = "Jo diagonalean: goitik eskuinetik erdira, gero ezkerretik. V forma!";
+constexpr const char* TIP_1 = "Heldu behetik, erpurua 1 eta 2 botoien gainean.";
+constexpr const char* TIP_2 = "Jaitsi diagonalean erdira, eskumuturra biratu gabe. V forma!";
 constexpr const char* TIP_3 = "Ez jo azkarregi: nekatuz gero, kolpeak ahulagoak dira.";
 constexpr const char* TIP_4 = "Erdira iristean, eman buelta B botoiarekin.";
+// Tarjeta "Nola jo" (cómo golpear)
+constexpr const char* HOW_TO = "Nola jo";
+constexpr const char* HOW_1 = "Heldu behetik";
+constexpr const char* HOW_1B = "erpurua 1-2 gainean";
+constexpr const char* HOW_2 = "Altxatu alde batetik";
+constexpr const char* HOW_2B = "JO! agertu arte";
+constexpr const char* HOW_3 = "Jaitsi erdira";
+constexpr const char* HOW_3B = "eskumuturra biratu gabe";
+constexpr const char* NEXT = "Orain:";
 
 constexpr const char* RESULTS = "Emaitzak";
 constexpr const char* WINNER = "Irabazlea";

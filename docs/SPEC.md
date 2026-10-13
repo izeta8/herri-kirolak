@@ -54,13 +54,17 @@ Guardado: `save.dat` en la misma carpeta desde la que se lanzó el juego (`argv[
 ### Cómo es en la vida real
 El aizkolari se sube **encima de un tronco tumbado** y corta **entre sus pies**. Hace un **corte en V**: golpes alternos en diagonal, uno desde un lado y otro desde el otro, sacando astillas. Cuando llega más o menos a la mitad del tronco, **se da la vuelta** y hace otra V por el lado contrario hasta que el tronco se parte en dos. En las competiciones se cortan varios troncos y gana el que tarde menos.
 
+### El gesto (definido el 13/10/2026 con el usuario)
+1. **Agarre**: el Wii Remote cogido por la parte de abajo, con el **pulgar encima de los botones 1 y 2**, como el mango de un hacha.
+2. **Subir**: por encima de la cabeza, por el lado del corte (arriba a la derecha o arriba a la izquierda). El mando acaba por encima del hombro (ángulo de subida > 120°). En pantalla, la barra *Altuera* se pone verde con **"JO!"**.
+3. **Bajar**: en diagonal hacia el centro (la V) **sin girar la muñeca**: el mando mantiene su orientación y es la mano la que hace la diagonal. Así el movimiento lateral cae siempre en el eje X del mando.
+   - Desde arriba a la derecha → **eskuina**; desde arriba a la izquierda → **ezkerra**.
+   - La **fuerza** sale del pico de aceleración.
+- Limitación: con solo acelerómetro (sin MotionPlus) no se puede saber la posición de la mano antes de bajar; el lado se decide **durante la bajada**. Por eso la pantalla indica qué lado toca y confirma el detectado al golpear.
+
 ### Mecánica
-- **Golpe**: levantar el Wiimote por encima de la cabeza y bajarlo con fuerza. La **fuerza** sale del pico de aceleración y la **precisión** del momento del impacto.
-- **Ángulo del golpe (la V)**: el giro de muñeca del Wiimote en el momento del golpe decide si el corte es **ezkerra** (diagonal izquierda) o **eskuina** (diagonal derecha).
-  - Alternar izquierda/derecha → la V avanza bien y salen astillas grandes.
-  - Repetir el mismo lado → avanza poco ("golpe malo").
-  - Indicador en pantalla de qué lado toca y de la calidad del golpe (*Bikain! / Ondo / Txarto*).
-- **Ritmo/cansancio**: golpear demasiado rápido sin levantar bien baja la precisión. Hay una barra de *nekea* (cansancio) que se recupera al bajar el ritmo.
+- **La V**: alternar izquierda/derecha → la V avanza bien y salen astillas grandes. Repetir el mismo lado → avanza poco. Flecha grande en pantalla con el lado que toca y valoración del golpe (*Bikain! / Ondo! / Ahul...*).
+- **Cansancio**: desactivado de momento (se recuperaba demasiado rápido para notarse).
 - **Darse la vuelta**: cuando la V frontal llega a ~50 % de profundidad aparece **"Buelta eman!"**. Se pulsa B (o un gesto) y la animación gira al aizkolari para atacar el otro lado.
 - **Fin del tronco**: cuando las dos V se juntan el tronco se parte (animación + astillas + público). Se pasa al siguiente tronco o se termina.
 - Visual: la V se ve de verdad en la malla del tronco (profundidad por lado actualizada en tiempo real) y vuelan astillas como partículas.

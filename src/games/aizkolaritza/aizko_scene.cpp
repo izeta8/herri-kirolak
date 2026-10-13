@@ -49,6 +49,7 @@ public:
         chips_.init();
         log_.pos = Vec3(0, 0, 0);
         startPlayer(0);
+        showHowTo_ = cfg_.training;
         camEye_ = Vec3(6, 3.5f, 7);
         camTarget_ = log_.center();
     }
@@ -67,6 +68,7 @@ private:
     void drawHud();
     void drawResults();
     void drawPause();
+    void drawHowTo();
     int padFor(int player) const;
     const Profile& profile(int player) const { return save::data().profiles[cfg_.profile[player] % MAX_PROFILES]; }
 
@@ -90,6 +92,10 @@ private:
     float botT_ = 1.0f;
     float botRaise_ = 0.0f;
     float needle_ = 0, needleTarget_ = 0;  // aguja izquierda/derecha del marcador
+    bool showHowTo_ = false;  // tarjeta "Nola jo" antes de empezar (entrenamiento)
+    float howToT_ = 0;
+    float sideFlash_ = 0;     // destello del lado detectado al golpear
+    int sideFlashHit_ = 0;
     float idleT_ = 0;  // tiempo sin subir el hacha (para el aviso)
     float tipT_ = 0;
     int tip_ = 0;
@@ -186,6 +192,8 @@ void AizkoScene::handleImpact() {
     }
     if (FATIGUE_ON) fatigue_ = fminf(1.0f, fatigue_ + FATIGUE_PER_CHOP);
     if (hit != HIT_STRAIGHT) lastSide_[notch] = hit;
+    sideFlash_ = 1.0f;
+    sideFlashHit_ = hit;
 
     float pan = clampv(at.x * 0.5f, -1.0f, 1.0f);
     if (factor >= 0.45f) audio::play(SFX_CHOP, 0.7f + 0.3f * strength, frand(0.92f, 1.08f), pan);
@@ -304,6 +312,15 @@ void AizkoScene::update(float dt) {
 
     switch (state_) {
         case ST_INTRO:
+            if (showHowTo_) {
+                howToT_ += dt;
+                stateT_ = 0;
+                if (howToT_ > 0.6f && (downAll & WPAD_BUTTON_A)) {
+                    showHowTo_ = false;
+                    audio::play(SFX_OK, 0.7f);
+                }
+                break;
+            }
             if (stateT_ > 2.4f || (human && stateT_ > 0.6f && (p.down & WPAD_BUTTON_A))) {
                 state_ = ST_COUNTDOWN;
                 stateT_ = 0;
@@ -388,6 +405,7 @@ void AizkoScene::update(float dt) {
         numLabels_--;
     }
     shake_ = approach(shake_, 0, 10, dt);
+    sideFlash_ = fmaxf(0.0f, sideFlash_ - dt * 1.5f);
     {
         const input::Pad& hp = input::pad(padFor(cur_));
         if (hp.state == input::SW_SWING) needleTarget_ = hp.swingTilt;
@@ -439,6 +457,10 @@ void AizkoScene::draw() {
     chips_.draw();
 
     gfx::begin2D();
+    if (showHowTo_) {
+        drawHowTo();
+        return;
+    }
     drawHud();
     if (state_ == ST_RESULTS) drawResults();
     if (paused_) drawPause();
@@ -517,6 +539,21 @@ void AizkoScene::drawHud() {
         gfx::arc(cx, cy, r - 14, r, ang(-1), ang(-st), cl, 12);
         gfx::arc(cx, cy, r - 14, r, ang(-st), ang(st), rgba(0xD8, 0xD8, 0xD8), 6);
         gfx::arc(cx, cy, r - 14, r, ang(st), ang(1), cr, 12);
+        // Qué lado toca ahora (grande, arriba) y destello del lado detectado al golpear
+        if (state_ == ST_PLAY && !(aizk_.side() == 0 && log_.depth[0] >= SIDE_MAX * LOG_RADIUS - 0.001f)) {
+            int next = want == HIT_NONE ? HIT_RIGHT : want;
+            const char* label = next == HIT_LEFT ? "<<  EZKERRA" : "ESKUINA  >>";
+            Color c = next == HIT_LEFT ? rgba(0xFF, 0xA0, 0x40) : rgba(0x6C, 0xC4, 0xFF);
+            float s = 1.0f + 0.04f * sinf(time_ * 6);
+            font::plain(txt::NEXT, W / 2, 62, 22, UI_WHITE, ALIGN_CENTER);
+            font::draw(label, W / 2, 84, 44 * s, c, rgba(0x20, 0x30, 0x40), ALIGN_CENTER);
+        }
+        if (sideFlash_ > 0 && sideFlashHit_ != HIT_STRAIGHT) {
+            bool left = sideFlashHit_ == HIT_LEFT;
+            float a = smooth01(sideFlash_ * 2);
+            font::draw(left ? txt::LEFT : txt::RIGHT, left ? cx - r - 12 : cx + r + 12, cy - 100, 34 * (1 + 0.3f * sideFlash_),
+                       UI_GOLD, rgba(0x60, 0x30, 0x10), left ? ALIGN_RIGHT : ALIGN_LEFT, a);
+        }
         // Aguja: se mueve mientras bajas el hacha y se queda en el lado que se ha detectado
         {
             float na = ang(clampv(needle_, -1.0f, 1.0f) * 0.85f);
@@ -636,6 +673,75 @@ void AizkoScene::drawResults() {
     float by = 400;
     ui::button(W / 2 - 150, by, 260, 64, txt::PLAY_AGAIN, resultsMenu_.anim[0]);
     ui::button(W / 2 + 150, by, 260, 64, txt::TO_MENU, resultsMenu_.anim[1]);
+}
+
+// Línea gruesa (dos triángulos)
+static void thickLine(float x0, float y0, float x1, float y1, float w, Color c) {
+    float dx = x1 - x0, dy = y1 - y0, l = sqrtf(dx * dx + dy * dy);
+    if (l < 0.01f) return;
+    float nx = -dy / l * w / 2, ny = dx / l * w / 2;
+    gfx::triangle(x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, c);
+    gfx::triangle(x0 + nx, y0 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny, c);
+}
+
+static void arrow(float x0, float y0, float x1, float y1, Color c) {
+    float dx = x1 - x0, dy = y1 - y0, l = sqrtf(dx * dx + dy * dy);
+    float ux = dx / l, uy = dy / l;
+    thickLine(x0, y0, x1 - ux * 14, y1 - uy * 14, 8, c);
+    gfx::triangle(x1, y1, x1 - ux * 20 - uy * 12, y1 - uy * 20 + ux * 12, x1 - ux * 20 + uy * 12, y1 - uy * 20 - ux * 12, c);
+}
+
+// Wii Remote visto de frente, vertical, con la punta (sensor) arriba
+static void remoteIcon(float cx, float cy, float s, bool thumb) {
+    float w = 26 * s, h = 96 * s;
+    gfx::roundRect(cx - w / 2 + 2, cy - h / 2 + 3, w, h, 9 * s, rgba(0, 0, 0, 50));
+    gfx::roundRect(cx - w / 2, cy - h / 2, w, h, 9 * s, UI_WHITE);
+    gfx::rect(cx - w / 2 + 3 * s, cy - h / 2 + 2 * s, w - 6 * s, 6 * s, rgba(0x30, 0x30, 0x38));
+    gfx::rect(cx - 7 * s, cy - h / 2 + 20 * s, 14 * s, 4 * s, rgba(0x70, 0x74, 0x7C));  // cruceta
+    gfx::rect(cx - 2 * s, cy - h / 2 + 15 * s, 4 * s, 14 * s, rgba(0x70, 0x74, 0x7C));
+    gfx::circle(cx, cy - h / 2 + 38 * s, 6 * s, rgba(0xC8, 0xCC, 0xD4), 16);              // A
+    gfx::circle(cx, cy + h / 2 - 30 * s, 4 * s, rgba(0xC8, 0xCC, 0xD4), 12);              // 1
+    gfx::circle(cx, cy + h / 2 - 18 * s, 4 * s, rgba(0xC8, 0xCC, 0xD4), 12);              // 2
+    if (thumb) {
+        gfx::circle(cx + 3 * s, cy + h / 2 - 24 * s, 11 * s, rgba(0xF2, 0xBC, 0x8C, 0xE0), 20);  // pulgar
+        gfx::roundRect(cx - w / 2 - 6 * s, cy + h / 2 - 34 * s, w + 12 * s, 30 * s, 10 * s, rgba(0xF2, 0xBC, 0x8C, 0x90));
+    }
+}
+
+void AizkoScene::drawHowTo() {
+    const float W = gfx::screenW();
+    float a = smooth01(howToT_ / 0.3f);
+    ui::fade(0.45f * a);
+    float pw = 760, ph = 330, px = W / 2 - pw / 2, py = 60 + (1 - easeOutCubic(howToT_ / 0.4f)) * 40;
+    ui::panel(px, py, pw, ph);
+    font::plain(txt::HOW_TO, W / 2, py + 12, 36, UI_TEXT, ALIGN_CENTER);
+    const char* t1[3] = {txt::HOW_1, txt::HOW_2, txt::HOW_3};
+    const char* t2[3] = {txt::HOW_1B, txt::HOW_2B, txt::HOW_3B};
+    for (int i = 0; i < 3; i++) {
+        float cx = px + pw * (i + 0.5f) / 3, cy = py + 160;
+        gfx::circle(cx - 92, py + 74, 16, UI_BLUE, 20);
+        char n[4] = {(char)('1' + i), 0, 0, 0};
+        font::plain(n, cx - 92, py + 61, 24, UI_WHITE, ALIGN_CENTER);
+        if (i == 0) {
+            remoteIcon(cx, cy, 1.35f, true);
+        } else if (i == 1) {
+            // cabeza + mando arriba a un lado + flecha de subida
+            gfx::circle(cx - 10, cy + 55, 26, rgba(0xF2, 0xBC, 0x8C), 24);
+            gfx::rect(cx - 36, cy + 42, 52, 10, rgba(0x1C, 0x1E, 0x26));
+            remoteIcon(cx + 56, cy - 22, 0.9f, false);
+            arrow(cx + 20, cy + 70, cx + 46, cy + 22, UI_GREEN);
+            font::draw(txt::HIT_NOW, cx + 52, cy - 82, 26, UI_GREEN, UI_WHITE, ALIGN_CENTER);
+        } else {
+            // la V: dos diagonales hacia el centro, y el mando sin girar
+            arrow(cx + 56, cy - 50, cx + 6, cy + 48, rgba(0x6C, 0xC4, 0xFF));
+            arrow(cx - 56, cy - 50, cx - 6, cy + 48, rgba(0xFF, 0xA0, 0x40));
+            remoteIcon(cx + 70, cy - 70, 0.6f, false);
+            remoteIcon(cx - 70, cy - 70, 0.6f, false);
+        }
+        font::plain(t1[i], cx, py + 236, 24, UI_TEXT, ALIGN_CENTER);
+        font::plain(t2[i], cx, py + 266, 19, UI_TEXT_LIGHT, ALIGN_CENTER);
+    }
+    if (howToT_ > 0.6f) ui::hints(txt::OK, nullptr);
 }
 
 void AizkoScene::drawPause() {
