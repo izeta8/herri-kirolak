@@ -35,6 +35,7 @@ struct Pad {
     bool swingStart = false;  // evento: empieza la bajada (para animar sin esperar al final del golpe)
     bool swingAbort = false;  // evento: la bajada no llegó a ser hachazo
     float rawDeg = 0;         // ángulo de subida con la lectura directa (rápido, para animar)
+    float swingTilt = 0;      // durante la bajada: lado estimado hasta ahora (-1 ezkerra .. +1 eskuina)
     SwingState state = SW_IDLE;
 
     // internos del detector

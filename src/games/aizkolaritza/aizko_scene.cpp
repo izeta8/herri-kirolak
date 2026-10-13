@@ -89,6 +89,7 @@ private:
     Vec3 camEye_, camTarget_;
     float botT_ = 1.0f;
     float botRaise_ = 0.0f;
+    float needle_ = 0, needleTarget_ = 0;  // aguja izquierda/derecha del marcador
     float idleT_ = 0;  // tiempo sin subir el hacha (para el aviso)
     float tipT_ = 0;
     int tip_ = 0;
@@ -387,6 +388,12 @@ void AizkoScene::update(float dt) {
         numLabels_--;
     }
     shake_ = approach(shake_, 0, 10, dt);
+    {
+        const input::Pad& hp = input::pad(padFor(cur_));
+        if (hp.state == input::SW_SWING) needleTarget_ = hp.swingTilt;
+        if (hp.chop.happened) needleTarget_ = hp.chop.tilt;
+        needle_ = approach(needle_, needleTarget_, 18, dt);
+    }
     tipT_ += dt;
     if (tipT_ > 5.0f) {
         tipT_ = 0;
@@ -510,14 +517,32 @@ void AizkoScene::drawHud() {
         gfx::arc(cx, cy, r - 14, r, ang(-1), ang(-st), cl, 12);
         gfx::arc(cx, cy, r - 14, r, ang(-st), ang(st), rgba(0xD8, 0xD8, 0xD8), 6);
         gfx::arc(cx, cy, r - 14, r, ang(st), ang(1), cr, 12);
-        // La aguja apunta al lado del último golpe (el lado sale de la diagonal del gesto)
-        if (last != HIT_NONE) {
-            float na = ang(last == HIT_LEFT ? -0.75f : last == HIT_RIGHT ? 0.75f : 0.0f);
-            gfx::triangle(cx + cosf(na) * (r + 6), cy + sinf(na) * (r + 6), cx + cosf(na + 1.57f) * 5,
-                          cy + sinf(na + 1.57f) * 5, cx + cosf(na - 1.57f) * 5, cy + sinf(na - 1.57f) * 5,
+        // Aguja: se mueve mientras bajas el hacha y se queda en el lado que se ha detectado
+        {
+            float na = ang(clampv(needle_, -1.0f, 1.0f) * 0.85f);
+            gfx::triangle(cx + cosf(na) * (r + 6), cy + sinf(na) * (r + 6), cx + cosf(na + 1.57f) * 6,
+                          cy + sinf(na + 1.57f) * 6, cx + cosf(na - 1.57f) * 6, cy + sinf(na - 1.57f) * 6,
                           rgba(0x30, 0x30, 0x38));
         }
         gfx::circle(cx, cy, 7, rgba(0x30, 0x30, 0x38), 12);
+
+        // Barra de altura: se llena al subir el hacha y se pone verde ("JO!") cuando ya se puede golpear
+        {
+            const input::Pad& hp = input::pad(padFor(cur_));
+            bool armed = hp.state == input::SW_ARMED || hp.state == input::SW_RAISING;
+            float bx = cx + r + 110, bh = 86, by = 466 - bh, bw = 22;
+            float fill = armed ? 1.0f : clampv(hp.raise, 0.0f, 1.0f);
+            gfx::roundRect(bx - 3, by - 3, bw + 6, bh + 6, 13, rgba(0, 0, 0, 90));
+            gfx::roundRect(bx, by, bw, bh, 11, rgba(255, 255, 255, 150));
+            Color fc = armed ? UI_GREEN : mixColor(UI_BLUE, UI_GOLD, fill);
+            if (fill > 0.04f) gfx::roundRect(bx, by + bh * (1 - fill), bw, bh * fill, 11, fc);
+            if (armed) {
+                float s = 1.0f + 0.08f * sinf(time_ * 14);
+                font::draw(txt::HIT_NOW, bx + bw / 2, by - 40, 32 * s, UI_GREEN, UI_WHITE, ALIGN_CENTER);
+            } else {
+                font::plain(txt::RAISE_LABEL, bx + bw / 2, by - 26, 18, UI_WHITE, ALIGN_CENTER);
+            }
+        }
         font::draw(txt::LEFT, cx - r - 12, cy - 30, 22, want == HIT_LEFT ? UI_WHITE : rgba(0xE0, 0xE0, 0xE0), rgba(0x20, 0x30, 0x40), ALIGN_RIGHT);
         font::draw(txt::RIGHT, cx + r + 12, cy - 30, 22, want == HIT_RIGHT ? UI_WHITE : rgba(0xE0, 0xE0, 0xE0), rgba(0x20, 0x30, 0x40), ALIGN_LEFT);
     }

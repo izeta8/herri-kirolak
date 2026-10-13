@@ -77,6 +77,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
             if (m > SWING_START_G) {
                 p.state = SW_SWING;
                 p.swingStart = true;
+                p.swingTilt = 0;
                 p.timer = 0;
                 p.peak = m;
                 p.lat = 0;
@@ -93,6 +94,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
             if (m > SWING_START_G) {
                 p.state = SW_SWING;
                 p.swingStart = true;
+                p.swingTilt = 0;
                 p.timer = 0;
                 p.peak = m;
                 p.lat = 0;
@@ -106,6 +108,7 @@ static void step(Pad& p, const Vec3& a, float dt) {
             p.timer += dt;
             p.peak = fmaxf(p.peak, m);
             p.lat += a.x * dt;  // empuje lateral acumulado (g·s)
+            p.swingTilt = clampv((LAT_MID_GS - p.lat) / LAT_SCALE_GS, -1.0f, 1.0f) * TILT_SIGN * s_tiltSign;
             if ((m < SWING_END_G && p.timer > 0.04f) || p.timer > SWING_MAX_TIME) {
                 if (p.peak >= s_chopMinG) {
                     Chop& c = p.chop;

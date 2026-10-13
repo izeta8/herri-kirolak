@@ -37,6 +37,7 @@ constexpr const char* RAISE_REMOTE = "Altxatu Wii Remote-a";
 constexpr const char* ARMED = "Prest! Jo behera!";
 constexpr const char* HIT = "Kolpea!";
 constexpr const char* RAISE_LABEL = "Altuera";
+constexpr const char* HIT_NOW = "JO!";
 constexpr const char* TILT_LABEL = "Okertzea";
 constexpr const char* HITS = "Kolpeak";
 constexpr const char* STRENGTH = "Indarra";
