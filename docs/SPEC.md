@@ -6,7 +6,7 @@ Juego homebrew para **Nintendo Wii real** (vía Homebrew Channel), estilo **Wii 
 
 | Tema | Decisión |
 |---|---|
-| Hardware objetivo | Wii real (PAL/NTSC), lanzado desde Homebrew Channel (`SD:/apps/herri-kirolak/boot.dol`) |
+| Hardware objetivo | Wii real (PAL/NTSC), lanzado desde Homebrew Channel. El usuario **no puede usar SD** en el PC: se instala en **USB** (`usb:/apps/herri-kirolak/boot.dol`, FAT32) o se envía por red con wiiload. Soportar SD y USB igualmente |
 | Toolchain | devkitPro → devkitPPC + libogc (GX, WPAD, ASND, libfat). Sin SDK oficial de Nintendo |
 | Lenguaje | C++17 (sin excepciones ni RTTI), algo de C donde convenga |
 | Emulador / visor | Dolphin (`D:\Tools\Dolphin\Dolphin-x64`, modo portable) |
@@ -47,7 +47,7 @@ Pantalla título (Herri Kirolak) → "Sakatu A"
       └ Irten (volver al Homebrew Channel)
 ```
 
-Guardado: `SD:/apps/herri-kirolak/save.dat` (personajes + récords). Si no hay SD, jugar sin guardar.
+Guardado: `save.dat` en la misma carpeta desde la que se lanzó el juego (`argv[0]`: `usb:/apps/herri-kirolak/` o `sd:/apps/herri-kirolak/`), montando con `fatInitDefault()`. Si se lanzó por wiiload (sin ruta), probar `usb:` y luego `sd:`. Si no hay almacenamiento, jugar sin guardar.
 
 ## 5. Juego 1 — Aizkolaritza (MVP)
 

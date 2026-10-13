@@ -22,7 +22,7 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [ ] Entrada: WPAD para 4 mandos, aceleración filtrada, detector de gestos (levantar/golpear, giro de muñeca)
 - [ ] Audio: ASND, cargar WAV/PCM para efectos
 - [ ] UI: botones estilo Wii navegables con cruceta, fundidos
-- [ ] Guardado en SD (libfat)
+- [ ] Guardado en USB/SD (libfat, carpeta de argv[0])
 
 ## Fase 3 — Personajes
 - [ ] Modelo de personaje "tipo Mii" (cabeza, cuerpo, manos flotantes, txapela, gerriko)

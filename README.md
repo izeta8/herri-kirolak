@@ -11,6 +11,6 @@ Built with [devkitPro](https://devkitpro.org/) (devkitPPC + libogc). Runs on a r
 2. `make` (or `scripts/build.ps1` on Windows) → `build/boot.dol`
 
 ## Play on Wii
-Copy `hbc/herri-kirolak/` + `boot.dol` to `SD:/apps/herri-kirolak/` and launch it from the Homebrew Channel.
+Copy `hbc/herri-kirolak/` + `boot.dol` to `apps/herri-kirolak/` on a FAT32 USB drive or SD card and launch it from the Homebrew Channel.
 
 See [docs/SPEC.md](docs/SPEC.md) and [docs/ROADMAP.md](docs/ROADMAP.md).

@@ -18,10 +18,10 @@ Juego homebrew de Wii estilo Wii Sports con deportes rurales vascos. Lee **docs/
 - Compilar: `scripts/build.ps1` → `build/boot.dol`
 - Ejecutar en Dolphin: `scripts/run.ps1`
 - Captura de Dolphin: `scripts/screenshot.ps1`
-- Mandar a la Wii: `scripts/deploy.ps1` (wiiload; IP de la Wii en `$env:WIILOAD = "tcp:192.168.x.x"`)
+- Mandar a la Wii (el usuario no tiene lector SD; usa USB o red): `scripts/deploy.ps1` (wiiload; IP de la Wii en `$env:WIILOAD = "tcp:192.168.x.x"`)
 
 ## Pendiente de probar en Wii
-- Fase 1: cubo girando + HOME vuelve al Homebrew Channel (copiar `build/boot.dol` + `hbc/herri-kirolak/meta.xml` a `SD:/apps/herri-kirolak/`)
+- Fase 1: cubo girando + HOME vuelve al Homebrew Channel (copiar `build/boot.dol` + `hbc/herri-kirolak/meta.xml` a `USB:/apps/herri-kirolak/` (USB en FAT32), o enviar con `scripts/deploy.ps1`)
 
 ## Convenciones técnicas
 - Caras en orden antihorario (como OpenGL) → `GX_SetCullMode(GX_CULL_FRONT)`.
