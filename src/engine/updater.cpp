@@ -6,6 +6,7 @@
 #include <malloc.h>
 #include <network.h>
 #include <ogc/machine/processor.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <wiiuse/wpad.h>
@@ -35,7 +36,9 @@ static bool looksLikeDol(const u8* d, u32 size) {
 
 void open() {
     s_server = telemetry::netListen(PORT);
-    if (s_server >= 0) telemetry::setNonBlocking(s_server);
+    char msg[48];
+    snprintf(msg, sizeof(msg), "eguneratzea: portua %d -> %d", PORT, (int)s_server);
+    telemetry::note(msg);
 }
 
 static void dropClient() {
@@ -50,17 +53,21 @@ static void dropClient() {
 void poll() {
     if (s_server < 0 || s_ready) return;
     if (s_client < 0) {
+        if (!telemetry::readable(s_server)) return;  // nadie quiere conectar
         struct sockaddr_in client;
         socklen_t len = sizeof(client);
         s32 c = net_accept(s_server, (struct sockaddr*)&client, &len);
-        if (c < 0) return;  // nadie (EAGAIN)
+        char msg[48];
+        snprintf(msg, sizeof(msg), "eguneratzea: accept -> %d", (int)c);
+        telemetry::note(msg);
+        if (c < 0) return;
         s_client = c;
-        telemetry::setNonBlocking(s_client);
         s_got = 0;
         s_inBody = false;
     }
-    // Lee lo que haya, sin bloquear
+    // Lee lo que haya llegado, sin quedarse esperando
     for (int chunk = 0; chunk < 64; chunk++) {
+        if (!telemetry::readable(s_client)) return;
         u8* dst;
         u32 want;
         if (!s_inBody) {
@@ -72,7 +79,6 @@ void poll() {
             if (want > 32768) want = 32768;
         }
         s32 n = net_recv(s_client, dst, want, 0);
-        if (n == -EAGAIN) return;  // de momento no hay más
         if (n <= 0) {
             dropClient();
             return;
@@ -87,6 +93,7 @@ void poll() {
             s_inBody = true;
             s_got = 0;
         } else if (s_inBody && s_got == s_size) {
+            telemetry::note("eguneratzea: DOL osoa jasota");
             if (looksLikeDol(s_buf, s_size)) {
                 net_send(s_client, "OK\n", 3, 0);
                 s_ready = true;

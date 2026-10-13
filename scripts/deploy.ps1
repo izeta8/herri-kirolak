@@ -31,24 +31,31 @@ if (-not (Reachable $Ip)) {
 }
 if ($Ip -ne "127.0.0.1") { Set-Content $cache $Ip }
 
-if (PortOpen $Ip 4301) {
-    Write-Host "Juego abierto en $Ip -> actualizando en caliente"
+$sent = $false
+try {
     $bytes = [IO.File]::ReadAllBytes($Dol)
-    $c = New-Object Net.Sockets.TcpClient($Ip, 4301)
+    $c = New-Object Net.Sockets.TcpClient
+    if (-not $c.ConnectAsync($Ip, 4301).Wait(2000)) { throw "sin respuesta" }
+    Write-Host "Juego abierto en $Ip -> actualizando en caliente"
     $s = $c.GetStream()
     $len = $bytes.Length
     $hdr = [byte[]](@([Text.Encoding]::ASCII.GetBytes("HKUP")) + @((($len -shr 24) -band 255), (($len -shr 16) -band 255), (($len -shr 8) -band 255), ($len -band 255)))
     $s.Write($hdr, 0, 8)
     $s.Write($bytes, 0, $bytes.Length)
     $s.Flush()
-    $s.ReadTimeout = 15000
+    $s.ReadTimeout = 20000
     $buf = New-Object byte[] 8
     $n = $s.Read($buf, 0, 8)
     $c.Close()
     $reply = [Text.Encoding]::ASCII.GetString($buf, 0, $n).Trim()
     if ($reply -ne "OK") { throw "La Wii respondió: $reply" }
     Write-Host "OK: la Wii está arrancando la versión nueva"
-} else {
+    $sent = $true
+} catch {
+    if ($_.Exception.Message -like "*respondió*") { throw }
+    if ($_.Exception.Message -notlike "*sin respuesta*") { Write-Host "Actualización en caliente falló: $($_.Exception.Message)" }
+}
+if (-not $sent) {
     Write-Host "Homebrew Channel en $Ip -> wiiload"
     $env:WIILOAD = "tcp:$Ip"
     & "C:\devkitPro\tools\bin\wiiload.exe" $Dol

@@ -37,7 +37,7 @@ s32 netListen(u16 port) {
             addr.sin_family = AF_INET;
             addr.sin_port = htons(port);
             addr.sin_addr.s_addr = INADDR_ANY;
-            if (net_bind(s, (struct sockaddr*)&addr, sizeof(addr)) >= 0 && net_listen(s, 1) >= 0) return s;
+            if (net_bind(s, (struct sockaddr*)&addr, sizeof(addr)) >= 0 && net_listen(s, 4) >= 0) return s;
             net_close(s);
         }
         usleep(250000);
@@ -45,9 +45,23 @@ s32 netListen(u16 port) {
     return -1;
 }
 
-// En la Wii el "no bloqueante" de IOS es el bit 0x04 (no el O_NONBLOCK de newlib)
-void setNonBlocking(s32 s) { net_fcntl(s, F_SETFL, net_fcntl(s, F_GETFL, 0) | 4); }
-static void setBlocking(s32 s) { net_fcntl(s, F_SETFL, net_fcntl(s, F_GETFL, 0) & ~4); }
+// En la Wii real el modo no bloqueante de IOS da problemas (reenvía datos viejos, el puerto deja de
+// aceptar conexiones): todo es bloqueante y antes de leer/aceptar se pregunta con net_poll
+// Bits de poll de IOS: POLLRDNORM 0x01, POLLRDBAND 0x02, POLLERR 0x20, POLLHUP 0x40
+static const u32 IOS_POLLIN = 0x0003, IOS_POLLERR_HUP = 0x0060;
+bool readable(s32 s) {
+    struct pollsd p = {s, IOS_POLLIN, 0};
+    return net_poll(&p, 1, 0) > 0 && (p.revents & (IOS_POLLIN | IOS_POLLERR_HUP));
+}
+
+static char s_notes[8][80];
+static volatile int s_noteHead = 0, s_noteTail = 0;
+void note(const char* text) {
+    int next = (s_noteHead + 1) % 8;
+    if (next == s_noteTail) return;
+    snprintf(s_notes[s_noteHead], sizeof(s_notes[0]), "# %s\n", text);
+    s_noteHead = next;
+}
 
 void stop() {
     if (s_client >= 0) net_close(s_client);
@@ -100,7 +114,6 @@ static void* run(void*) {
     updater::open();
     s32 server = netListen(PORT);
     if (server < 0) snprintf(s_ip + strlen(s_ip), sizeof(s_ip) - strlen(s_ip), " (bind?)");
-    else setNonBlocking(server);
     s_server = server;
     s_status = 1;
 
@@ -111,14 +124,11 @@ static void* run(void*) {
             usleep(100000);
             continue;
         }
-        if (s_server >= 0 && s_client < 0) {
+        if (s_server >= 0 && s_client < 0 && readable(s_server)) {
             struct sockaddr_in client;
             socklen_t len = sizeof(client);
             s32 sock = net_accept(s_server, (struct sockaddr*)&client, &len);
             if (sock >= 0) {
-                // El socket aceptado hereda el "no bloqueante": en la Wii real los envíos no bloqueantes
-                // acaban reenviando datos viejos, así que la conexión con el PC va en modo normal
-                setBlocking(sock);
                 s_client = sock;
                 s_tail = s_head;  // empezar con el búfer vacío
                 s_status = 2;
@@ -131,6 +141,10 @@ static void* run(void*) {
             }
         }
         if (s_client >= 0) {
+            while (s_noteTail != s_noteHead) {
+                if (!sendAll(s_client, s_notes[s_noteTail], strlen(s_notes[s_noteTail]))) break;
+                s_noteTail = (s_noteTail + 1) % 8;
+            }
             int n = 0;
             while (s_tail != s_head && n < (int)sizeof(buf) - 128) {
                 const Entry& e = s_ring[s_tail];

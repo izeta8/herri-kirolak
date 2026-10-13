@@ -13,7 +13,8 @@ void push(int chan, const input::Sample& s);
 int status();
 const char* ip();  // IP de la Wii ("" si no hay red)
 s32 netListen(u16 port);     // socket de escucha con reintentos (-1 si falla)
-void setNonBlocking(s32 sock);
+bool readable(s32 sock);     // ¿hay algo que leer/aceptar? (net_poll sin esperar)
+void note(const char* text); // manda una línea "# texto" al PC (depuración)
 void stop();                 // cierra los sockets (antes de saltar a otra versión)
 
 }  // namespace telemetry
