@@ -130,6 +130,7 @@ constexpr const char* COLOR = "Kolorea";
 constexpr const char* SKIN = "Azala";
 constexpr const char* HAIR = "Ilea";
 constexpr const char* HAIR_STYLE = "Orrazkera";
+constexpr const char* MII = "Mii";
 constexpr const char* HAIR_STYLES[] = {"Motza", "Zutik", "Luzea", "Ertaina"};  // peinados (NUM_HAIR_STYLES)
 constexpr const char* TXAPELA = "Txapela";
 constexpr const char* SAVE = "Gorde";

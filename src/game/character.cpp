@@ -265,6 +265,8 @@ static MiiInfo miiFor(const Appearance& a) {
     static const u8 SKIN_TO_MII[NUM_SKINS] = {0, 1, 2, 4};
     static const u8 HAIR_TO_MII[NUM_HAIRS] = {0, 1, 7, 2, 4};
     static const u8 STYLE_TO_MII[NUM_HAIR_STYLES] = {33, 55, 12, 24};
+    // Un Mii del Canal Mii, tal cual
+    if (a.user >= 0 && a.user < mii::userCount()) return mii::user(a.user);
     bool female = a.style >= 2;
     MiiInfo m;
     if (a.casual) {
@@ -302,6 +304,7 @@ void CharacterModel::build(const Appearance& a) {
         mii = new MiiHead();
         if (mii->build(info, low ? 64 : 128)) {
             skin = mii::skinColor(info.faceColor);
+            if (a.user >= 0) shirt = mii::favoriteColor(info.favColor);  // la camiseta del color favorito del Mii
             if (a.txapela) {
                 const Color c = rgba(0x1C, 0x1E, 0x26);
                 b.sphere(Vec3(0, 0, 0), Vec3(0.27f, 0.075f, 0.25f), c, 22, 8);

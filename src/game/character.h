@@ -10,10 +10,13 @@ struct Appearance {
     u8 color = 0, skin = 0, hair = 0, txapela = 0;
     u8 casual = 0;  // 1 = público: ropa de calle (pantalón gris de Mii, sin gerriko) y menos polígonos
     u8 style = 0;   // peinado
-    static Appearance from(const Profile& p) { return {p.color, p.skin, p.hair, p.txapela, 0, p.hairStyle}; }
+    s8 user = -1;   // Mii de la consola (índice en el Canal Mii); -1 = ninguno
+    static Appearance from(const Profile& p) {
+        return {p.color, p.skin, p.hair, p.txapela, 0, p.hairStyle, (s8)(p.mii ? p.mii - 1 : -1)};
+    }
     bool operator==(const Appearance& o) const {
         return color == o.color && skin == o.skin && hair == o.hair && txapela == o.txapela && casual == o.casual &&
-               style == o.style;
+               style == o.style && user == o.user;
     }
 };
 

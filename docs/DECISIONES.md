@@ -35,6 +35,7 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-13 | UI, menús y Miis con el estilo de **Wii Sports Resort**; **no** su ubicación ni su ambiente (nada de isla/playa) | Copiar el estilo gráfico, no el sitio |
 | 2026-10-14 | **Cada deporte en un sitio real** que él dirá. Aizkolaritza = **probaleku de Usurbil** (zona empedrada entre Etxebeste e Irazu) | Que lo reconozca alguien de Usurbil |
 | 2026-10-14 | Miis **calcados a los de la Wii** (cabeza de huevo, cara de línea, pelo de casco con picos, brazos) | Mandó capturas; mis versiones anteriores no le valían |
+| 2026-10-14 | **Solo Miis de la consola**: cada jugador es uno de sus Miis del Canal Mii (se mantiene la opción de txapela) y el público también; nuestro editor queda solo de reserva | "Tengo bien de Miis en vez de crear tuyos propios" |
 | 2026-10-14 | Miis **con las piezas oficiales** (opciones fijas de ojos, pelo, cara…) leídas de su propia Wii, y sus Miis del Canal Mii como jugadores | "Son opciones establecidas y fijas; tú te inventas las tuyas". Las piezas no van al repo |
 
 ## Desarrollo

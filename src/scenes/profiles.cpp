@@ -1,4 +1,5 @@
-// Jokalariak: crear y editar personajes (nombre, color, piel, pelo, txapela)
+// Jokalariak: cada jugador es uno de los Miis de la consola (y si lleva txapela). Sin Miis en la consola, editor
+// propio de reserva (nombre, color, piel, pelo, peinado, txapela).
 #include <stdio.h>
 #include <string.h>
 #include "engine/audio.h"
@@ -7,6 +8,7 @@
 #include "engine/input.h"
 #include "engine/save.h"
 #include "engine/ui.h"
+#include "game/mii/mii.h"
 #include "game/palette.h"
 #include "game/text.h"
 #include "scenes/common.h"
@@ -15,7 +17,7 @@
 namespace {
 
 enum Mode { MODE_LIST, MODE_EDIT, MODE_KEYBOARD };
-enum Field { F_NAME, F_COLOR, F_SKIN, F_HAIR, F_STYLE, F_TXAPELA, F_SAVE, F_DELETE, F_COUNT };
+enum Field { F_MII, F_NAME, F_COLOR, F_SKIN, F_HAIR, F_STYLE, F_TXAPELA, F_SAVE, F_DELETE, F_COUNT };
 
 // Teclado en pantalla: 4 filas de 10 teclas; la última fila son teclas especiales
 static const char* KEYS[3][10] = {
@@ -79,16 +81,37 @@ private:
                 work_.color = (u8)(editing_ * 5 % NUM_COLORS);
                 work_.skin = 0;
                 work_.hair = 1;
+                if (miiMode()) setProfileMii(work_, firstFreeMii());
             }
             mode_ = MODE_EDIT;
             edit_ = ui::ListMenu();
-            edit_.count = F_COUNT;
-            edit_.enabled[F_DELETE] = save::data().profiles[editing_].used && usedCount() > 1;
+            nFields_ = 0;
+            if (miiMode()) {
+                for (int f : {F_MII, F_TXAPELA, F_SAVE, F_DELETE}) fields_[nFields_++] = f;
+            } else {
+                for (int f : {F_NAME, F_COLOR, F_SKIN, F_HAIR, F_STYLE, F_TXAPELA, F_SAVE, F_DELETE}) fields_[nFields_++] = f;
+            }
+            edit_.count = nFields_;
+            edit_.enabled[nFields_ - 1] = save::data().profiles[editing_].used && usedCount() > 1;  // F_DELETE
         }
     }
 
+    static bool miiMode() { return mii::userCount() > 0; }
+
+    // El primer Mii de la consola que no sea ya de otro jugador
+    int firstFreeMii() const {
+        int count = mii::userCount();
+        for (int k = 0; k < count; k++) {
+            bool used = false;
+            for (int i = 0; i < MAX_PROFILES; i++)
+                if (i != editing_ && save::data().profiles[i].used && save::data().profiles[i].mii == k + 1) used = true;
+            if (!used) return k;
+        }
+        return 0;
+    }
+
     void updateEdit(float dt, u32 down) {
-        int field = edit_.sel;
+        int field = fields_[edit_.sel];
         int dir = (down & WPAD_BUTTON_RIGHT) ? 1 : (down & WPAD_BUTTON_LEFT) ? -1 : 0;
         // En esta pantalla izquierda/derecha cambian el valor, no la selección
         u32 navDown = down & ~(WPAD_BUTTON_LEFT | WPAD_BUTTON_RIGHT);
@@ -99,11 +122,18 @@ private:
                 case F_HAIR: work_.hair = (u8)((work_.hair + dir + NUM_HAIRS) % NUM_HAIRS); break;
                 case F_STYLE: work_.hairStyle = (u8)((work_.hairStyle + dir + NUM_HAIR_STYLES) % NUM_HAIR_STYLES); break;
                 case F_TXAPELA: work_.txapela = !work_.txapela; break;
+                case F_MII: {
+                    int count = mii::userCount();
+                    int cur = work_.mii ? work_.mii - 1 : 0;
+                    setProfileMii(work_, (cur + dir + count) % count);
+                    break;
+                }
                 default: break;
             }
-            if (field >= F_COLOR && field <= F_TXAPELA) audio::play(SFX_MOVE, 0.6f);
+            if (field == F_MII || (field >= F_COLOR && field <= F_TXAPELA)) audio::play(SFX_MOVE, 0.6f);
         }
         int r = edit_.update(dt, navDown);
+        if (r >= 0) r = fields_[r];
         if (r == -2) {
             mode_ = MODE_LIST;
         } else if (r == F_NAME) {
@@ -184,6 +214,8 @@ private:
     int slots_[MAX_PROFILES];
     int count_ = 0;
     int editing_ = 0;
+    int fields_[F_COUNT];  // campos visibles en el editor (con Miis: Mii, txapela, guardar, borrar)
+    int nFields_ = 0;
     Profile work_;
     int keyRow_ = 0, keyCol_ = 0;
     bool shift_ = true;
@@ -230,20 +262,27 @@ void ProfilesScene::draw() {
         ui::hints(txt::EDIT, txt::BACK);
     } else if (mode_ == MODE_EDIT) {
         float px = 40, py = 100;
-        ui::panel(px, py, 380, 328);
-        const char* labels[F_COUNT] = {txt::NAME, txt::COLOR, txt::SKIN, txt::HAIR, txt::HAIR_STYLE, txt::TXAPELA, txt::SAVE, txt::DELETE};
-        for (int i = 0; i < F_COUNT; i++) {
-            float y = py + 12 + i * 38;
-            float a = edit_.anim[i];
+        ui::panel(px, py, 380, 22 + nFields_ * 38);
+        const char* labels[F_COUNT] = {txt::MII,         txt::NAME,    txt::COLOR, txt::SKIN,  txt::HAIR,
+                                       txt::HAIR_STYLE, txt::TXAPELA, txt::SAVE,  txt::DELETE};
+        for (int k = 0; k < nFields_; k++) {
+            int i = fields_[k];
+            float y = py + 12 + k * 38;
+            float a = edit_.anim[k];
             if (a > 0.05f) gfx::roundRect(px + 10, y - 2, 360, 38, 19, withAlpha(rgba(0xC8, 0xE6, 0xFF), a));
-            Color tc = edit_.enabled[i] ? UI_TEXT : UI_TEXT_LIGHT;
+            Color tc = edit_.enabled[k] ? UI_TEXT : UI_TEXT_LIGHT;
             if (i >= F_SAVE) {
-                font::plain(labels[i], px + 190, y + 4, 26, i == F_SAVE ? UI_BLUE_DARK : (edit_.enabled[i] ? UI_RED : UI_TEXT_LIGHT), ALIGN_CENTER);
+                font::plain(labels[i], px + 190, y + 4, 26, i == F_SAVE ? UI_BLUE_DARK : (edit_.enabled[k] ? UI_RED : UI_TEXT_LIGHT), ALIGN_CENTER);
                 continue;
             }
             font::plain(labels[i], px + 24, y + 6, 23, tc);
-            float vx = px + 270;
+            float vx = i == F_MII ? px + 240 : px + 270;
+            if (i == F_MII && a > 0.5f) {
+                gfx::triangle(vx - 92, y + 18, vx - 82, y + 10, vx - 82, y + 26, UI_BLUE);
+                gfx::triangle(vx + 92, y + 18, vx + 82, y + 10, vx + 82, y + 26, UI_BLUE);
+            }
             switch (i) {
+                case F_MII: font::plain(work_.name, vx, y + 4, 25, UI_TEXT, ALIGN_CENTER); break;
                 case F_NAME: font::plain(work_.name, px + 360, y + 4, 25, UI_TEXT, ALIGN_RIGHT); break;
                 case F_COLOR: ui::colorDot(vx, y + 18, 12, FAV_COLORS[work_.color]); break;
                 case F_SKIN: ui::colorDot(vx, y + 18, 12, SKIN_COLORS[work_.skin]); break;

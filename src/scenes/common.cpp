@@ -1,5 +1,9 @@
 #include "scenes/common.h"
+#include <string.h>
 #include "engine/gfx.h"
+#include "engine/save.h"
+#include "game/mii/mii.h"
+#include "game/palette.h"
 #include "game/world.h"
 #include "scenes/scenes.h"
 
@@ -11,6 +15,49 @@ World& sharedWorld() {
         built = true;
     }
     return w;
+}
+
+void setProfileMii(Profile& p, int index) {
+    const MiiInfo& m = mii::user(index);
+    p.mii = (u8)(index + 1);
+    // Nombre del Mii recortado sin partir una letra UTF-8
+    int n = 0;
+    while (m.name[n] && n < NAME_LEN) {
+        int len = ((unsigned char)m.name[n] & 0xE0) == 0xC0 ? 2 : 1;
+        if (n + len > NAME_LEN) break;
+        n += len;
+    }
+    memcpy(p.name, m.name, n);
+    p.name[n] = 0;
+    if (!p.name[0]) strcpy(p.name, "Mii");
+    // Color y piel parecidos para los puntos de color de los menús
+    static const u8 FACE_TO_SKIN[6] = {0, 1, 2, 1, 3, 3};
+    p.color = m.favColor % NUM_COLORS;
+    p.skin = FACE_TO_SKIN[m.faceColor % 6];
+}
+
+void linkProfilesToMiis() {
+    int count = mii::userCount();
+    if (count == 0) return;
+    bool taken[100] = {false};
+    SaveData& d = save::data();
+    for (int i = 0; i < MAX_PROFILES; i++)
+        if (d.profiles[i].used && d.profiles[i].mii && d.profiles[i].mii <= count) taken[d.profiles[i].mii - 1] = true;
+    bool changed = false;
+    int next = 0;
+    for (int i = 0; i < MAX_PROFILES; i++) {
+        Profile& p = d.profiles[i];
+        if (!p.used) continue;
+        if (p.mii && p.mii <= count) {
+            setProfileMii(p, p.mii - 1);  // el nombre o el color pueden haber cambiado en el Canal Mii
+            continue;
+        }
+        while (next < count && taken[next]) next++;
+        setProfileMii(p, next < count ? next : i % count);
+        if (next < count) taken[next] = true;
+        changed = true;
+    }
+    if (changed) save::write();
 }
 
 void drawMenuBackdrop(float t) {

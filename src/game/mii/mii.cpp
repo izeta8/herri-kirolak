@@ -60,11 +60,19 @@ bool decodeRaw(const u8* d, MiiInfo& m) {
     p0.take(4);
     p0.take(5);
     m.favColor = p0.take(4);
+    int n = 0;
     for (int i = 0; i < 10; i++) {
         u16 c = rd16(d + 2 + i * 2);
-        m.name[i] = c == 0 ? 0 : (c < 256 ? (char)c : '?');
+        if (c == 0) break;
+        if (c >= 256) c = '?';
+        if (c < 0x80) {
+            m.name[n++] = (char)c;
+        } else {
+            m.name[n++] = (char)(0xC0 | (c >> 6));
+            m.name[n++] = (char)(0x80 | (c & 0x3F));
+        }
     }
-    m.name[10] = 0;
+    m.name[n] = 0;
     m.height = d[0x16];
     m.build = d[0x17];
     Bits f(d + 0x20);
@@ -79,8 +87,8 @@ bool decodeRaw(const u8* d, MiiInfo& m) {
     m.eyeType = e1.take(6); m.eyeRotate = e1.take(5); m.eyeY = e1.take(5);
     Bits e2(d + 0x2A);
     m.eyeColor = e2.take(3); m.eyeScale = e2.take(4); m.eyeX = e2.take(4);
-    Bits n(d + 0x2C);
-    m.noseType = n.take(4); m.noseScale = n.take(4); m.noseY = n.take(5);
+    Bits ns(d + 0x2C);
+    m.noseType = ns.take(4); m.noseScale = ns.take(4); m.noseY = ns.take(5);
     Bits mo(d + 0x2E);
     m.mouthType = mo.take(5); m.mouthColor = mo.take(2); m.mouthScale = mo.take(4); m.mouthY = mo.take(5);
     Bits g(d + 0x30);

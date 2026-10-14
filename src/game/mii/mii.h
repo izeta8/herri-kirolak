@@ -19,7 +19,7 @@ struct MiiInfo {
     u8 height = 64, build = 64;
     u8 favColor = 0;
     bool female = false;
-    char name[11] = {0};  // en Latin-1
+    char name[32] = {0};  // en UTF-8 (lo que no sea Latin-1 sale como '?')
 };
 
 namespace mii {

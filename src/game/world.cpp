@@ -1,4 +1,5 @@
 #include "game/world.h"
+#include "game/mii/mii.h"
 #include "game/palette.h"
 #include "engine/gfx.h"
 
@@ -486,6 +487,8 @@ void World::build(unsigned seed) {
         s.look.style = (u8)((k * 7) % NUM_HAIR_STYLES);
         s.look.txapela = (k % 4) == 0;
         s.look.casual = 1;
+        // Con Miis en la consola, el público son esos Miis (repetidos si hay pocos)
+        if (mii::userCount() > 0) s.look.user = (s8)((numSpectators_ * 7 + 3) % mii::userCount());
         s.model = nullptr;
     };
     int k = 0;

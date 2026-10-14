@@ -64,7 +64,8 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
   el usuario quiere las piezas oficiales, no imitaciones
 - [x] Módulo `mii/`: piezas oficiales leídas de la NAND, montaje de la cabeza y la cara (compila; **sin probar**)
 - [ ] Encender la Wii: `deploy.ps1` y `pull-miis.ps1`; probar y corregir los Miis en Dolphin y en la Wii
-- [ ] Cada jugador elige uno de sus Miis del Canal Mii (en vez de nuestro editor); público con Miis de la consola
+- [x] Cada jugador elige uno de sus Miis del Canal Mii (Jokalariak: Mii + txapela); al arrancar se enlazan solos los
+  perfiles sin Mii; público con Miis de la consola (compila; **sin probar**)
 - [ ] Cuerpo de los Miis igual que en Wii Sports Resort (proporciones según altura y complexión del Mii)
 - [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
 - [ ] Marcador de la partida al estilo Resort
