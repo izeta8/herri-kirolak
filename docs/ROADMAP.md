@@ -70,7 +70,14 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [ ] Revisar caras: algún Mii se ve con los ojos pixelados de cerca (escala grande del ojo)
 - [x] Cada jugador elige uno de sus Miis del Canal Mii (Jokalariak: Mii + txapela); al arrancar se enlazan solos los
   perfiles sin Mii; público con Miis de la consola (compila; **sin probar**)
-- [ ] Cuerpo de los Miis igual que en Wii Sports Resort (proporciones según altura y complexión del Mii)
+- [x] Cuerpo de Wii Sports Resort (`WS2_avaA1`: brazos, dedos, 28 huesos) para jugadores y `WS2_avaC1` (sin brazos,
+  manos sueltas) para el público; IK de brazos hacia las manos del juego; gerriko en la cintura. Probado en Dolphin
+  (escenas 6, 7 y 9). Sin las calcomanías de la ropa (logo de Nintendo): camiseta lisa del color favorito
+- [ ] Ver los cuerpos en la Wii real (USB ya con `hk_body.bin`) y comparar con Resort de cuerpo entero (en Dolphin el
+  puntero no deja elegir Mii en Resort: comparar en la Wii)
+- [ ] Proporciones por altura/complexión: fórmula aproximada (`MII_BODY_SY*`, `MII_BODY_SXZ*` en tuning.h); calibrar
+  con un Mii alto y uno bajo contra Resort
+- [ ] Ropa propia de aizkolari sobre el cuerpo de Resort (camisa blanca, pantalón) si el usuario la quiere
 - [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
 - [x] Tutorial "Nola jokatu" animado estilo Resort: Wii Remote en 3D, estela, JO!, tronco en V, 5 pasos
   (`games/aizkolaritza/howto.cpp`); grabado en Dolphin, sin probar aún en la Wii

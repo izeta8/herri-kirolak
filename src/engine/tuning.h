@@ -57,4 +57,20 @@ constexpr float TURN_ALLOWED = 0.6f;         // profundidad (× radio) para pode
 constexpr float TURN_PROMPT = 0.9f;          // profundidad para mostrar "Buelta eman!"
 constexpr float SIDE_MAX = 1.3f;             // profundidad máxima por lado (× radio)
 
+// --- Cuerpo de Mii (Wii Sports Resort, game/mii/body) ---
+// Unidades del modelo de Resort: hombros a 9.25 sobre los pies, cuello a 9.7
+constexpr float MII_BODY_UNIT = 0.0886f;     // m por unidad: hombros a 0.82 m (como el cuerpo anterior)
+constexpr float MII_HEAD_UNITS = 3.9f;       // ancho de la cabeza en unidades del cuerpo (Resort: algo más que el torso)
+constexpr float MII_HEAD_DY = 0.0f;          // barbilla respecto a head_set (unidades)
+constexpr float MII_HEAD_DZ = 0.0f;
+// Proporciones según el Mii (0..127): escala vertical por la altura y horizontal por la complexión
+constexpr float MII_BODY_SY0 = 0.8f, MII_BODY_SY_RANGE = 0.4f;
+constexpr float MII_BODY_SXZ0 = 0.8f, MII_BODY_SXZ_RANGE = 0.4f;
+constexpr float MII_HAND_REACH = 0.55f;      // de la muñeca al centro de la mano (unidades)
+constexpr float MII_ELBOW_OUT = 0.4f;        // hacia dónde apunta el codo al doblar el brazo
+constexpr float MII_ELBOW_BACK = 0.4f;
+constexpr float MII_SASH_Y = 5.65f;          // altura del gerriko: donde acaba la camiseta (unidades)
+constexpr float MII_SASH_UNITS = 1.78f;      // su radio: lo más ancho del torso es 1.69 (unidades)
+constexpr float MII_SASH_DEPTH = 1.0f;       // y su fondo respecto al ancho
+
 }  // namespace tuning

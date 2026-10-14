@@ -21,3 +21,5 @@ build-rec/
 # Piezas de los Miis (de Nintendo, sacadas del disco del usuario): nunca al repositorio
 RFL_Res.dat
 RFL_DB.dat
+hk_body.bin
+*.brres

@@ -46,6 +46,15 @@
 - Las gafas son media textura: `GX_MIRROR` en S. La cara a 128 px se ve borrosa de cerca (jugadores: 256).
 - Wii Sports Resort en Dolphin pide quitar el Nunchuk (`WiimoteNew.ini`, `Extension = None`) y se maneja apuntando
   con el ratón (D-pad no mueve el menú). Sirve de referencia para comparar Miis. Devolver luego `Extension = Nunchuk`.
+- Cuerpos de Resort (`Common/Kokeshi/common.carc` → `G3D/WS2_ava*.brres`, MDL0 v11): A* y B* con brazos (28 huesos;
+  A1/A5/A8/A11/B8/B11 en pose de T), C* sin brazos y con manos sueltas; `WS2_ava_hand*` manos aparte. `clothes.brres`
+  solo trae calcomanías (logo de Nintendo, flores), no el color: la ropa se colorea por zonas. Unidades: hombros a
+  9.25, cuello (`head_set`) a 9.7. Casi todo rígido; triángulos entre huesos solo en dedos y cuello. Las mallas en
+  unidades grandes queman la luz: corregir la escala de las normales (`loadModelMtx(xf, escala)`).
+- En Dolphin, Resort no deja elegir Mii con la cruceta mientras el puntero se ve, y el puntero no se esconde al sacar
+  el ratón de la ventana (se queda en el borde): la comparación de cuerpo entero, mejor en la Wii.
+- Copia del disco en `D:\Tools\wsr-tmp` (ver su `LEEME.txt`): ISO para comparar en Dolphin y volver a sacar piezas.
+  Se puede borrar cuando los Miis (cabeza y cuerpo) estén aprobados en la Wii; `cleanrip-usb\` es redundante ya.
 
 ## Windows / herramientas
 - C: casi lleno: proyecto, Dolphin y descargas en D:. devkitPro en C:\devkitPro.

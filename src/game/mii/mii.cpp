@@ -13,7 +13,6 @@
 
 namespace {
 
-const char* RES_PATH = "/shared2/FaceLib/RFL_Res.dat";
 const char* DB_PATH = "/shared2/menu/FaceLib/RFL_DB.dat";
 
 // Secciones del fichero de piezas (en el orden en que vienen)
@@ -309,12 +308,12 @@ void setHeadVtx(bool txc) {
     GX_SetVtxAttrFmt(GX_VTXFMT2, GX_VA_TEX0, GX_TEX_ST, GX_S16, 13);
 }
 
-// RFL_Res.dat de la carpeta del juego en el USB/SD (alineado a 32 bytes, como el de la NAND)
-u8* readResFromFat(u32* size) {
+// Fichero de la carpeta del juego en el USB/SD (alineado a 32 bytes, como los de la NAND)
+u8* readFromFat(const char* name, u32* size) {
     const char* dir = save::directory();
     if (!dir || !dir[0]) return nullptr;
     char path[256];
-    snprintf(path, sizeof(path), "%sRFL_Res.dat", dir);
+    snprintf(path, sizeof(path), "%s%s", dir, name);
     FILE* f = fopen(path, "rb");
     if (!f) return nullptr;
     fseek(f, 0, SEEK_END);
@@ -335,11 +334,17 @@ u8* readResFromFat(u32* size) {
 // ------------------------------------------------------------------ API
 namespace mii {
 
+u8* readAsset(const char* name, u32* size) {
+    char path[64];
+    snprintf(path, sizeof(path), "/shared2/FaceLib/%s", name);
+    u8* data = nand::readFile(path, size);
+    return data ? data : readFromFat(name, size);
+}
+
 bool init() {
     if (s_res) return true;
     u32 size = 0;
-    u8* res = nand::readFile(RES_PATH, &size);
-    if (!res) res = readResFromFat(&size);
+    u8* res = readAsset("RFL_Res.dat", &size);
     if (res && size > (ARC_COUNT + 1) * 4) {
         bool ok = true;
         for (int i = 0; i < ARC_COUNT && ok; i++) {

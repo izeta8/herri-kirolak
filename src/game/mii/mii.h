@@ -1,7 +1,8 @@
 #pragma once
 // Miis de verdad: las piezas (formas de cara, pelos, narices, texturas de ojos, cejas, bocas…) se leen de la propia
-// Wii (/shared2/FaceLib/RFL_Res.dat) y los Miis del Canal Mii de /shared2/menu/FaceLib/RFL_DB.dat. Nada de eso va en
-// el repositorio. La cabeza se monta igual que la librería de Miis de la Wii (RVLFaceLib); el cuerpo es del juego.
+// Wii o del disco del usuario (RFL_Res.dat, ver readAsset) y los Miis del Canal Mii de /shared2/menu/FaceLib/RFL_DB.dat.
+// Nada de eso va en el repositorio. La cabeza se monta igual que la librería de Miis de la Wii (RVLFaceLib); el cuerpo
+// es el de Wii Sports Resort (mii/body.h).
 #include <vector>
 #include "engine/gfx.h"
 
@@ -24,6 +25,9 @@ struct MiiInfo {
 
 namespace mii {
 
+// Fichero de Nintendo sacado de la consola o del disco del usuario (RFL_Res.dat, hk_body.bin…): primero la NAND
+// (/shared2/FaceLib/, así en Dolphin) y si no la carpeta del juego en el USB/SD. Búfer alineado para free(); nullptr si no.
+u8* readAsset(const char* name, u32* size);
 bool init();       // carga las piezas y la base de datos de la NAND; false si esta Wii/Dolphin no las tiene
 bool available();  // hay piezas: se pueden dibujar Miis de verdad
 int userCount();   // Miis del Canal Mii

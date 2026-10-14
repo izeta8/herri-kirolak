@@ -46,3 +46,4 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-13 | Probar con la Wii por WiFi (wiiload / actualización en caliente) y telemetría | Un solo monitor compartido con la Wii; el usuario escribe desde el móvil |
 | 2026-10-13 | Construir un **harness** para crear juegos más rápido y con más calidad (docs, skills, herramientas) | Objetivo explícito del usuario |
 | 2026-10-14 | Miis con las **piezas oficiales sacadas del disco de Wii Sports Resort** del usuario (solo en su USB y en Dolphin, nunca en el repo); si fallara, piezas propias a partir de sus Miis | El usuario quiere los Miis idénticos a Wii Sports |
+| 2026-10-14 | **Cuerpos de Wii Sports Resort** (del disco del usuario, como las caras): jugadores con brazos y dedos (A1), público sin brazos (C1); camiseta del color favorito, pantalón y gerriko nuestros, sin logos | "Quiero que todos los modelos sean iguales" |

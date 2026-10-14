@@ -1,4 +1,5 @@
 #include "game/character.h"
+#include "engine/tuning.h"
 #include "game/mii/mii.h"
 #include "game/palette.h"
 
@@ -318,6 +319,18 @@ void CharacterModel::build(const Appearance& a) {
         }
     }
     Color pantsCol = a.casual ? PANTS_MII : PANTS_WHITE;
+    // Cuerpo de Wii Sports Resort (con brazos y dedos) para los Miis de verdad
+    if (mii && miibody::available(a.casual ? miibody::CROWD : miibody::PLAYER)) {
+        const MiiInfo info = miiFor(a);
+        const Color zones[4] = {skin, shirt, pantsCol, rgba(0x4A, 0x48, 0x4C)};
+        body.build(a.casual ? miibody::CROWD : miibody::PLAYER, zones, info.height, info.build);
+        if (!a.casual) {
+            Color sashCol = (a.color == 0 || a.color == 7) ? rgba(0x22, 0x22, 0x2A) : rgba(0xC8, 0x1E, 0x1E);
+            b.cylinder(Vec3(0, -0.04f, 0), 1.0f, 1.0f, 0.08f, sashCol, sashCol, 18, true);
+            b.build(sash);
+            b.clear();
+        }
+    }
     // Torso de Mii: estrecho, un poco más ancho en la cintura que en los hombros
     const float ys[] = {-0.03f, 0.0f, 0.12f, 0.26f, 0.37f, 0.44f, 0.475f, 0.48f};
     const float rs[] = {0.12f, 0.145f, 0.152f, 0.145f, 0.13f, 0.1f, 0.05f, 0.0f};
@@ -358,6 +371,8 @@ void CharacterModel::release() {
         mii = nullptr;
     }
     beret.release();
+    body.release();
+    sash.release();
     head.release();
     headBlink.release();
     torso.release();
@@ -393,8 +408,36 @@ static void drawLimb(const Mesh& m, const Vec3& a, const Vec3& b) {
     gfx::drawMesh(m, Xf::fromBasis(a, x, y * len, z));
 }
 
+// Mii con el cuerpo de Wii Sports Resort
+static void drawResortCharacter(const CharacterModel& m, const CharacterPose& p) {
+    miibody::Pose bp;
+    bp.root = Xf().translate(p.pos).rotateY(p.yaw);
+    bp.lean = p.lean;
+    bp.side = p.side;
+    bp.headPitch = p.headPitch;
+    bp.squash = p.squash;
+    bp.handL = p.handL;
+    bp.handR = p.handR;
+    bp.handsVisible = p.handsVisible;
+    Xf head, waist;
+    miibody::draw(m.body, bp, &head, &waist);
+    if (m.sash.valid()) {
+        float r = tuning::MII_SASH_UNITS * tuning::MII_BODY_UNIT * m.body.sxz;
+        gfx::drawMesh(m.sash, waist * Xf().scale(Vec3(r, 1, r * tuning::MII_SASH_DEPTH)));
+    }
+    if (m.mii && m.mii->ready()) {
+        Xf h = head * Xf().scale(miibody::headWidth() / 0.43f);
+        m.mii->draw(h, p.blink);
+        if (m.beret.valid()) gfx::drawMesh(m.beret, h * Xf().translate(Vec3(0, m.mii->top() - 0.035f, -0.01f)).rotateZ(0.16f));
+    }
+}
+
 void drawCharacter(const CharacterModel& m, const CharacterPose& p) {
     if (!m.built) return;
+    if (m.body.valid()) {
+        drawResortCharacter(m, p);
+        return;
+    }
     Xf root = Xf().translate(p.pos).rotateY(p.yaw);
     float sq = clampv(p.squash, -0.3f, 0.3f);
     float hipY = HIP_Y * (1 - sq * 0.5f);

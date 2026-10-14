@@ -2,6 +2,7 @@
 // Personaje calcado a los Miis de la Wii: cabeza de huevo con la cara de línea, pelo de casco, cuerpo estrecho y brazos.
 #include "engine/mesh.h"
 #include "engine/save.h"
+#include "game/mii/body.h"
 
 // Peinados: 0 corto con raya, 1 de punta, 2 melena larga, 3 media melena
 constexpr int NUM_HAIR_STYLES = 4;
@@ -26,6 +27,8 @@ struct CharacterModel {
     Appearance look;
     MiiHead* mii = nullptr;  // cabeza de Mii de verdad (si la consola tiene las piezas); si no, la nuestra
     Mesh beret;              // txapela para ponerla encima de la cabeza Mii
+    miibody::Body body;      // cuerpo de Wii Sports Resort (si están sus modelos); si no, el nuestro
+    Mesh sash;               // gerriko para el cuerpo de Resort
     Mesh head, headBlink, torso, legUnit, pants, hand, sleeve, forearm, shoulder;
     bool built = false;
     void build(const Appearance& a);
