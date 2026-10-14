@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <wiiuse/wpad.h>
 #include "booter_bin.h"
+#include "engine/nand.h"
 #include "engine/telemetry.h"
 
 namespace updater {
@@ -50,6 +51,40 @@ static void dropClient() {
     }
 }
 
+// "HKPL" + longitud + ruta: manda al PC un fichero de /shared2 de la NAND (solo lectura). Sirve para copiar las piezas
+// de los Miis (RFL_Res.dat) y la base de datos (RFL_DB.dat) a la NAND de Dolphin y probar allí. Respuesta: u32 tamaño
+// (0 = no se pudo) y los datos.
+static void servePull() {
+    u32 len = (s_header[4] << 24) | (s_header[5] << 16) | (s_header[6] << 8) | s_header[7];
+    char path[96];
+    u32 size = 0;
+    u8* data = nullptr;
+    if (len > 0 && len < sizeof(path)) {
+        u32 got = 0;
+        while (got < len) {
+            s32 n = net_recv(s_client, path + got, len - got, 0);
+            if (n <= 0) break;
+            got += n;
+        }
+        path[got] = 0;
+        if (got == len && strncmp(path, "/shared2/", 9) == 0 && !strstr(path, "..")) data = nand::readFile(path, &size);
+    }
+    char msg[128];
+    snprintf(msg, sizeof(msg), "nand: %s -> %u byte", len < sizeof(path) ? path : "?", (unsigned)(data ? size : 0));
+    telemetry::note(msg);
+    u8 hdr[4] = {(u8)(size >> 24), (u8)(size >> 16), (u8)(size >> 8), (u8)size};
+    if (!data) hdr[0] = hdr[1] = hdr[2] = hdr[3] = 0;
+    net_send(s_client, hdr, 4, 0);
+    for (u32 sent = 0; data && sent < size;) {
+        s32 n = net_send(s_client, data + sent, size - sent > 16384 ? 16384 : size - sent, 0);
+        if (n <= 0) break;
+        sent += n;
+    }
+    free(data);
+    usleep(50000);
+    dropClient();
+}
+
 void poll() {
     if (s_server < 0 || s_ready) return;
     if (s_client < 0) {
@@ -84,6 +119,10 @@ void poll() {
             return;
         }
         s_got += n;
+        if (!s_inBody && s_got == 8 && memcmp(s_header, "HKPL", 4) == 0) {
+            servePull();
+            return;
+        }
         if (!s_inBody && s_got == 8) {
             s_size = (s_header[4] << 24) | (s_header[5] << 16) | (s_header[6] << 8) | s_header[7];
             if (memcmp(s_header, "HKUP", 4) != 0 || s_size > MAX_DOL || !(s_buf = (u8*)memalign(32, s_size))) {

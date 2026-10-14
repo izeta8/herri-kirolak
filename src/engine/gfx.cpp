@@ -105,8 +105,66 @@ void init() {
     GX_InvalidateTexAll();
 }
 
+static void (*s_frameStart)() = nullptr;
+static const GXColor CLEAR_COLOR = {0x7C, 0xC4, 0xF4, 0xFF};
+
+void setFrameStartCallback(void (*cb)()) { s_frameStart = cb; }
+
 void beginFrame() {
     GX_SetViewport(0, 0, s_rmode->fbWidth, s_rmode->efbHeight, 0, 1);
+    s_mode = MODE_NONE;
+    if (s_frameStart) {
+        s_frameStart();
+        s_mode = MODE_NONE;
+    }
+}
+
+void offscreenBegin(u16 size) {
+    static u8* scratch = nullptr;
+    if (!scratch) scratch = (u8*)memalign(32, 256 * 256 * 2);
+    GX_SetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+    GX_SetCopyFilter(GX_FALSE, nullptr, GX_FALSE, nullptr);
+    GX_SetViewport(0, 0, s_rmode->fbWidth, s_rmode->efbHeight, 0, 1);
+    GX_SetScissor(0, 0, size, size);
+    Mtx44 ortho;
+    guOrtho(ortho, 0, s_rmode->efbHeight, 0, s_rmode->fbWidth, -1, 1);
+    GX_LoadProjectionMtx(ortho, GX_ORTHOGRAPHIC);
+    GX_SetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GX_SetCullMode(GX_CULL_NONE);
+    GX_SetFog(GX_FOG_NONE, 0, 0, 0, 0, (GXColor){0, 0, 0, 0});
+    GX_SetColorUpdate(GX_TRUE);
+    GX_SetAlphaUpdate(GX_TRUE);
+    // Borrar la esquina a (0,0,0,0) copiándola con borrado a un búfer de usar y tirar
+    GX_SetCopyClear((GXColor){0, 0, 0, 0}, 0x00FFFFFF);
+    GX_SetTexCopySrc(0, 0, size, size);
+    GX_SetTexCopyDst(size, size, GX_TF_RGB5A3, GX_FALSE);
+    DCInvalidateRange(scratch, size * size * 2);
+    GX_CopyTex(scratch, GX_TRUE);
+    GX_PixModeSync();
+    s_mode = MODE_NONE;
+}
+
+void offscreenCopy(void* dst, u16 size, u8 texFmt) {
+    GX_SetTexCopySrc(0, 0, size, size);
+    GX_SetTexCopyDst(size, size, texFmt, GX_FALSE);
+    DCInvalidateRange(dst, size * size * 2);
+    GX_CopyTex(dst, GX_TRUE);
+    GX_PixModeSync();
+}
+
+void offscreenEnd() {
+    GX_DrawDone();
+    GX_SetPixelFmt(s_rmode->aa ? GX_PF_RGB565_Z16 : GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    GX_SetCopyFilter(s_rmode->aa, s_rmode->sample_pattern, GX_TRUE, s_rmode->vfilter);
+    GX_SetCopyClear(CLEAR_COLOR, 0x00FFFFFF);
+    GX_SetScissor(0, 0, s_rmode->fbWidth, s_rmode->efbHeight);
+    GX_SetViewport(0, 0, s_rmode->fbWidth, s_rmode->efbHeight, 0, 1);
+    GX_SetColorUpdate(GX_TRUE);
+    GX_SetAlphaUpdate(GX_FALSE);
+    GX_SetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
+    GX_SetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GX_InvalidateTexAll();
+    GX_InvVtxCache();
     s_mode = MODE_NONE;
 }
 
@@ -212,6 +270,32 @@ void drawMesh(const Mesh& mesh, const Xf& model) {
     guMtxTranspose(nrm, nrm);
     GX_LoadNrmMtxImm(nrm, GX_PNMTX0);
     mesh.call();
+}
+
+void loadModelMtx(const Xf& model, float normalScale) {
+    Mtx mv, nrm;
+    guMtxConcat(s_view, (MtxP)model.m, mv);
+    GX_LoadPosMtxImm(mv, GX_PNMTX0);
+    guMtxInverse(mv, nrm);
+    guMtxTranspose(nrm, nrm);
+    if (normalScale != 1.0f)
+        for (int r = 0; r < 3; r++)
+            for (int c = 0; c < 3; c++) nrm[r][c] *= normalScale;
+    GX_LoadNrmMtxImm(nrm, GX_PNMTX0);
+    GX_SetCurrentMtx(GX_PNMTX0);
+}
+
+void restore3D() {
+    s_mode = MODE_NONE;
+    use3DFormat();
+    setChannels(s_lit);
+    for (int i = 0; i < 3; i++) GX_SetTevSwapMode((u8)(GX_TEVSTAGE0 + i), GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GX_SetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    GX_SetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GX_SetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
+    GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GX_SetCullMode(GX_CULL_FRONT);
+    GX_SetCurrentMtx(GX_PNMTX0);
 }
 
 bool project(const Vec3& p, float& sx, float& sy) {

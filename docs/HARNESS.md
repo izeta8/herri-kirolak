@@ -30,6 +30,11 @@ solo cada 4 s). **Al crear algo nuevo, añadir su número.**
 - Probar siempre la CPU (escenas 6 y 7) tras tocar animaciones o la escena de partida.
 - Dolphin no sirve para el tacto del gesto (no gira más de 90°): eso se valida en la Wii con telemetría.
 
+## 2b. Miis de verdad en Dolphin — `scripts/pull-miis.ps1`
+Con el juego abierto en la Wii (versión con "HKPL"), copia `RFL_Res.dat` y `RFL_DB.dat` de la consola a la NAND de
+Dolphin (`D:\Tools\Dolphin\Dolphin-x64\User\Wii\shared2\...`). Solo hace falta una vez. Son ficheros de Nintendo de la
+consola del usuario: **nunca al repositorio**.
+
 ## 3. Mandar a la Wii — `scripts/deploy.ps1 [-Dol ruta]`
 1. Si el juego está abierto: **actualización en caliente** (TCP 4301). La Wii muestra "Eguneratzen…" y salta a la
    versión nueva sin pasar por el Homebrew Channel.

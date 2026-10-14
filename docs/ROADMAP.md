@@ -60,7 +60,12 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 ## Estilo Wii (rama `estilo-wii-sports-resort`, pendiente de que el usuario lo vea en la Wii)
 - [x] UI y menús estilo Wii Sports Resort; fondo de menús = escenario 3D
 - [x] Aizkolaritza en el probaleku de Usurbil (iglesia, frontón, gradas, porterías, casas, empedrado, muros de cantos)
-- [x] Miis calcados a los de la Wii + peinado en el editor (Orrazkera); escena 9 = galería de Miis
+- [x] Miis calcados a los de la Wii + peinado en el editor (Orrazkera); escena 9 = galería de Miis — **descartado**:
+  el usuario quiere las piezas oficiales, no imitaciones
+- [x] Módulo `mii/`: piezas oficiales leídas de la NAND, montaje de la cabeza y la cara (compila; **sin probar**)
+- [ ] Encender la Wii: `deploy.ps1` y `pull-miis.ps1`; probar y corregir los Miis en Dolphin y en la Wii
+- [ ] Cada jugador elige uno de sus Miis del Canal Mii (en vez de nuestro editor); público con Miis de la consola
+- [ ] Cuerpo de los Miis igual que en Wii Sports Resort (proporciones según altura y complexión del Mii)
 - [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
 - [ ] Marcador de la partida al estilo Resort
 - [ ] Más caras a elegir (ojos, cejas, bocas, narices) como en el editor de Miis

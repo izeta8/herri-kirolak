@@ -17,8 +17,12 @@ struct Appearance {
     }
 };
 
+class MiiHead;
+
 struct CharacterModel {
     Appearance look;
+    MiiHead* mii = nullptr;  // cabeza de Mii de verdad (si la consola tiene las piezas); si no, la nuestra
+    Mesh beret;              // txapela para ponerla encima de la cabeza Mii
     Mesh head, headBlink, torso, legUnit, pants, hand, sleeve, forearm, shoulder;
     bool built = false;
     void build(const Appearance& a);

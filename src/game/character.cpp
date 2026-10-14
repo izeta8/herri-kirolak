@@ -1,4 +1,5 @@
 #include "game/character.h"
+#include "game/mii/mii.h"
 #include "game/palette.h"
 
 // Miis calcados a los de la Wii:
@@ -258,6 +259,28 @@ static void lathe(MeshBuilder& b, const float* ys, const float* rs, const Color*
     }
 }
 
+// Mii para un aspecto del juego. Jugadores: un invitado de la Wii con su piel, pelo y color. Público: Miis
+// aleatorios hechos con las piezas oficiales (siempre los mismos para el mismo aspecto).
+static MiiInfo miiFor(const Appearance& a) {
+    static const u8 SKIN_TO_MII[NUM_SKINS] = {0, 1, 2, 4};
+    static const u8 HAIR_TO_MII[NUM_HAIRS] = {0, 1, 7, 2, 4};
+    static const u8 STYLE_TO_MII[NUM_HAIR_STYLES] = {33, 55, 12, 24};
+    bool female = a.style >= 2;
+    MiiInfo m;
+    if (a.casual) {
+        u32 seed = 2654435761u * (1u + a.color + 13u * a.skin + 131u * a.hair + 1031u * a.style + 7919u * a.txapela);
+        m = mii::random(seed, female);
+    } else {
+        m = mii::guest(female ? 3 : 0);
+        m.hairType = STYLE_TO_MII[a.style % NUM_HAIR_STYLES];
+    }
+    m.faceColor = SKIN_TO_MII[a.skin % NUM_SKINS];
+    m.hairColor = HAIR_TO_MII[a.hair % NUM_HAIRS];
+    m.browColor = m.hairColor;
+    m.favColor = a.color % 12;
+    return m;
+}
+
 void CharacterModel::build(const Appearance& a) {
     buildShared();
     release();
@@ -273,6 +296,24 @@ void CharacterModel::build(const Appearance& a) {
 
     Color shirt = FAV_COLORS[a.color % NUM_COLORS];
     Color skin = SKIN_COLORS[a.skin % NUM_SKINS];
+    // Cabeza de Mii de verdad si la consola tiene las piezas (si no, se queda la nuestra)
+    if (mii::available()) {
+        MiiInfo info = miiFor(a);
+        mii = new MiiHead();
+        if (mii->build(info, low ? 64 : 128)) {
+            skin = mii::skinColor(info.faceColor);
+            if (a.txapela) {
+                const Color c = rgba(0x1C, 0x1E, 0x26);
+                b.sphere(Vec3(0, 0, 0), Vec3(0.27f, 0.075f, 0.25f), c, 22, 8);
+                b.cylinder(Vec3(0, 0.06f, 0), 0.013f, 0.008f, 0.04f, c, c, 6, true);
+                b.build(beret);
+                b.clear();
+            }
+        } else {
+            delete mii;
+            mii = nullptr;
+        }
+    }
     Color pantsCol = a.casual ? PANTS_MII : PANTS_WHITE;
     // Torso de Mii: estrecho, un poco más ancho en la cintura que en los hombros
     const float ys[] = {-0.03f, 0.0f, 0.12f, 0.26f, 0.37f, 0.44f, 0.475f, 0.48f};
@@ -308,6 +349,12 @@ void CharacterModel::build(const Appearance& a) {
 }
 
 void CharacterModel::release() {
+    if (mii) {
+        mii->release();
+        delete mii;
+        mii = nullptr;
+    }
+    beret.release();
     head.release();
     headBlink.release();
     torso.release();
@@ -361,7 +408,12 @@ void drawCharacter(const CharacterModel& m, const CharacterPose& p) {
     gfx::drawMesh(m.pants, root * Xf().translate(Vec3(0, hipY, 0)));
     gfx::drawMesh(m.torso, torso);
     Xf head = torso * Xf().translate(Vec3(0, NECK_Y, 0)).rotateX(p.headPitch);
-    gfx::drawMesh(p.blink ? m.headBlink : m.head, head);
+    if (m.mii && m.mii->ready()) {
+        m.mii->draw(head, p.blink);
+        if (m.beret.valid()) gfx::drawMesh(m.beret, head * Xf().translate(Vec3(0, m.mii->top() - 0.035f, -0.01f)).rotateZ(0.16f));
+    } else {
+        gfx::drawMesh(p.blink ? m.headBlink : m.head, head);
+    }
     if (p.handsVisible) {
         for (int s = -1; s <= 1; s += 2) {
             Vec3 sh = torso.apply(Vec3(s * SHOULDER.x, SHOULDER.y, SHOULDER.z));

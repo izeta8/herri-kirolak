@@ -49,6 +49,12 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 - **`world`** — escenario de aizkolaritza: **el probaleku de Usurbil** (empedrado, muros de cantos con albardilla, gradas
   con toldo, porterías, iglesia de San Salvador con la torre, frontón cubierto, casas de Etxebeste e Irazu, montes;
   29 espectadores con 10 aspectos). −Z = sur (iglesia), +X = oeste (Etxebeste); la plataforma a y = 0, calles a −1.
+- **`mii/`** — **Miis de verdad**: lee de la NAND de la consola `/shared2/FaceLib/RFL_Res.dat` (piezas: modelos y
+  texturas) y `/shared2/menu/FaceLib/RFL_DB.dat` (Miis del Canal Mii) con `engine/nand`. `MiiHead` monta la cabeza como
+  la RVLFaceLib (referencia: decompilación pública SMGCommunity/Petari): contorno, máscara, pelo, gorra, frente, nariz,
+  raya de la nariz, barba y gafas con display lists indexadas (formato de vértices 2, s16), y la cara (ojos, cejas,
+  boca, bigote, lunar) pintada en una textura RGB5A3 al empezar el frame (`gfx::offscreen*`, cola `mii::processPending`).
+  Si no hay piezas (Dolphin sin copiarlas), `CharacterModel` usa nuestra cabeza de siempre. **Nada de esto va al repo.**
 - **Fondo de menús**: `ui::setBackground(drawMenuBackdrop)` (en `main.cpp`) pinta el escenario 3D detrás de los paneles
   de cristal (estilo Wii Sports Resort); `gfx::clearDepth()` borra el Z antes del personaje de vista previa.
   `sharedWorld()` (una sola instancia), `drawSky()` (2D, antes de 3D), `draw()`, `cheer(s)`, `clapLight(s)`,

@@ -14,6 +14,7 @@
 #include "engine/font.h"
 #include "engine/ui.h"
 #include "game/palette.h"
+#include "game/mii/mii.h"
 #include "scenes/common.h"
 #include "scenes/scenes.h"
 
@@ -63,6 +64,10 @@ int main(int argc, char** argv) {
     SYS_SetPowerCallback(onPower);
     WPAD_SetPowerButtonCallback(onPadPower);
     srand(gettime());
+
+    // Miis de verdad con las piezas de la propia consola (si no las hay, personajes propios)
+    telemetry::note(mii::init() ? "miiak: piezak NANDetik" : "miiak: piezarik ez (gure pertsonaiak)");
+    gfx::setFrameStartCallback(mii::processPending);
 
     sharedWorld();
     ui::setBackground(drawMenuBackdrop);
