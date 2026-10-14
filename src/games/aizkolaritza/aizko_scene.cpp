@@ -15,6 +15,7 @@
 #include "game/text.h"
 #include "game/world.h"
 #include "games/aizkolaritza/aizkolari.h"
+#include "games/aizkolaritza/howto.h"
 #include "games/aizkolaritza/log.h"
 #include "scenes/scenes.h"
 
@@ -79,6 +80,7 @@ public:
             resetLog(p);
         }
         showHowTo_ = cfg_.training && !cfg_.bot[0];
+    if (showHowTo_) howTo_.start();
         camEye_ = Vec3(6, 3.5f, 9);
         camTarget_ = Vec3(0, 0.9f, 0);
     }
@@ -101,7 +103,6 @@ private:
     void drawCommon();
     void drawResults();
     void drawPause();
-    void drawHowTo();
 
     MatchConfig cfg_;
     int n_ = 1;
@@ -119,6 +120,7 @@ private:
     int order_[MAXP] = {0, 1, 2, 3};
     float resultsT_ = 0;
     bool showHowTo_ = false;
+    HowTo howTo_;
     float howToT_ = 0;
 };
 
@@ -372,10 +374,7 @@ void AizkoScene::update(float dt) {
             if (showHowTo_) {
                 howToT_ += dt;
                 stateT_ = 0;
-                if (howToT_ > 0.6f && (downAll & WPAD_BUTTON_A)) {
-                    showHowTo_ = false;
-                    audio::play(SFX_OK, 0.7f);
-                }
+                if (howTo_.update(dt, downAll)) showHowTo_ = false;
                 break;
             }
             if (stateT_ > 2.6f || (stateT_ > 0.6f && (downAll & WPAD_BUTTON_A))) {
@@ -484,7 +483,7 @@ void AizkoScene::draw() {
 
     gfx::begin2D();
     if (showHowTo_) {
-        drawHowTo();
+        howTo_.draw();
         return;
     }
     drawCommon();
@@ -742,73 +741,6 @@ void AizkoScene::drawResults() {
     float by = fminf(430.0f, py + ph + 44);
     ui::button(W / 2 - 150, by, 260, 60, txt::PLAY_AGAIN, resultsMenu_.anim[0]);
     ui::button(W / 2 + 150, by, 260, 60, txt::TO_MENU, resultsMenu_.anim[1]);
-}
-
-// Línea gruesa (dos triángulos)
-static void thickLine(float x0, float y0, float x1, float y1, float w, Color c) {
-    float dx = x1 - x0, dy = y1 - y0, l = sqrtf(dx * dx + dy * dy);
-    if (l < 0.01f) return;
-    float nx = -dy / l * w / 2, ny = dx / l * w / 2;
-    gfx::triangle(x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, c);
-    gfx::triangle(x0 + nx, y0 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny, c);
-}
-
-static void arrow(float x0, float y0, float x1, float y1, Color c) {
-    float dx = x1 - x0, dy = y1 - y0, l = sqrtf(dx * dx + dy * dy);
-    float ux = dx / l, uy = dy / l;
-    thickLine(x0, y0, x1 - ux * 14, y1 - uy * 14, 8, c);
-    gfx::triangle(x1, y1, x1 - ux * 20 - uy * 12, y1 - uy * 20 + ux * 12, x1 - ux * 20 + uy * 12, y1 - uy * 20 - ux * 12, c);
-}
-
-// Wii Remote visto de frente, vertical, con la punta (sensor) arriba
-static void remoteIcon(float cx, float cy, float s, bool thumb) {
-    float w = 26 * s, h = 96 * s;
-    gfx::roundRect(cx - w / 2 + 2, cy - h / 2 + 3, w, h, 9 * s, rgba(0, 0, 0, 50));
-    gfx::roundRect(cx - w / 2, cy - h / 2, w, h, 9 * s, UI_WHITE);
-    gfx::rect(cx - w / 2 + 3 * s, cy - h / 2 + 2 * s, w - 6 * s, 6 * s, rgba(0x30, 0x30, 0x38));
-    gfx::rect(cx - 7 * s, cy - h / 2 + 20 * s, 14 * s, 4 * s, rgba(0x70, 0x74, 0x7C));
-    gfx::rect(cx - 2 * s, cy - h / 2 + 15 * s, 4 * s, 14 * s, rgba(0x70, 0x74, 0x7C));
-    gfx::circle(cx, cy - h / 2 + 38 * s, 6 * s, rgba(0xC8, 0xCC, 0xD4), 16);
-    gfx::circle(cx, cy + h / 2 - 30 * s, 4 * s, rgba(0xC8, 0xCC, 0xD4), 12);
-    gfx::circle(cx, cy + h / 2 - 18 * s, 4 * s, rgba(0xC8, 0xCC, 0xD4), 12);
-    if (thumb) {
-        gfx::circle(cx + 3 * s, cy + h / 2 - 24 * s, 11 * s, rgba(0xF2, 0xBC, 0x8C, 0xE0), 20);
-        gfx::roundRect(cx - w / 2 - 6 * s, cy + h / 2 - 34 * s, w + 12 * s, 30 * s, 10 * s, rgba(0xF2, 0xBC, 0x8C, 0x90));
-    }
-}
-
-void AizkoScene::drawHowTo() {
-    const float W = gfx::screenW();
-    float a = smooth01(howToT_ / 0.3f);
-    ui::fade(0.45f * a);
-    float pw = 760, ph = 330, px = W / 2 - pw / 2, py = 60 + (1 - easeOutCubic(howToT_ / 0.4f)) * 40;
-    ui::panel(px, py, pw, ph);
-    font::plain(txt::HOW_TO, W / 2, py + 12, 36, UI_TEXT, ALIGN_CENTER);
-    const char* t1[3] = {txt::HOW_1, txt::HOW_2, txt::HOW_3};
-    const char* t2[3] = {txt::HOW_1B, txt::HOW_2B, txt::HOW_3B};
-    for (int i = 0; i < 3; i++) {
-        float cx = px + pw * (i + 0.5f) / 3, cy = py + 160;
-        gfx::circle(cx - 92, py + 74, 16, UI_BLUE, 20);
-        char num[2] = {(char)('1' + i), 0};
-        font::plain(num, cx - 92, py + 61, 24, UI_WHITE, ALIGN_CENTER);
-        if (i == 0) {
-            remoteIcon(cx, cy, 1.35f, true);
-        } else if (i == 1) {
-            gfx::circle(cx - 10, cy + 55, 26, rgba(0xF2, 0xBC, 0x8C), 24);
-            gfx::rect(cx - 36, cy + 42, 52, 10, rgba(0x1C, 0x1E, 0x26));
-            remoteIcon(cx + 56, cy - 22, 0.9f, false);
-            arrow(cx + 20, cy + 70, cx + 46, cy + 22, UI_GREEN);
-            font::draw(txt::HIT_NOW, cx + 56, cy - 88, 26, UI_GREEN, UI_WHITE, ALIGN_CENTER);
-        } else {
-            arrow(cx + 56, cy - 50, cx + 6, cy + 48, rgba(0x6C, 0xC4, 0xFF));
-            arrow(cx - 56, cy - 50, cx - 6, cy + 48, rgba(0xFF, 0xA0, 0x40));
-            remoteIcon(cx + 70, cy - 70, 0.6f, false);
-            remoteIcon(cx - 70, cy - 70, 0.6f, false);
-        }
-        font::plain(t1[i], cx, py + 236, 24, UI_TEXT, ALIGN_CENTER);
-        font::plain(t2[i], cx, py + 266, 19, UI_TEXT_LIGHT, ALIGN_CENTER);
-    }
-    if (howToT_ > 0.6f) ui::hints(txt::OK, nullptr);
 }
 
 void AizkoScene::drawPause() {

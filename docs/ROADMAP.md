@@ -68,6 +68,8 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
   perfiles sin Mii; público con Miis de la consola (compila; **sin probar**)
 - [ ] Cuerpo de los Miis igual que en Wii Sports Resort (proporciones según altura y complexión del Mii)
 - [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
+- [x] Tutorial "Nola jokatu" animado estilo Resort: Wii Remote en 3D, estela, JO!, tronco en V, 5 pasos
+  (`games/aizkolaritza/howto.cpp`); grabado en Dolphin, sin probar aún en la Wii
 - [ ] Marcador de la partida al estilo Resort
 - [ ] Más caras a elegir (ojos, cejas, bocas, narices) como en el editor de Miis
 - [ ] Juntar con `main` cuando lo apruebe

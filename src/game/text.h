@@ -99,6 +99,16 @@ constexpr const char* TIP_1 = "Heldu behetik, erpurua 1 eta 2 botoien gainean.";
 constexpr const char* TIP_2 = "Jaitsi diagonalean erdira, eskumuturra biratu gabe. V forma!";
 constexpr const char* TIP_3 = "Ez jo azkarregi: nekatuz gero, kolpeak ahulagoak dira.";
 constexpr const char* TIP_4 = "Erdira iristean, eman buelta B botoiarekin.";
+// Tutorial animado "Nola jokatu" (estilo Wii Sports Resort): título y dos líneas por paso
+constexpr const char* HOWTO = "Nola jokatu";
+constexpr const char* HOWTO_NEXT = "Hurrengoa";
+constexpr const char* HOWTO_STEPS[5][3] = {
+    {"Heldu horrela", "Wii Remote-a zutik,", "erpurua 1 eta 2 botoien gainean."},
+    {"Altxatu alde batera", "Igo aizkora ezkerrera edo", "eskuinera, JO! agertu arte."},
+    {"Jo diagonalean", "Jaitsi bizkor erdira,", "eskumuturra biratu gabe."},
+    {"Egin V forma", "Txandakatu: ezkerretik,", "eskuinetik, ezkerretik..."},
+    {"Buelta eman", "Aurrekoa erdiraino iristean,", "sakatu B atzekoa jotzeko."},
+};
 // Tarjeta "Nola jo" (cómo golpear)
 constexpr const char* HOW_TO = "Nola jo";
 constexpr const char* HOW_1 = "Heldu behetik";
