@@ -45,3 +45,4 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-13 | Sin lector de SD: instalar por **USB** (`ESD-USB`, F:) o por **WiFi** | El otro USB (`WiiGames`) tiene mal el conector |
 | 2026-10-13 | Probar con la Wii por WiFi (wiiload / actualización en caliente) y telemetría | Un solo monitor compartido con la Wii; el usuario escribe desde el móvil |
 | 2026-10-13 | Construir un **harness** para crear juegos más rápido y con más calidad (docs, skills, herramientas) | Objetivo explícito del usuario |
+| 2026-10-14 | Miis con las **piezas oficiales sacadas del disco de Wii Sports Resort** del usuario (solo en su USB y en Dolphin, nunca en el repo); si fallara, piezas propias a partir de sus Miis | El usuario quiere los Miis idénticos a Wii Sports |

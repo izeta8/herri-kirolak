@@ -39,6 +39,12 @@ solo cada 4 s). **Al crear algo nuevo, añadir su número.**
 Con el juego abierto en la Wii (versión con "HKPL"), copia `RFL_Res.dat` y `RFL_DB.dat` de la consola a la NAND de
 Dolphin (`D:\Tools\Dolphin\Dolphin-x64\User\Wii\shared2\...`). Solo hace falta una vez. Son ficheros de Nintendo de la
 consola del usuario: **nunca al repositorio**.
+- **`RFL_Res.dat` no está en la NAND de la Wii** (va dentro de cada juego): `pull-miis.ps1` solo trae `RFL_DB.dat`. Las
+  piezas se sacaron del disco de Wii Sports Resort (CleanRip por wiiload → USB; `DolphinTool extract` de
+  `Common/Kokeshi/common.carc`, Yaz0 + U8). Van a `User\Wii\shared2\FaceLib\` (Dolphin) y a `apps\herri-kirolak\` (USB).
+- `scripts/wii-ls.ps1 /ruta/ …`: lista carpetas de la NAND con el juego abierto ("HKPL" con la ruta acabada en `/`).
+  Solo rutas de Miis (`allowedPull` en `updater.cpp`); la nota `# nand: … (err N)` de la telemetría da el error de ISFS
+  (-106 = no existe). `/title/.../content` no se puede listar desde el Homebrew Channel.
 
 ## 3. Mandar a la Wii — `scripts/deploy.ps1 [-Dol ruta]`
 1. Si el juego está abierto: **actualización en caliente** (TCP 4301). La Wii muestra "Eguneratzen…" y salta a la

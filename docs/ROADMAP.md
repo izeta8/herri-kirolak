@@ -62,8 +62,12 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Aizkolaritza en el probaleku de Usurbil (iglesia, frontón, gradas, porterías, casas, empedrado, muros de cantos)
 - [x] Miis calcados a los de la Wii + peinado en el editor (Orrazkera); escena 9 = galería de Miis — **descartado**:
   el usuario quiere las piezas oficiales, no imitaciones
-- [x] Módulo `mii/`: piezas oficiales leídas de la NAND, montaje de la cabeza y la cara (compila; **sin probar**)
-- [ ] Encender la Wii: `deploy.ps1` y `pull-miis.ps1`; probar y corregir los Miis en Dolphin y en la Wii
+- [x] Módulo `mii/`: piezas oficiales y montaje de la cabeza y la cara; **probado en Dolphin** con los Miis del usuario
+  (galería, escena 9) comparando con Wii Sports Resort: se parecen. Gafas en espejo y cara de 256 px para jugadores
+- [x] `RFL_Res.dat` no está en la NAND de la Wii: sacado del disco de Wii Sports Resort del usuario y copiado a
+  `F:pps\herri-kirolak\` (USB) y a la NAND de Dolphin; el juego lo lee del USB si no está en la NAND
+- [ ] Ver los Miis en la Wii real (USB ya instalado) y comparar con Wii Sports Resort
+- [ ] Revisar caras: algún Mii se ve con los ojos pixelados de cerca (escala grande del ojo)
 - [x] Cada jugador elige uno de sus Miis del Canal Mii (Jokalariak: Mii + txapela); al arrancar se enlazan solos los
   perfiles sin Mii; público con Miis de la consola (compila; **sin probar**)
 - [ ] Cuerpo de los Miis igual que en Wii Sports Resort (proporciones según altura y complexión del Mii)

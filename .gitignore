@@ -17,3 +17,7 @@ build/
 __pycache__/
 build-test/
 build-rec/
+
+# Piezas de los Miis (de Nintendo, sacadas del disco del usuario): nunca al repositorio
+RFL_Res.dat
+RFL_DB.dat

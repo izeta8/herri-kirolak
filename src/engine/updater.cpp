@@ -51,6 +51,17 @@ static void dropClient() {
     }
 }
 
+// Solo se puede leer lo de los Miis: /shared2, los contenidos compartidos (/shared1) y los títulos del Menú Wii y del
+// Canal Mii (donde puede estar RFL_Res.dat). Nada de cuentas, tienda ni partidas guardadas.
+static bool allowedPull(const char* path) {
+    static const char* const OK[] = {"/shared2/menu/", "/shared2/FaceLib/", "/shared1/", "/title/00000001/00000002/",
+                                     "/title/00010002/48414341/", "/title/00010002/48414345/", "/title/00010002/4841434a/",
+                                     "/title/00010002/48414350/"};
+    for (const char* p : OK)
+        if (strncmp(path, p, strlen(p)) == 0) return true;
+    return false;
+}
+
 // "HKPL" + longitud + ruta: manda al PC un fichero de /shared2 de la NAND (solo lectura). Sirve para copiar las piezas
 // de los Miis (RFL_Res.dat) y la base de datos (RFL_DB.dat) a la NAND de Dolphin y probar allí. Respuesta: u32 tamaño
 // (0 = no se pudo) y los datos.
@@ -67,10 +78,10 @@ static void servePull() {
             got += n;
         }
         path[got] = 0;
-        if (got == len && strncmp(path, "/shared2/", 9) == 0 && !strstr(path, "..")) data = nand::readFile(path, &size);
+        if (got == len && allowedPull(path) && !strstr(path, "..")) data = path[len - 1] == '/' ? nand::listDir(path, &size) : nand::readFile(path, &size);
     }
     char msg[128];
-    snprintf(msg, sizeof(msg), "nand: %s -> %u byte", len < sizeof(path) ? path : "?", (unsigned)(data ? size : 0));
+    snprintf(msg, sizeof(msg), "nand: %s -> %u byte (err %d)", len < sizeof(path) ? path : "?", (unsigned)(data ? size : 0), (int)nand::lastError());
     telemetry::note(msg);
     u8 hdr[4] = {(u8)(size >> 24), (u8)(size >> 16), (u8)(size >> 8), (u8)size};
     if (!data) hdr[0] = hdr[1] = hdr[2] = hdr[3] = 0;

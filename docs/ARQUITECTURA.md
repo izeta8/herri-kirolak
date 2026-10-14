@@ -49,8 +49,9 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 - **`world`** — escenario de aizkolaritza: **el probaleku de Usurbil** (empedrado, muros de cantos con albardilla, gradas
   con toldo, porterías, iglesia de San Salvador con la torre, frontón cubierto, casas de Etxebeste e Irazu, montes;
   29 espectadores con 10 aspectos). −Z = sur (iglesia), +X = oeste (Etxebeste); la plataforma a y = 0, calles a −1.
-- **`mii/`** — **Miis de verdad**: lee de la NAND de la consola `/shared2/FaceLib/RFL_Res.dat` (piezas: modelos y
-  texturas) y `/shared2/menu/FaceLib/RFL_DB.dat` (Miis del Canal Mii) con `engine/nand`. `MiiHead` monta la cabeza como
+- **`mii/`** — **Miis de verdad**: piezas (modelos y texturas) de `RFL_Res.dat`: primero la NAND
+  (`/shared2/FaceLib/`, así está en Dolphin) y si no, `RFL_Res.dat` en la carpeta del juego del USB/SD (`save::directory()`;
+  en la Wii real no está en la NAND). Miis del Canal Mii de `/shared2/menu/FaceLib/RFL_DB.dat` con `engine/nand`. `MiiHead` monta la cabeza como
   la RVLFaceLib (referencia: decompilación pública SMGCommunity/Petari): contorno, máscara, pelo, gorra, frente, nariz,
   raya de la nariz, barba y gafas con display lists indexadas (formato de vértices 2, s16), y la cara (ojos, cejas,
   boca, bigote, lunar) pintada en una textura RGB5A3 al empezar el frame (`gfx::offscreen*`, cola `mii::processPending`).

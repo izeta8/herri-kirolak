@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
     srand(gettime());
 
     // Miis de verdad con las piezas de la propia consola (si no las hay, personajes propios)
-    telemetry::note(mii::init() ? "miiak: piezak NANDetik" : "miiak: piezarik ez (gure pertsonaiak)");
+    telemetry::note(mii::init() ? "miiak: piezak kargatuta" : "miiak: piezarik ez (gure pertsonaiak)");
     gfx::setFrameStartCallback(mii::processPending);
     linkProfilesToMiis();  // solo Miis de la consola: cada perfil es uno de ellos
 

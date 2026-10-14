@@ -302,7 +302,7 @@ void CharacterModel::build(const Appearance& a) {
     if (mii::available()) {
         MiiInfo info = miiFor(a);
         mii = new MiiHead();
-        if (mii->build(info, low ? 64 : 128)) {
+        if (mii->build(info, low ? 64 : 256)) {
             skin = mii::skinColor(info.faceColor);
             if (a.user >= 0) shirt = mii::favoriteColor(info.favColor);  // la camiseta del color favorito del Mii
             if (a.txapela) {

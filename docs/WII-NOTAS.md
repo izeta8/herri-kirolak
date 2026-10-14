@@ -39,6 +39,14 @@
 - La primera vez que el juego abre puertos de red, Windows pregunta por el cortafuegos para Dolphin: no hace falta.
 - La SD virtual sincronizada con carpeta no se rellena al arrancar un .dol suelto: el guardado en Dolphin no funciona.
 
+## Miis
+- La Wii **no** guarda las piezas de los Miis (`RFL_Res.dat`) en la NAND: solo `RFL_DB.dat` en
+  `/shared2/menu/FaceLib/`. Cada juego trae su copia (Wii Sports Resort: `Common/Kokeshi/common.carc`).
+- `ISFS_ReadDir` con lista nula para contar entradas colgó el juego: usar siempre un búfer fijo.
+- Las gafas son media textura: `GX_MIRROR` en S. La cara a 128 px se ve borrosa de cerca (jugadores: 256).
+- Wii Sports Resort en Dolphin pide quitar el Nunchuk (`WiimoteNew.ini`, `Extension = None`) y se maneja apuntando
+  con el ratón (D-pad no mueve el menú). Sirve de referencia para comparar Miis. Devolver luego `Extension = Nunchuk`.
+
 ## Windows / herramientas
 - C: casi lleno: proyecto, Dolphin y descargas en D:. devkitPro en C:\devkitPro.
 - Editar ficheros con heredocs de bash + Python rompe los `\n` de C (`"\n"` acaba como salto real): para cambios con

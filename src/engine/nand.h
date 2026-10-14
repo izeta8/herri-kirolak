@@ -8,4 +8,7 @@ namespace nand {
 // liberar con free(), o nullptr si no existe o no se puede leer. `size` recibe el tamaño en bytes.
 u8* readFile(const char* path, u32* size);
 
+s32 lastError();  // último código de error de ISFS (<0), para diagnóstico
+u8* listDir(const char* path, u32* size);
+
 }  // namespace nand

@@ -1,11 +1,15 @@
 #include "game/mii/mii.h"
 #include <malloc.h>
+#include <stdio.h>
 #include <string.h>
 #include "engine/nand.h"
+#include "engine/save.h"
 
 // Montaje de la cabeza basado en cómo lo hace la librería de Miis de la Wii (RVLFaceLib), documentada por la
 // decompilación pública de Super Mario Galaxy (SMGCommunity/Petari). Las piezas (modelos y texturas) NO están en
-// este repositorio: se leen en tiempo de ejecución de la NAND de la consola del usuario.
+// este repositorio: se leen en tiempo de ejecución de la NAND de la consola del usuario o, como la Wii no las trae en la
+// NAND (van dentro de cada juego), de RFL_Res.dat en la carpeta del juego del USB, sacado del disco del usuario
+// (Wii Sports Resort: Common/Kokeshi/common.carc). Ver docs/WII-NOTAS.md.
 
 namespace {
 
@@ -305,6 +309,27 @@ void setHeadVtx(bool txc) {
     GX_SetVtxAttrFmt(GX_VTXFMT2, GX_VA_TEX0, GX_TEX_ST, GX_S16, 13);
 }
 
+// RFL_Res.dat de la carpeta del juego en el USB/SD (alineado a 32 bytes, como el de la NAND)
+u8* readResFromFat(u32* size) {
+    const char* dir = save::directory();
+    if (!dir || !dir[0]) return nullptr;
+    char path[256];
+    snprintf(path, sizeof(path), "%sRFL_Res.dat", dir);
+    FILE* f = fopen(path, "rb");
+    if (!f) return nullptr;
+    fseek(f, 0, SEEK_END);
+    long len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    u8* buf = len > 0 ? (u8*)memalign(32, (len + 31) & ~31) : nullptr;
+    if (buf && fread(buf, 1, len, f) != (size_t)len) {
+        free(buf);
+        buf = nullptr;
+    }
+    fclose(f);
+    if (buf) *size = (u32)len;
+    return buf;
+}
+
 }  // namespace
 
 // ------------------------------------------------------------------ API
@@ -314,6 +339,7 @@ bool init() {
     if (s_res) return true;
     u32 size = 0;
     u8* res = nand::readFile(RES_PATH, &size);
+    if (!res) res = readResFromFat(&size);
     if (res && size > (ARC_COUNT + 1) * 4) {
         bool ok = true;
         for (int i = 0; i < ARC_COUNT && ok; i++) {
@@ -558,6 +584,7 @@ bool MiiHead::build(const MiiInfo& info, u16 maskSize) {
         float gt[3] = {noseT[0], 5.0f + noseT[1] - 1.5f * (info.glassY - 11), 2.0f + noseT[2]};
         loadShape(glass_, ARC_GLASS, 0, true, false, 0.15f * info.glassScale + 0.4f, gt, nullptr);
         loadTex(glassTex_, glassTexBuf_, ARC_GLASSTEX, info.glassType);
+        GX_InitTexObjWrapMode(&glassTex_, GX_MIRROR, GX_CLAMP);  // la textura es media gafa: la otra mitad, en espejo
     }
     loadTex(faceTex_, faceTexBuf_, ARC_FACETEX, info.faceTex);
     if (cap_.dl) loadTex(capTex_, capTexBuf_, ARC_CAPTEX, info.hairType);

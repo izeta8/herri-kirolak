@@ -4,6 +4,7 @@
 #include "engine/input.h"
 #include "engine/ui.h"
 #include "game/character.h"
+#include "game/mii/mii.h"
 #include "game/palette.h"
 #include "scenes/scenes.h"
 
@@ -20,6 +21,7 @@ public:
             looks_[i].style = (u8)(i % NUM_HAIR_STYLES);
             looks_[i].txapela = i == 0;
             looks_[i].casual = i >= 3;
+            if (i < mii::userCount()) looks_[i].user = (s8)i;  // los Miis de la consola, en su orden
         }
     }
 
