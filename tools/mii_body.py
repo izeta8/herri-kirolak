@@ -8,11 +8,14 @@ Uso: python tools/mii_body.py <carpeta G3D> <salida hk_body.bin>
 Formato (big endian, para la Wii):
   'HKB1', u32 numCuerpos
   por cuerpo: char[8] nombre, u32 numHuesos, u32 numVértices (múltiplo de 3: triángulos)
-    huesos: char[16] nombre, s32 padre, u32 zona (0 piel, 1 camiseta, 2 pantalón, 3 zapato), f32[12] matriz 3x4 de
-            reposo en espacio del modelo
-    vértices: u8 hueso, u8[3] relleno, f32[3] posición y f32[3] normal en el espacio del hueso
+    huesos: char[16] nombre, s32 padre, u32 zona (no se usa), f32[12] matriz 3x4 de reposo en espacio del modelo
+    vértices: u8 hueso, u8 zona (0 piel, 1 camiseta, 2 pantalón, 3 zapato), u8[2] relleno, f32[3] posición y f32[3]
+              normal en el espacio del hueso
 Cada vértice va pegado a un solo hueso (los cuerpos de Resort son casi todos rígidos; las pocas envolventes de dos huesos
 se quedan con el primero), así el juego dibuja cada hueso como una malla con su matriz.
+
+Como en Resort, los Miis no tienen brazos: el cuerpo de jugador es el de A1 sin brazos ni dedos (los del paracaidismo) y
+las manos son un modelo suelto (hand1: la bola de los bolos; hand4, el puño que agarra, trae pegado un mango).
 """
 import os
 import struct
@@ -23,13 +26,21 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from brres_mdl0 import Model, find_mdl0  # noqa: E402
 
-# Cuerpos que usa el juego: jugadores (con brazos y dedos) y público (sin brazos, manos sueltas)
-BODIES = [('player', 'WS2_avaA1'), ('crowd', 'WS2_avaC1')]
+# Cuerpos que usa el juego, en el orden de miibody::Kind
+BODIES = [('player', 'WS2_avaA1'), ('crowd', 'WS2_avaC1'), ('hand', 'WS2_ava_hand1')]
+ARM_BONES = ('clavicle', 'arm_', 'wrist', 'finger', 'thumb')
+CROWD_BASE_Y = 3.4  # el público (torso de bala) tiene la base oscura, como en Resort
 
 
-def zone(name):
-    n = name.lower()
-    if any(k in n for k in ('wrist', 'finger', 'thumb', 'hand', 'head')):
+def zone(body, bone, model_y):
+    n = bone.lower()
+    if body == 'hand':
+        return 0
+    if body == 'crowd':
+        if 'hand' in n:
+            return 1  # manos del color de la camiseta
+        return 2 if model_y < CROWD_BASE_Y else 1
+    if 'head' in n:
         return 0
     if 'ankle' in n:
         return 3
@@ -88,13 +99,20 @@ def main():
     blob = bytearray(b'HKB1' + struct.pack('>I', len(BODIES)))
     for name, file in BODIES:
         bones, verts = convert(f'{src}/{file}.brres')
+        if name == 'player':  # sin brazos: fuera los triángulos de los huesos del brazo
+            keep = []
+            for t in range(0, len(verts), 3):
+                if not any(k in bones[verts[t][0]]['name'] for k in ARM_BONES):
+                    keep += verts[t:t + 3]
+            verts = keep
         blob += name.encode().ljust(8, b'\0') + struct.pack('>II', len(bones), len(verts))
         for b in bones:
             blob += b['name'].encode()[:15].ljust(16, b'\0')
-            blob += struct.pack('>iI', b['parent'], zone(b['name']))
+            blob += struct.pack('>iI', b['parent'], 0)
             blob += struct.pack('>12f', *b['world'][:3, :].flatten())
         for bi, p, n in verts:
-            blob += struct.pack('>B3x6f', bi, *p, *n)
+            y = (bones[bi]['world'] @ np.append(p, 1.0))[1]
+            blob += struct.pack('>BB2x6f', bi, zone(name, bones[bi]['name'], y), *p, *n)
         print(f'{name}: {file}, {len(bones)} huesos, {len(verts) // 3} triángulos')
     open(out, 'wb').write(blob)
     print(out, len(blob), 'bytes')

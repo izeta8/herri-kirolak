@@ -57,8 +57,9 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
   boca, bigote, lunar) pintada en una textura RGB5A3 al empezar el frame (`gfx::offscreen*`, cola `mii::processPending`).
   Si no hay piezas (Dolphin sin copiarlas), `CharacterModel` usa nuestra cabeza de siempre. **Nada de esto va al repo.**
 - **`mii/body`** — cuerpo de Wii Sports Resort leído de `hk_body.bin` (`mii::readAsset`; lo genera
-  `tools/mii_body.py`). Una malla rígida por hueso coloreada por zonas (piel, camiseta, pantalón, zapato); la pose se
-  calcula en espacio del modelo: inclinación del pecho, cabeza e IK de dos huesos de los brazos hacia `handL/handR`.
+  `tools/mii_body.py`). Una malla rígida por hueso coloreada por zonas (piel, camiseta, pantalón, zapato; la zona va
+  en cada vértice); la pose se calcula en espacio del modelo: inclinación del pecho y cabeza. Sin brazos: las manos son
+  la bola de Resort en `handL/handR` (la derecha en espejo); el público mueve sus manos (`handL/handR` del modelo).
   `draw()` devuelve dónde van la cabeza (`head_set`) y el gerriko. Unidades de Resort × `MII_BODY_UNIT` (tuning.h).
   `CharacterModel::body` lo usa si existe; si no, el cuerpo propio de antes.
   Jugadores = Miis de la consola: `Profile::mii` (índice + 1) → `Appearance::user`; `linkProfilesToMiis()` (al arrancar)

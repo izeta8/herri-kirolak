@@ -51,8 +51,12 @@
   solo trae calcomanías (logo de Nintendo, flores), no el color: la ropa se colorea por zonas. Unidades: hombros a
   9.25, cuello (`head_set`) a 9.7. Casi todo rígido; triángulos entre huesos solo en dedos y cuello. Las mallas en
   unidades grandes queman la luz: corregir la escala de las normales (`loadModelMtx(xf, escala)`).
-- En Dolphin, Resort no deja elegir Mii con la cruceta mientras el puntero se ve, y el puntero no se esconde al sacar
-  el ratón de la ventana (se queda en el borde): la comparación de cuerpo entero, mejor en la Wii.
+- **Los Miis de Resort no tienen brazos**: manos sueltas (bola) junto al torso en pera; el público, torso de bala sin
+  piernas con la base oscura y manos del color de la camiseta. A1 (con brazos y dedos) es el del paracaidismo.
+  Proporciones medidas en los bolos: cara ≈ ancho del torso (3.9 u), camiseta hasta 4.5 u, piernas 4.3 u.
+- Navegar Resort en Dolphin: `IR/Auto-Hide = True` en `WiimoteNew.ini` (sin Nunchuk); el puntero solo sigue al ratón
+  si se mueve poco a poco (`SetCursorPos` a saltos lo deja pegado al borde); en la elección de Mii, la **cruceta**
+  (`keys.ps1 DOWN`, con la marca de tecla extendida) mueve la mano. Los bolos dan la mejor vista de cuerpo entero.
 - Copia del disco en `D:\Tools\wsr-tmp` (ver su `LEEME.txt`): ISO para comparar en Dolphin y volver a sacar piezas.
   Se puede borrar cuando los Miis (cabeza y cuerpo) estén aprobados en la Wii; `cleanrip-usb\` es redundante ya.
 

@@ -70,11 +70,12 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [ ] Revisar caras: algún Mii se ve con los ojos pixelados de cerca (escala grande del ojo)
 - [x] Cada jugador elige uno de sus Miis del Canal Mii (Jokalariak: Mii + txapela); al arrancar se enlazan solos los
   perfiles sin Mii; público con Miis de la consola (compila; **sin probar**)
-- [x] Cuerpo de Wii Sports Resort (`WS2_avaA1`: brazos, dedos, 28 huesos) para jugadores y `WS2_avaC1` (sin brazos,
-  manos sueltas) para el público; IK de brazos hacia las manos del juego; gerriko en la cintura. Probado en Dolphin
-  (escenas 6, 7 y 9). Sin las calcomanías de la ropa (logo de Nintendo): camiseta lisa del color favorito
-- [ ] Ver los cuerpos en la Wii real (USB ya con `hk_body.bin`) y comparar con Resort de cuerpo entero (en Dolphin el
-  puntero no deja elegir Mii en Resort: comparar en la Wii)
+- [x] Cuerpo de Wii Sports Resort **sin brazos** (como en Resort): torso y piernas de `WS2_avaA1` sin los huesos del
+  brazo, manos sueltas `WS2_ava_hand1` (bola) y público `WS2_avaC1` (bala, base oscura, manos del color de la
+  camiseta); gerriko en la cintura. Comparado con los bolos de Resort en Dolphin y probado en las escenas 7 y 9.
+  (Primer intento con brazos y dedos —el cuerpo del paracaidismo— descartado: "parecen Pinocho")
+- [ ] Ver los cuerpos en la Wii real (USB ya con `hk_body.bin`)
+- [ ] Piernas algo más gruesas en Resort que las nuestras (o el pantalón blanco lo parece): revisar con el usuario
 - [ ] Proporciones por altura/complexión: fórmula aproximada (`MII_BODY_SY*`, `MII_BODY_SXZ*` en tuning.h); calibrar
   con un Mii alto y uno bajo contra Resort
 - [ ] Ropa propia de aizkolari sobre el cuerpo de Resort (camisa blanca, pantalón) si el usuario la quiere
