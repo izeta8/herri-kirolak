@@ -39,6 +39,17 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-14 | **Solo Miis de la consola**: cada jugador es uno de sus Miis del Canal Mii (se mantiene la opción de txapela) y el público también; nuestro editor queda solo de reserva | "Tengo bien de Miis en vez de crear tuyos propios" |
 | 2026-10-14 | Miis **con las piezas oficiales** (opciones fijas de ojos, pelo, cara…) leídas de su propia Wii, y sus Miis del Canal Mii como jugadores | "Son opciones establecidas y fijas; tú te inventas las tuyas". Las piezas no van al repo |
 
+## Palas
+| Fecha | Decisión | Motivo / detalle |
+|---|---|---|
+| 2026-10-15 | Segundo deporte: **palas** (pala de madera en frontón). Primero el juego en un frontón provisional; el **frontón de Zarautz** después | El juego decide medidas y cámara; el sitio se viste luego |
+| 2026-10-15 | **1v1 primero**, luego 2v2 | — |
+| 2026-10-15 | Moverse con el **nunchuk**, **obligatorio** (sin él no se juega a palas) | Descartó el movimiento automático de Wii Sports y que se moviera solo sin nunchuk |
+| 2026-10-15 | El golpe decide **momento y fuerza**; derecha/revés automático según la pelota (pronto = cruzada, tarde = a la pared; fuerte = rápida, suave = dejada) | Descartó que el lado del latigazo decidiera derecha/revés |
+| 2026-10-15 | Saque: **A para botar + latigazo** | Como de verdad |
+| 2026-10-15 | Partido a **10/15/22 tantos** a elegir | — |
+| 2026-10-15 | Cámara **detrás, viendo el frontis** (algo alta), una sola pantalla | — |
+
 ## Desarrollo
 | Fecha | Decisión | Motivo / detalle |
 |---|---|---|

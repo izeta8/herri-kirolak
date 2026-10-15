@@ -84,7 +84,7 @@ private:
                 menu_.sel = cfg_.training ? 0 : 1;
                 break;
             case STEP_PLAYERS:
-                menu_.count = 4;
+                menu_.count = clampv(sport(cfg_.sport).maxPlayers, 1, 4);
                 menu_.horizontal = true;
                 menu_.sel = cfg_.numPlayers - 1;
                 break;
@@ -182,8 +182,9 @@ void SetupScene::draw() {
     switch (step_) {
         case STEP_SPORT: {
             ui::header(txt::CHOOSE_SPORT);
+            float gap = sportCount() > 1 ? fminf(78.0f, 280.0f / (sportCount() - 1)) : 78.0f;  // que quepan todos
             for (int i = 0; i < sportCount(); i++)
-                ui::button(W / 2 + slide, 140 + i * 78, 470, 64, sport(i).name, menu_.anim[i], menu_.enabled[i],
+                ui::button(W / 2 + slide, 132 + i * gap, 470, gap - 12, sport(i).name, menu_.anim[i], menu_.enabled[i],
                            sport(i).desc);
             break;
         }
@@ -198,9 +199,9 @@ void SetupScene::draw() {
         case STEP_PLAYERS: {
             ui::header(txt::COMPETITION);
             font::plain(txt::HOW_MANY_PLAYERS, W / 2, 130, 36, UI_TEXT, ALIGN_CENTER);
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < menu_.count; i++) {
                 snprintf(buf, sizeof(buf), "%d", i + 1);
-                float x = W / 2 + (i - 1.5f) * 150 + slide;
+                float x = W / 2 + (i - (menu_.count - 1) * 0.5f) * 150 + slide;
                 ui::button(x, 270, 120, 120, buf, menu_.anim[i]);
                 for (int k = 0; k <= i; k++) ui::colorDot(x - i * 9 + k * 18, 352, 6, FAV_COLORS[(k * 5) % NUM_COLORS]);
             }
@@ -209,8 +210,9 @@ void SetupScene::draw() {
         case STEP_ROUNDS: {
             ui::header(txt::COMPETITION);
             font::plain(sport(cfg_.sport).roundsQuestion, W / 2, 130, 36, UI_TEXT, ALIGN_CENTER);
+            const int* values = sport(cfg_.sport).roundValues;
             for (int i = 0; i < menu_.count; i++) {
-                snprintf(buf, sizeof(buf), "%d", i + 1);
+                snprintf(buf, sizeof(buf), "%d", values ? values[i] : i + 1);
                 ui::button(W / 2 + (i - (menu_.count - 1) * 0.5f) * 180 + slide, 270, 140, 120, buf, menu_.anim[i]);
             }
             break;
@@ -220,7 +222,7 @@ void SetupScene::draw() {
             spin_ = approach(spin_, 0, 4, 1.0f / 60.0f);
             drawCharacterPreview(Appearance::from(pr), 0, sinf(t_ * 0.8f) * 0.4f + spin_ * 6.28f, t_, 0);
             gfx::begin2D();
-            ui::header(txt::CHOOSE_CHAR);
+            ui::header(sport(cfg_.sport).chooseChar ? sport(cfg_.sport).chooseChar : txt::CHOOSE_CHAR);
             if (cfg_.numPlayers > 1) {
                 snprintf(buf, sizeof(buf), txt::PLAYER_N, charIdx_ + 1);
                 font::draw(buf, W / 2, 92, 32, UI_WHITE, UI_BLUE_DARK, ALIGN_CENTER);

@@ -18,16 +18,17 @@ editar código ─► compilar ─► probar en Dolphin (capturas + teclas) ─�
 
 `START_SCENE` (en `main.cpp`): 0 título · 1 menú · 2 preparar partida · 3 jugadores · 4 récords · 5 entrenamiento ·
 6 lehiaketa 4 CPU a la vez · 7 entrenamiento con la CPU · 8 Kolpe proba · 9 galería de Miis (de cerca; el zoom cambia
-solo cada 4 s). **Al crear algo nuevo, añadir su número.**
+solo cada 4 s) · **pala**: 10 entrenamiento · 11 CPU contra CPU · 12 jugador contra la CPU · 13 entrenamiento de la CPU.
+Con `-Test`, en la pala 1 = latigazo suave y 2 = fuerte; el saque con A (X en Dolphin) y el stick del Nunchuk con WASD. **Al crear algo nuevo, añadir su número.**
 
 ## 2. Probar en Dolphin
 - `scripts/run.ps1 [-Dol ruta]` cierra Dolphin si estaba abierto y arranca el .dol.
 - `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png` (leerla con la herramienta Read para verla). Usa
   PrintWindow: captura aunque Dolphin esté tapado y **no le quita el foco** al usuario (`-Focus` = método antiguo).
 - `scripts/keys.ps1 X,DOWN,X,"K>",700,"M+250","K<"` pulsa teclas: X=A, Z=B, flechas, 1, 2, Q=−, E=+, ENTER=HOME,
-  I/K/J/L inclinar, M/N/O swing; `"K+800"` mantener; `"K>"`/`"K<"` pulsar/soltar; un número = pausa en ms.
+  I/K/J/L inclinar, M/N/O swing, W/A/S/D stick del Nunchuk, LSHIFT/LCONTROL = Z/C; `"K+800"` mantener; `"K>"`/`"K<"` pulsar/soltar; un número = pausa en ms.
 - Para varias capturas seguidas, unir en una cuadrícula con PIL y mirar una sola imagen.
-- Probar siempre la CPU (escenas 6 y 7) tras tocar animaciones o la escena de partida.
+- Probar siempre la CPU (escenas 6 y 7; en la pala 11 y 13) tras tocar animaciones o la escena de partida.
 - Dolphin no sirve para el tacto del gesto (no gira más de 90°): eso se valida en la Wii con telemetría.
 
 - **Vídeo para el usuario** (cuando no está en casa): `scripts/record.ps1 -Dol build-test/boot.dol -Seconds 75 -Name x`

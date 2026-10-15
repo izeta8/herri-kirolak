@@ -4,7 +4,9 @@ Objetivo: que cada deporte sea una carpeta y una línea en el registro, reutiliz
 **Cada deporte va en un sitio real que elige el usuario** (aizkolaritza = probaleku de Usurbil, `src/game/world.cpp`):
 preguntarle dónde, mirar satélite y Street View (las miniaturas `streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=…&yaw=…`
 se ven en el navegador aunque el visor 3D no cargue) y modelar lo reconocible desde donde mira la cámara.
-Referencia completa: Aizkolaritza (`src/games/aizkolaritza/`).
+Referencia completa: Aizkolaritza (`src/games/aizkolaritza/`). Juego de pelota con Nunchuk y CPU que se mueve: Pala
+(`src/games/pala/`). Si el sitio real aún no está decidido, se puede empezar con un escenario provisional propio
+(la pala usa un frontón genérico y no `sharedWorld()`, salvo el cielo y las sombras).
 
 ## 0. Antes de programar (con el usuario)
 1. **El deporte real**: cómo se hace, cómo se gana, qué hace el cuerpo. Escribirlo en `docs/SPEC.md` (nueva sección).
@@ -26,6 +28,8 @@ src/games/<nombre>/
 2. Declarar la fábrica en `src/scenes/scenes.h`: `Scene* make<Nombre>Scene(const MatchConfig& cfg);`
 3. Registrar el deporte en `src/game/sports.cpp` (sustituye su entrada "Laster!"):
    `{txt::NOMBRE, txt::NOMBRE_DESC, txt::NOMBRE_ROUNDS_Q, 3, make<Nombre>Scene, make<Gesto>TestScene}`.
+   Opcionales al final: jugadores máximos, valores a enseñar en las rondas y título de "elegir personaje"
+   (ejemplo: la pala, `2, PALA_POINTS, txt::CHOOSE_PELOTARI`).
 4. Textos en euskera en `src/game/text.h`.
 5. Constantes ajustables en `src/engine/tuning.h` (sección del deporte).
 6. **Gesto**: si es distinto del hachazo, añadir un detector propio en `src/engine/input.cpp` (otra máquina de estados,

@@ -55,11 +55,44 @@ static float rollOf(const Vec3& g) {
     return clampv(g.x / tuning::TILT_FULL_G, -1.0f, 1.0f) * tuning::TILT_SIGN * s_tiltSign;
 }
 
+// Latigazo (palas): |a| supera WHIP_START_G → se espera al pico → golpe si el pico llega a WHIP_MIN_G
+static void stepWhip(Pad& p, float m, float dt) {
+    using namespace tuning;
+    switch (p.whipSt) {
+        case 0:
+            if (m > WHIP_START_G) {
+                p.whipSt = 1;
+                p.whipT = 0;
+                p.whipPeak = m;
+                p.whipStart = true;
+            }
+            break;
+        case 1:
+            p.whipT += dt;
+            p.whipPeak = fmaxf(p.whipPeak, m);
+            if ((p.whipPeak >= WHIP_MIN_G && m < PEAK_DROP * p.whipPeak) || m < SWING_END_G || p.whipT > SWING_MAX_TIME) {
+                if (p.whipPeak >= WHIP_MIN_G) {
+                    p.whip.happened = true;
+                    p.whip.peakG = p.whipPeak;
+                    p.whip.strength = clampv((p.whipPeak - WHIP_MIN_G) / (WHIP_FULL_G - WHIP_MIN_G), 0.0f, 1.0f);
+                }
+                p.whipSt = 2;
+                p.whipT = WHIP_COOLDOWN;
+            }
+            break;
+        default:
+            p.whipT -= dt;
+            if (p.whipT <= 0 && m < SWING_END_G) p.whipSt = 0;
+            break;
+    }
+}
+
 // Procesa una lectura del acelerómetro
 static void step(Pad& p, const Vec3& a, float dt) {
     using namespace tuning;
     p.accel = a;
     float m = length(a);
+    stepWhip(p, m, dt);
     // La gravedad solo se actualiza cuando el mando va despacio (si no, mide el movimiento)
     if (fabsf(m - 1.0f) < 0.3f) p.grav = approachv(p.grav, a, 10.0f, dt);
     float gl = fmaxf(length(p.grav), 0.5f);
@@ -168,16 +201,32 @@ void update(float dt) {
     for (int i = 0; i < MAX_PADS; i++) {
         Pad& p = s_pads[i];
         p.chop = Chop();
-        p.swingStart = p.swingAbort = false;
+        p.whip = Whip();
+        p.swingStart = p.swingAbort = p.whipStart = false;
         u32 type;
         p.connected = WPAD_Probe(i, &type) == WPAD_ERR_NONE;
         if (!p.connected) {
             p.held = p.down = 0;
             p.state = SW_IDLE;
+            p.nunchuk = false;
+            p.stickX = p.stickY = 0;
             continue;
         }
         p.held = WPAD_ButtonsHeld(i);
         p.down = WPAD_ButtonsDown(i);
+        WPADData* wd = WPAD_Data(i);
+        p.nunchuk = wd && wd->exp.type == WPAD_EXP_NUNCHUK;
+        p.stickX = p.stickY = 0;
+        if (p.nunchuk) {
+            // ang: grados desde arriba en el sentido del reloj; mag: 0..1
+            float mag = wd->exp.nunchuk.js.mag;
+            if (mag > tuning::STICK_DEADZONE) {
+                float k = clampv((mag - tuning::STICK_DEADZONE) / (1.0f - tuning::STICK_DEADZONE), 0.0f, 1.0f);
+                float ang = wd->exp.nunchuk.js.ang * DEG;
+                p.stickX = sinf(ang) * k;
+                p.stickY = cosf(ang) * k;
+            }
+        }
         int n = s_queued[i];
         if (n == 0) {
             WPADData* d = WPAD_Data(i);
@@ -202,6 +251,11 @@ void update(float dt) {
             p.chop.happened = true;
             p.chop.strength = 0.9f;
             p.chop.tilt = (p.down & WPAD_BUTTON_1) ? -1.0f : (p.down & WPAD_BUTTON_2) ? 1.0f : 0.0f;
+        }
+        // Latigazos simulados (palas): 1 = suave, 2 = fuerte
+        if (p.down & (WPAD_BUTTON_1 | WPAD_BUTTON_2)) {
+            p.whip.happened = p.whipStart = true;
+            p.whip.strength = (p.down & WPAD_BUTTON_2) ? 0.85f : 0.2f;
         }
 #endif
         if (p.rumbleT > 0) {

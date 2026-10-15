@@ -29,7 +29,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 | `Xf` (en gfx.h) | Transformaciones encadenables estilo OpenGL | `Xf().translate(p).rotateY(a).scale(s)`, `fromBasis`, `apply`, `applyDir` |
 | `mesh` | Mallas con color por vértice → display lists de GX | `MeshBuilder` (`box`, `sphere`, `cylinder`, `capsule`, `disc`, `tri`, `quad`, campo `xf`) → `build(Mesh&)`; `Mesh::release()` |
 | `font` | Texto con contorno (Nunito OFL, atlas IA8, Latin-1: ñ, tildes) | `font::draw(txt, x, y, size, relleno, contorno, align, alpha)`, `font::plain(...)`, `font::width` |
-| `input` | 4 Wii Remotes: botones, acelerómetro a ~100 lecturas/s, **detector de hachazo** | `input::pad(i)` → `Pad` (`down`, `held`, `accel`, `grav`, `raise`, `state`, `chop`, `swingStart`, `swingTilt`…); `allDown()`, `rumble(i, s)` |
+| `input` | 4 Wii Remotes: botones, acelerómetro a ~100 lecturas/s, **detector de hachazo**, **latigazo** (pala) y **stick del Nunchuk** | `input::pad(i)` → `Pad` (`down`, `held`, `accel`, `grav`, `raise`, `state`, `chop`, `swingStart`, `swingTilt`, `whip`, `whipStart`, `nunchuk`, `stickX/Y`…); `allDown()`, `rumble(i, s)` |
 | `audio` | Efectos con ASND (PCM 16 bits BE 32 kHz) | `audio::play(SFX_x, volumen, tono, pan)` |
 | `save` | `save.dat` junto al `boot.dol` (USB o SD), versión 3 con migración | `save::data()` (`profiles`, `records`, `settings`), `save::write()`, `save::directory()` |
 | `ui` | Elementos estilo Wii manejados con cruceta | `background`, `header`, `panel`, `button`, `buttonIcon`, `hints`, `fade`, `colorDot`, `formatTime`, `ListMenu` |
@@ -40,7 +40,8 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 
 ## Común a los deportes (`src/game/`)
 - **`sports.h/.cpp`** — registro de deportes y `MatchConfig` (deporte, entrenamiento/lehiaketa, jugadores, rondas,
-  perfiles, CPU). El menú "preparar partida" se construye con esta lista. Ver `docs/NUEVO-JUEGO.md`.
+  perfiles, CPU). Cada `Sport` puede limitar los jugadores (`maxPlayers`), enseñar otros valores en las rondas
+  (`roundValues`, p. ej. 10/15/22 tantos) y cambiar el título de elegir personaje (`chooseChar`). El menú "preparar partida" se construye con esta lista. Ver `docs/NUEVO-JUEGO.md`.
 - **`character`** — Mii calcado a los de la Wii: cabeza de huevo con barbilla en punta, cara pintada con trazos sobre la
   superficie (`decalStroke`/`decalEllipse`: ojos, cejas, nariz de gancho, boca de raya), pelo de casco con flequillo en
   picos (4 peinados, `Profile::hairStyle`), cuerpo estrecho con brazos de manga larga y manos de bola, txapela.
@@ -97,6 +98,19 @@ jugadores → rondas → personajes, con − para CPU) → escena del deporte. `
 - `aizko_scene` — la partida. `Player` guarda el estado de cada jugador (tronco, aizkolari, tiempo, puesto…).
   Entrenamiento: 1 jugador, cámara que gira con él. Lehiaketa: hasta 4 a la vez en fila (`SPACING` 2.1 m), cámara fija,
   un panel por jugador.
+
+## Pala (`src/games/pala/`) — prototipo en frontón provisional
+- `fronton` — malla del frontón: frontis (z = 0) con chapa y línea de arriba, pared izquierda (x = −COURT_W/2) con las
+  rayas de los cuadros, falta y pasa en rojo, contracancha, rebote y grada. Medidas en `tuning.h` (sección Palas).
+- `ball` — `Ball`: física con subpasos (suelo, frontis, pared izquierda, rebote) y estado de la jugada (`needFrontis`,
+  `bounces`, `drop` = saque botado). `step()` devuelve eventos con el estado de ese instante; las reglas las aplica la
+  escena. `BallPath::predict()` simula hacia delante (golpe, CPU y marca de bote).
+- `pelotari` — `Pelotari`: personaje mirando al frontis (−Z) con la pala en la mano derecha; carrera, preparación
+  (derecha/revés según el lado de la pelota), golpe en arco (`swing`) y bote del saque (`dropBall`).
+- `pala_scene` — la partida 1v1 (o peloteo en entrenamiento). Golpe: al llegar el latigazo se busca el momento en que la
+  pelota pasa más cerca del pelotari (historial hacia atrás + trayectoria prevista hacia delante); si está a menos de
+  `REACH`, el adelanto/retraso da la dirección y la fuerza la profundidad (`doHit` calcula la velocidad para botar
+  donde toca). Un golpe que llega pronto queda pendiente hasta que la pelota llega a su lado. Sin Nunchuk se para todo.
 
 ## Convenciones
 - Caras en orden antihorario → `GX_CULL_FRONT`; `MeshBuilder::tri()` orienta las caras solo con un vector "hacia fuera".

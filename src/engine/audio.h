@@ -15,6 +15,9 @@ enum Sfx {
     SFX_BACK,
     SFX_WHOOSH,
     SFX_BAD,
+    SFX_PALA,
+    SFX_FRONTIS,
+    SFX_BOTE,
     SFX_COUNT
 };
 

@@ -12,6 +12,7 @@ Scene* makeRecordsScene();
 Scene* makeSwingTestScene();
 Scene* makeMiiGalleryScene();  // prueba: Miis de cerca
 Scene* makeAizkoScene(const MatchConfig& cfg);
+Scene* makePalaScene(const MatchConfig& cfg);
 
 // Escenario compartido (se construye una vez)
 World& sharedWorld();

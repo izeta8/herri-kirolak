@@ -20,7 +20,8 @@
 #include "scenes/scenes.h"
 
 // START_SCENE (solo para pruebas): 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords,
-// 5 entrenamiento, 6 lehiaketa 4 CPU a la vez, 7 entrenamiento con la CPU, 8 kolpe proba, 9 galería de Miis
+// 5 entrenamiento, 6 lehiaketa 4 CPU a la vez, 7 entrenamiento con la CPU, 8 kolpe proba, 9 galería de Miis,
+// 10 pala: entrenamiento, 11 pala: CPU contra CPU, 12 pala: jugador contra la CPU, 13 pala: entrenamiento de la CPU
 #ifndef START_SCENE
 #define START_SCENE 0
 #endif
@@ -49,6 +50,17 @@ static Scene* firstScene() {
         case 7:
             cfg.bot[0] = true;
             return makeAizkoScene(cfg);
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+            cfg.sport = 1;
+            cfg.training = START_SCENE == 10 || START_SCENE == 13;
+            cfg.numPlayers = START_SCENE == 11 ? 2 : 1;
+            cfg.rounds = 1;
+            cfg.bot[0] = START_SCENE == 11 || START_SCENE == 13;
+            cfg.bot[1] = START_SCENE == 11;
+            return makePalaScene(cfg);
         default: return makeTitleScene();
     }
 }

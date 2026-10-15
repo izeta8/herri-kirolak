@@ -12,7 +12,7 @@ include $(DEVKITPPC)/wii_rules
 TARGET   := boot
 OUTDIR   ?= build
 BUILD    := $(OUTDIR)/obj
-SOURCES  := src src/engine src/game src/game/mii src/scenes src/games/aizkolaritza
+SOURCES  := src src/engine src/game src/game/mii src/scenes src/games/aizkolaritza src/games/pala
 DATA     := data
 INCLUDES := src
 

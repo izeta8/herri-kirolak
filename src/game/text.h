@@ -152,4 +152,30 @@ constexpr const char* NO_RECORD = "Errekorrik ez";
 constexpr const char* REC_TRAINING = "Entrenamendua";
 constexpr const char* REC_COMP = "Lehiaketa - %d enbor";
 
+// Pala
+constexpr const char* PALA = "Pala";
+constexpr const char* PALA_DESC = "Jo pilota frontoira egurrezko palarekin!";
+constexpr const char* HOW_MANY_POINTS = "Zenbat tantotara?";
+constexpr const char* CHOOSE_PELOTARI = "Aukeratu pelotaria";
+constexpr const char* POINTS_N = "%d tantotara";
+constexpr const char* PALA_TRAINING_SUB = "Peloteoa frontoiaren kontra";
+constexpr const char* CHAPA = "Txapa!";
+constexpr const char* TOO_HIGH = "Gainetik!";
+constexpr const char* OUT = "Kanpora!";
+constexpr const char* LONG = "Luze!";
+constexpr const char* TWO_BOUNCES = "Bi bote!";
+constexpr const char* FALTA = "Falta!";
+constexpr const char* PASA = "Pasa!";
+constexpr const char* SHORT = "Motz!";
+constexpr const char* MISS = "Huts!";
+constexpr const char* POINT_FOR = "Tantoa: %s";
+constexpr const char* SERVE = "Sakea";
+constexpr const char* SERVE_HOW = "Sakatu A eta jo";
+constexpr const char* CONNECT_NUNCHUK = "Konektatu Nunchuk-a";
+constexpr const char* NUNCHUK_NEEDED = "Palan Nunchuk-arekin mugitzen zara";
+constexpr const char* STREAK = "Jarraian";
+constexpr const char* BEST = "Onena";
+constexpr const char* EARLY = "Goiz";
+constexpr const char* LATE = "Berandu";
+
 }  // namespace txt

@@ -6,6 +6,9 @@
 #include "sfx_back_bin.h"
 #include "sfx_bad_bin.h"
 #include "sfx_beep_bin.h"
+#include "sfx_bote_bin.h"
+#include "sfx_frontis_bin.h"
+#include "sfx_pala_bin.h"
 #include "sfx_bell_bin.h"
 #include "sfx_cheer_bin.h"
 #include "sfx_chop_bin.h"
@@ -36,7 +39,8 @@ void init() {
         {sfx_beep_bin, sfx_beep_bin_size},     {sfx_go_bin, sfx_go_bin_size},
         {sfx_move_bin, sfx_move_bin_size},     {sfx_ok_bin, sfx_ok_bin_size},
         {sfx_back_bin, sfx_back_bin_size},     {sfx_whoosh_bin, sfx_whoosh_bin_size},
-        {sfx_bad_bin, sfx_bad_bin_size},
+        {sfx_bad_bin, sfx_bad_bin_size},       {sfx_pala_bin, sfx_pala_bin_size},
+        {sfx_frontis_bin, sfx_frontis_bin_size}, {sfx_bote_bin, sfx_bote_bin_size},
     };
     for (int i = 0; i < SFX_COUNT; i++) s_samples[i] = table[i];
 }

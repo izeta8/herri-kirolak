@@ -50,6 +50,19 @@ resuelve 11–58 ms después del pico.
   (se notaba: "el hacha toca la madera antes que yo"). Ahora la animación espera justo encima y entra en el pico.
 - Sin pausa en el impacto ni temblor, el golpe "no pesa".
 
+## El latigazo (pala) — sin calibrar
+Golpe de pala: un latigazo con el Wii Remote, **sin subirlo antes** (independiente del hachazo, en `stepWhip`).
+Decide el **momento** (el pico es el instante del golpe) y la **fuerza**; el lado (derecha/revés) lo pone el juego.
+
+| Fase | Cómo se detecta | Constantes (`tuning.h`) |
+|---|---|---|
+| Empieza | \|a\| > `WHIP_START_G` (2,2 g) → evento `whipStart` (para animar) | `WHIP_START_G` |
+| Resolver | en el pico (\|a\| < 0,85 × pico) si el pico ≥ `WHIP_MIN_G` (2,6 g) → evento `whip` | `WHIP_MIN_G`, `PEAK_DROP` |
+| Fuerza | (pico − 2,6) / (7,5 − 2,6) → 0..1 | `WHIP_FULL_G` |
+
+Valores puestos a ojo a partir del hachazo: **falta grabar latigazos reales** (suaves, normales, fuertes; de derecha
+y de revés) y ajustar con datos. También: comprobar el retraso entre el golpe real y el evento.
+
 ### Datos (`tuning-data/`)
 | Fichero | Contenido |
 |---|---|

@@ -106,7 +106,21 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 ## Próximo
 - [ ] **Puntero IR en los menús** (además de la cruceta)
 - [ ] Probar la lehiaketa con 2-4 mandos reales
-- [ ] Siguiente deporte (skill `nuevo-juego`)
+- [x] Siguiente deporte elegido: **palas** (reglas y controles en SPEC §6 y DECISIONES)
+
+## Fase 5 — Palas
+- [x] Prototipo en frontón provisional: cancha, pelota con física (frontis, pared, botes, chapa), pelotari con nunchuk,
+  golpe con botones (modo test) y saque (rama `palas`; probado en Dolphin con la CPU: escenas 11 y 13)
+- [x] CPU rival y reglas (tanto, falta, pasa, chapa, bi bote, kanpora; marcador a 10/15/22)
+- [x] Aviso de nunchuk obligatorio
+- [ ] Probar en la Wii real: moverse con el nunchuk, saque con A y latigazo (en Dolphin las teclas no llegaron: sin foco)
+- [ ] Ajustar el ritmo: velocidad de la pelota, alcance, ventana de tiempo, errores de la CPU (largos peloteos)
+- [ ] Choque entre los dos pelotaris (ahora se pueden solapar)
+- [ ] Marca de bote: quitarla cuando el juego se lea bien sin ella (`SHOW_LANDING`)
+- [ ] Gesto del latigazo con datos reales (momento y fuerza) + pantalla de prueba
+- [ ] Entrenamendua (peloteo) y Lehiaketa 1v1 + resultados + récord
+- [ ] Frontón de Zarautz (fotos del usuario)
+- [ ] 2v2
 
 ## Más adelante
 - [ ] Cansancio bien diseñado (desactivado ahora)

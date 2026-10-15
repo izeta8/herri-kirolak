@@ -57,6 +57,64 @@ constexpr float TURN_ALLOWED = 0.6f;         // profundidad (× radio) para pode
 constexpr float TURN_PROMPT = 0.9f;          // profundidad para mostrar "Buelta eman!"
 constexpr float SIDE_MAX = 1.3f;             // profundidad máxima por lado (× radio)
 
+// --- Palas: latigazo y nunchuk (sin datos reales todavía: calibrar con telemetría) ---
+constexpr float WHIP_START_G = 2.2f;    // |a| que inicia el latigazo
+constexpr float WHIP_MIN_G = 2.6f;      // pico mínimo para que sea golpe
+constexpr float WHIP_FULL_G = 7.5f;     // pico que da fuerza máxima
+constexpr float WHIP_COOLDOWN = 0.25f;  // s entre latigazos
+constexpr float STICK_DEADZONE = 0.15f;
+
+// --- Palas: frontón (m). El frontis está en z = 0 y la cancha va hacia +z; pared izquierda en x = -COURT_W/2 ---
+constexpr float COURT_LEN = 30.0f;      // largo de la cancha (frontón corto)
+constexpr float COURT_W = 10.0f;        // ancho (de la pared izquierda a la línea del lado abierto)
+constexpr float CUADRO = 3.5f;          // separación de las rayas de la pared izquierda
+constexpr float WALL_H = 10.0f;         // altura del frontis y de la pared izquierda
+constexpr float CHAPA_H = 0.9f;         // chapa: la pelota tiene que dar por encima
+constexpr float TOP_LINE = 9.5f;        // línea de arriba del frontis
+constexpr float FALTA_Z = 14.0f;        // saque: tiene que botar entre falta (cuadro 4)…
+constexpr float PASA_Z = 24.5f;         // …y pasa (cuadro 7)
+constexpr float SERVE_Z = 17.5f;        // desde donde se saca (cuadro 5)
+constexpr float RECEIVE_Z = 23.0f;      // donde espera el que resta
+
+// --- Palas: pelota ---
+constexpr float BALL_R = 0.035f;        // radio real
+constexpr float BALL_DRAW_R = 0.11f;    // radio con el que se dibuja (si no, no se ve desde la cámara)
+constexpr float BALL_G = 9.8f;
+constexpr float FLOOR_E = 0.62f;        // rebote vertical en el suelo
+constexpr float FLOOR_F = 0.86f;        // y lo que conserva en horizontal
+constexpr float FRONTIS_E = 0.62f;      // rebote en el frontis (velocidad normal)
+constexpr float FRONTIS_F = 0.9f;       // y lo que conserva en tangencial
+constexpr float WALL_E = 0.7f;          // pared izquierda
+constexpr float DROP_VY = -4.0f;        // saque: velocidad con la que el pelotari bota la pelota (m/s)
+constexpr float DROP_Y = 1.0f;          // altura desde la que la suelta
+
+// --- Palas: golpe ---
+constexpr float SHOT_SPEED_MIN = 13.0f; // velocidad hacia el frontis (m/s) con el golpe más suave…
+constexpr float SHOT_SPEED_MAX = 24.0f; // …y con el más fuerte
+constexpr float SHOT_DEPTH_MIN = 9.0f;  // dónde bota la pelota al volver (z) con el golpe más suave (dejada)…
+constexpr float SHOT_DEPTH_MAX = 26.0f; // …y con el más fuerte
+constexpr float SHOT_DEPTH_RAND = 1.8f;
+constexpr float SERVE_DEPTH_MIN = 15.5f;  // saque: entre falta y pasa según la fuerza
+constexpr float SERVE_DEPTH_MAX = 23.0f;
+constexpr float SHOT_X_MID = -0.5f;     // dónde bota en x con el golpe a tiempo…
+constexpr float SHOT_X_SPAN = 4.3f;     // …y cuánto se va hacia el ancho (pronto) o a la pared (tarde)
+constexpr float SHOT_X_RAND = 0.6f;
+constexpr float TIMING_WINDOW = 0.16f;  // s de adelanto/retraso que dan dirección completa
+constexpr float TIMING_MAX = 1.3f;      // tope de la dirección (más de 1 = puede salir fuera)
+constexpr float HIT_EARLY = 0.26f;      // s: latigazo como mucho así de pronto…
+constexpr float HIT_LATE = 0.2f;        // …o así de tarde respecto a cuando la pelota pasa a su lado
+constexpr float REACH = 1.35f;          // m: distancia horizontal máxima a la pelota para darle
+constexpr float REACH_Y_MIN = 0.1f, REACH_Y_MAX = 2.4f;
+constexpr float PLAYER_SPEED = 6.5f;    // m/s corriendo con el stick
+constexpr float PLAYER_ACCEL = 14.0f;   // suavizado de la carrera
+constexpr bool SHOW_LANDING = true;     // marca dónde va a botar la pelota (ayuda del prototipo)
+// CPU
+constexpr float BOT_TIMING_NOISE = 0.09f;  // s de error en el momento del golpe
+constexpr float BOT_MISTAKE = 0.18f;    // probabilidad de un golpe a destiempo (puede salir fuera o a la chapa)
+constexpr float BOT_MISTAKE_NOISE = 0.24f;
+constexpr float BOT_SPEED = 0.85f;      // × PLAYER_SPEED
+constexpr float BOT_DROP_SHOT = 0.15f;  // probabilidad de dejada
+
 // --- Cuerpo de Mii (Wii Sports Resort, game/mii/body) ---
 // Unidades del modelo de Resort: hombros a 9.25 sobre los pies, cuello a 9.7
 constexpr float MII_BODY_UNIT = 0.0886f;     // m por unidad: hombros a 0.82 m (como el cuerpo anterior)

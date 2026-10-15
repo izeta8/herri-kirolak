@@ -78,8 +78,39 @@ El aizkolari se sube **encima de un tronco tumbado** y corta **entre sus pies**.
 - Rival de la CPU (fantasma).
 - Distintos troncos (grosor y tipo de madera).
 
-## 6. Otros juegos (después del MVP, uno por uno)
+## 6. Juego 2 — Palas (en diseño, 15/10/2026)
+
+### Cómo es en la vida real
+Pelota vasca con **pala de madera** en frontón (frontis + pared izquierda; el lado derecho abierto, con la grada).
+La pelota tiene que dar en el **frontis** entre la **chapa** de abajo y la línea de arriba (puede tocar antes la pared
+izquierda) y **solo puede botar una vez** antes de devolverla (o se le da de volea). Saque: el pelotari bota la pelota y
+la golpea; tiene que volver del frontis y caer entre la línea de **falta** y la de **pasa**. En la vida real se juega
+sobre todo por parejas (delantero y zaguero) y a 35–40 tantos.
+
+### Lo que hemos decidido
+- **1v1 primero** (mano a mano); después se amplía a **2v2**.
+- **Moverse con el nunchuk** (stick); el Wii Remote, en la otra mano, es la pala. **Nunchuk obligatorio**: sin él no
+  se juega a palas y se avisa en pantalla. La CPU no lo necesita.
+- **Golpe**: el **latigazo** del Wii Remote. Derecha o revés sale solo según por dónde viene la pelota. El gesto decide:
+  - **el momento**: pronto = pelota cruzada hacia el ancho (lado abierto); tarde = pegada a la pared izquierda;
+  - **la fuerza**: latigazo fuerte = pelota rápida y larga; suave = dejada.
+- **Saque**: pulsar **A** → el pelotari bota la pelota → **latigazo** cuando sube. Mal hecho (corto/largo) = falta.
+- **Partido a 10, 15 o 22 tantos** (se elige al empezar, como las rondas de aizkolaritza).
+- **Cámara detrás, viendo el frontis**, algo alta (como desde la grada del fondo). Los dos miran al mismo lado: una
+  sola pantalla, sin partirla.
+- Sitio: **frontón de Zarautz** (más adelante; primero un frontón provisional para el prototipo).
+
+### Reglas del prototipo (propuesta, ajustable)
+- Tanto perdido si la pelota: da en la chapa o por debajo, por encima de la línea de arriba, fuera de la cancha o del
+  lado abierto antes de botar, bota dos veces, o no llega al frontis.
+- Saca el que ganó el tanto anterior (como en pelota). Saque a un bote entre falta y pasa.
+
+### Modos
+1. **Entrenamendua**: peloteo contra el frontis (sin rival) con tarjeta "Nola jo".
+2. **Lehiaketa**: 1v1 humano contra humano o contra la CPU. Resultados y récord (tantos de diferencia / racha).
+
+## 7. Otros juegos (después del MVP, uno por uno)
 Harri-jasotzea, Sokatira, Trontza, Txingak, Lasto altxatzea, Estropadak, Segalariak.
 
-## 7. Fuera de alcance por ahora
+## 8. Fuera de alcance por ahora
 MotionPlus, online, otros idiomas. (El puntero IR, la música y los Miis reales están planificados en el ROADMAP.)

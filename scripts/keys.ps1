@@ -1,5 +1,6 @@
 # Pulsa teclas en la ventana de Dolphin (para probar sin mando).
 # Mapeo del Wii Remote emulado: X = A, Z = B, flechas = cruceta, 1/2 = botones 1/2, Q = −, E = +, Enter = HOME
+# Nunchuk: W/A/S/D = stick, LSHIFT = Z, LCONTROL = C
 # Inclinar: I/K (adelante/atrás), J/L (izquierda/derecha); swing: M (abajo), N (izquierda), O (derecha)
 # Uso: scripts/keys.ps1 X,DOWN,DOWN,X -DelayMs 400   ·   "K+800" = mantener K 800 ms   ·   "K>" pulsar, "K<" soltar
 param([string[]]$Keys, [int]$DelayMs = 350, [int]$HoldMs = 90)
@@ -11,7 +12,7 @@ public class K {
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
 }
 "@
-$vk = @{ I=0x49; J=0x4A; K=0x4B; L=0x4C; M=0x4D; N=0x4E; O=0x4F; X=0x58; Z=0x5A; Q=0x51; E=0x45; "1"=0x31; "2"=0x32; ENTER=0x0D; UP=0x26; DOWN=0x28; LEFT=0x25; RIGHT=0x27 }
+$vk = @{ W=0x57; A=0x41; S=0x53; D=0x44; LSHIFT=0xA0; LCONTROL=0xA2; I=0x49; J=0x4A; K=0x4B; L=0x4C; M=0x4D; N=0x4E; O=0x4F; X=0x58; Z=0x5A; Q=0x51; E=0x45; "1"=0x31; "2"=0x32; ENTER=0x0D; UP=0x26; DOWN=0x28; LEFT=0x25; RIGHT=0x27 }
 $ext = @("UP","DOWN","LEFT","RIGHT")
 $p = Get-Process Dolphin -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
 if (-not $p) { throw "Dolphin no está abierto" }

@@ -145,6 +145,34 @@ def bad():
     return norm(thud + clank * 0.25, 0.7)
 
 
+def pala():
+    # Golpe seco de madera contra la pelota
+    d = 0.18
+    tok = (np.sin(2 * np.pi * 950 * t(d)) + 0.5 * np.sin(2 * np.pi * 1900 * t(d))) * env(int(SR * d), 0.0005, 0.022)
+    click = bandpass(noise(d), 1500, 7000) * env(int(SR * d), 0.0003, 0.006)
+    body = np.sin(2 * np.pi * 320 * t(d)) * env(int(SR * d), 0.001, 0.03) * 0.5
+    return norm(tok + click * 1.2 + body, 0.9)
+
+
+def frontis():
+    # La pelota contra la piedra del frontis, con algo de eco del frontón
+    d = 0.6
+    slap = bandpass(noise(d), 300, 3500) * env(int(SR * d), 0.0005, 0.025)
+    thump = np.sin(2 * np.pi * 180 * t(d)) * env(int(SR * d), 0.001, 0.04)
+    echo = np.zeros(int(SR * d))
+    lag = int(SR * 0.09)
+    echo[lag:] = (slap * 0.35 + thump * 0.25)[: len(echo) - lag]
+    tail = bandpass(noise(d), 200, 1500) * env(int(SR * d), 0.01, 0.15) * 0.12
+    return norm(slap * 1.2 + thump + echo + tail, 0.85)
+
+
+def bote():
+    d = 0.12
+    tk = np.sin(2 * np.pi * 420 * t(d)) * env(int(SR * d), 0.0005, 0.015)
+    sn = bandpass(noise(d), 800, 4000) * env(int(SR * d), 0.0003, 0.005)
+    return norm(tk + sn * 0.6, 0.6)
+
+
 def write(path, x):
     pcm = (np.clip(x, -1, 1) * 32767).astype(">i2").tobytes()
     pcm += b"\0" * ((-len(pcm)) % 32)
@@ -166,6 +194,9 @@ SOUNDS = {
     "back": back,
     "whoosh": whoosh,
     "bad": bad,
+    "pala": pala,
+    "frontis": frontis,
+    "bote": bote,
 }
 
 if __name__ == "__main__":
