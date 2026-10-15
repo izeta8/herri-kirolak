@@ -53,6 +53,10 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-16 | Cámara **isométrica y más cerca**, fija desde **atrás-derecha** (lado de la grada) | Descartó la lateral |
 | 2026-10-16 | No probar en la Wii todavía: **iterar el diseño primero**, por pasos pequeños apuntados en el ROADMAP | Tiene pocos tokens |
 | 2026-10-16 | **Apuntar con Z + stick**: el stick mueve; con Z mantenida el pelotari se planta y el stick mueve una mira en el frontis y la pared izquierda (biparetas). Fuerza = aceleración del golpe | Idea del usuario: "así es habilidad de la persona adónde tira" |
+| 2026-10-16 | **Tipo de golpe con botones** al hacer el latigazo: B = dejada, sin botón = media cancha, A = tiro largo; la fuerza = aceleración | Del usuario |
+| 2026-10-16 | Cámara **mucho más cerca** que sigue a la pelota: pelota cerca del frontis → cámara cerca; lejos → lejos | Del usuario |
+| 2026-10-16 | La mira de Z solo marca la **dirección** (recorrido pared izquierda → txoko → frontis); la altura sale del tipo de golpe y la fuerza | Decidido por Claude al juntar botones y mira (revisar con el usuario) |
+| 2026-10-16 | Iterar solo (sin el usuario) hasta un resultado excelente en juego, cámara, estilo y animaciones de Resort | El usuario deja el PC encendido toda la noche |
 | 2026-10-16 | De momento **se queda la marca de bote**; sin valoración de calidad por puntos en entrenamiento | No los eligió |
 
 ## Desarrollo

@@ -117,26 +117,21 @@ Hecho (prototipo v1):
 - [x] Frontón provisional, pelota con física y predicción, pelotari con pala, reglas, marcador 10/15/22, CPU básica
 - [x] Nunchuk obligatorio, choque entre pelotaris, sonidos, escenas 10–14, pantalla de prueba del latigazo
 
-Diseño v2 (en orden):
-- [ ] **5.1 Cámara isométrica cerca**: `PalaScene::updateCamera` con dirección fija desde atrás-derecha (p. ej.
-  (+0.55, +0.65, +0.75) normalizado), distancia ~12 m, FOV ~32; mira al punto medio entre pelotaris y pelota, con
-  límites dentro de la cancha; sin girar. Revisar con capturas: frontis, pared y pelotaris grandes a la vista.
-- [ ] **5.2 Punto dulce**: en `tryHit`/`doHit`, calidad = f(tiempo) × f(distancia) con `SWEET_TIME`, `SWEET_DIST`,
-  `SWEET_DIST_TOL`; calidad baja → menos velocidad, más altura y error de dirección; muy baja → chapa o fuera.
-  Etiqueta *Bikain! / Ondo / Txarto* y destello. Ventanas más estrechas que ahora (`HIT_EARLY/LATE`, `REACH`).
-- [ ] **5.3 Apuntar con Z + stick (mira en las paredes) y biparetas**: con Z mantenida el pelotari se planta y el
-  stick mueve una mira (por jugador) sobre el frontis y la pared izquierda (un recorrido continuo: pared → txoko →
-  frontis); dibujarla en 3D sobre la pared. En `doHit`, resolver la velocidad para que la pelota dé en la mira
-  (si es la pared, sale bipareta con la física de `Ball`) con la velocidad de la fuerza; error según la calidad.
-  Comprobar con `BallPath` que la bipareta vuelve dentro de la cancha. CPU: elige mira (también biparetas).
-  Test en Dolphin: LSHIFT = Z, WASD.
-- [ ] **5.4 Riesgo con la fuerza**: las ventanas de 5.2 se estrechan con la fuerza; suave + ↓ = dejada.
-- [ ] **5.5 Volea y bote pronto**: en `closest`/`doHit`, saber si es antes del bote o <80 ms tras él; ventana más
-  corta, pelota más rápida, etiqueta *Bolea! / Bote pronto!*.
-- [ ] **5.6 Peloteo que se acelera**: `RALLY_SPEEDUP` por golpe bueno, con tope; se reinicia en cada tanto.
-- [ ] **5.7 CPU por niveles**: `BotLevel` (Erraza/Normala/Zaila) con error, velocidad, riesgo y colocación; que use
-  la puntería (pared/chapa) como el jugador. Elegir el nivel en `setup` (paso propio de la pala).
-- [ ] **5.8 HUD de habilidad**: indicador del último golpe (tiempo y sitio) y tarjeta "Nola jo" del entrenamiento.
+Diseño v2 (en orden; trabajo autónomo del 16/10, ver SPEC §6):
+- [ ] **5.1 Cámara isométrica cerca que sigue a la pelota** (`updateCamera`): dirección fija atrás-derecha, distancia
+  y posición a lo largo de la cancha según la z de la pelota, tirando hacia el humano.
+- [ ] **5.2 Controles**: `Ctl` por jugador (stick, Z, A, B, latigazo) que rellena el mando o la CPU; Z + stick mueve
+  la mira (pared izquierda → txoko → frontis) y planta al pelotari; A/B/nada = largo/dejada/media. Mira 3D en la pared.
+- [ ] **5.3 Golpe nuevo** (`doHit`): dirección hacia la mira (bipareta si es la pared), velocidad por la fuerza, altura
+  buscada simulando con `Ball` para que bote a la profundidad del tipo de golpe; punto dulce (tiempo × sitio) que da
+  error y pierde velocidad; ventanas más estrechas con la fuerza; volea / bote pronto; peloteo que se acelera.
+- [ ] **5.4 CPU por niveles** (Erraza/Normala/Zaila) usando los mismos `Ctl` (se coloca, planta, apunta, A/B, golpea);
+  paso de nivel en `setup`.
+- [ ] **5.5 HUD y efectos**: valoración del golpe (Bikain!/Ondo/Txarto, Bolea!, Bote pronto!, Bipareta!), estela de la
+  pelota, destello en el impacto, indicador de tipo de golpe y mira, "Nola jo" de la pala.
+- [ ] **5.6 Estilo Resort**: frontón con más detalle (bloques, números de cuadro, grada con público Mii que reacciona,
+  fondo de monte), animaciones (preparado con saltito, carrera, giro de cuerpo en el golpe, celebración y bajón).
+- [ ] **5.7 Repaso**: escenas 11 y 13 con capturas, aizkolaritza (6), docs.
 - [ ] **5.9 Wii real**: calibrar el latigazo con la grabación guiada (escena 14) y probar el tacto con el usuario.
 - [ ] 5.10 Entrenamendua y Lehiaketa completos + resultados + récord (récords por deporte en save.dat)
 - [ ] 5.11 Frontón de Zarautz (fotos del usuario) · 5.12 2v2

@@ -105,20 +105,18 @@ del Wii Remote · derecha/revés automático según el lado de la pelota · saqu
 
 **2. Apuntar con Z + stick (16/10, idea del usuario).** El stick **mueve** al pelotari por la cancha (tiene que estar
 físicamente bien colocado para llegar a la pelota). **Manteniendo Z**, el pelotari se planta y el stick mueve una
-**mira sobre las paredes** (frontis y pared izquierda): adónde va el golpe. Moverse y apuntar no se pueden hacer a la
-vez: hay que decidir cuándo dejar de correr para apuntar.
-- La mira recorre el frontis (izquierda/derecha, arriba/abajo: cerca de la chapa = rápida y arriesgada; alta = globo)
-  y sigue por la **pared izquierda**. Si se apunta a la pared, la pelota da primero en ella y luego en el frontis:
-  **bipareta**, sale muy desviada hacia el ancho. Cuanto más cerca del frontis (txoko), más desvío.
-- El golpe se calcula para que la pelota **dé en el punto de la mira** con la velocidad de la fuerza; la física hace
-  el resto (rebotes reales en las dos paredes).
-- Sin Z la mira se queda donde estaba la última vez (al principio, en el centro del frontis).
-- El *momento* y el *sitio* deciden la **calidad**: con calidad baja, la pelota se desvía de la mira (error) y pierde
-  velocidad.
-- La **fuerza** sale de la aceleración del Wii Remote en el golpe (el pico del latigazo, como ahora).
+**mira sobre las paredes**: un recorrido continuo que va por la **pared izquierda** (desde el cuadro 4 hasta el txoko) y
+sigue por el **frontis** hasta la raya del lado abierto. Moverse y apuntar no se pueden hacer a la vez.
+- Si la mira está en la pared, la pelota da primero en ella y luego en el frontis: **bipareta**, sale muy desviada
+  hacia el ancho. Cuanto más cerca del txoko, más desvío.
+- Sin Z la mira se queda donde estaba (al principio, en el centro del frontis).
+- La mira solo marca **adónde** (en horizontal); la altura en la pared sale del tipo de golpe y de la fuerza.
 
-**3. Riesgo con la fuerza.** Latigazo fuerte = pelota más rápida pero **punto dulce más pequeño** (ventana de tiempo y
-de sitio más estrechas). Suave = más control; suave + ↓ = **dejada**.
+**3. Tipo de golpe con los botones del Wii Remote (16/10, del usuario)**, mantenidos al hacer el latigazo:
+- **B: dejada** (bota cerca del frontis) · **sin botón: a media cancha** · **A: tiro largo** (al fondo del frontón).
+- En el saque: B = justo pasada la falta, sin botón = al medio, A = cerca de la pasa (arriesgado).
+- La **fuerza** (pico de aceleración del latigazo) da la **velocidad**. Una dejada fuerte va baja y rápida: riesgo de
+  chapa. Un tiro largo flojo se queda corto. **Riesgo con la fuerza**: cuanto más fuerte, más pequeño el punto dulce.
 
 **4. Volea y bote pronto.** Darle **antes del bote** (volea) o **justo al botar** (bote pronto, <~80 ms tras el bote)
 tiene una ventana más corta, pero la pelota sale más rápida y el rival tiene menos tiempo. Se anuncia (*Bolea!*,
@@ -130,9 +128,10 @@ en el tanto siguiente vuelve a la base.
 **6. CPU por niveles.** Erraza / Normala / Zaila (se elige al preparar el partido). El nivel cambia su error de tiempo,
 su velocidad, lo que arriesga (chapa, pared) y lo bien que se coloca. La difícil busca la pared y la chapa.
 
-**7. Cámara isométrica, más cerca.** Fija en diagonal desde **atrás y a la derecha** (lado de la grada), en alto
-(~35–40°), con FOV estrecho; **no gira**, solo se desplaza siguiendo el centro entre los pelotaris y la pelota (con
-límites). Los pelotaris se ven grandes; el frontis y la pared izquierda siguen a la vista.
+**7. Cámara isométrica, mucho más cerca (16/10).** Fija en diagonal desde **atrás y a la derecha** (lado de la grada),
+en alto, con FOV estrecho; **no gira**. **Sigue a la pelota a lo largo de la cancha**: cuanto más cerca está la pelota
+del frontis, más cerca del frontis está la cámara (y más cerrada); cuanto más se aleja, más se aleja la cámara. Tira
+un poco hacia el pelotari humano para que no se pierda de vista.
 
 Se mantiene la **marca de bote** (ayuda) de momento.
 
