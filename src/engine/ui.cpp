@@ -8,64 +8,73 @@
 
 namespace ui {
 
+// Nube esponjosa de dibujo (centro de la base, escala)
+static void cloud2D(float cx, float cy, float s, Color c) {
+    gfx::circle(cx, cy - 14 * s, 30 * s, c, 24);
+    gfx::circle(cx + 34 * s, cy - 4 * s, 24 * s, c, 24);
+    gfx::circle(cx - 34 * s, cy - 2 * s, 22 * s, c, 24);
+    gfx::circle(cx + 12 * s, cy - 30 * s, 22 * s, c, 24);
+    gfx::roundRect(cx - 56 * s, cy - 6 * s, 112 * s, 24 * s, 12 * s, c);
+}
+
+static void (*s_background)(float) = nullptr;
+
+void setBackground(void (*draw)(float t)) { s_background = draw; }
+
 void background(float t) {
     float w = gfx::screenW();
-    gfx::rectGrad(0, 0, w, 480, UI_BG_TOP, UI_BG_BOTTOM);
-    // Franjas diagonales suaves que se desplazan
-    float off = fmodf(t * 18.0f, 120.0f);
-    for (float x = -480 - 120 + off; x < w + 120; x += 120) {
-        gfx::setBlend(true);
-        GX_Begin(GX_QUADS, GX_VTXFMT1, 4);
-        Color c = rgba(255, 255, 255, 70);
-        GX_Position3f32(x, 480, 0); GX_Color1u32(c);
-        GX_Position3f32(x + 50, 480, 0); GX_Color1u32(c);
-        GX_Position3f32(x + 530, 0, 0); GX_Color1u32(c);
-        GX_Position3f32(x + 480, 0, 0); GX_Color1u32(c);
-        GX_End();
+    if (s_background) {
+        // Fondo del juego (el escenario en 3D) con un velo claro para que destaquen los paneles
+        s_background(t);
+        gfx::begin2D();
+        gfx::clearDepth();
+        gfx::rectGrad(0, 0, w, 480, rgba(255, 255, 255, 40), rgba(255, 255, 255, 90));
+        return;
     }
-    // Burbujas
+    // Sin escenario: cielo con nubes
+    gfx::rectGrad(0, 0, w, 480, rgba(0x2C, 0x84, 0xE0), rgba(0xC8, 0xE2, 0xF2));
     for (int i = 0; i < 6; i++) {
-        float bx = fmodf(i * 173.0f + t * (8 + i * 3), w + 200) - 100;
-        float by = 420 - fmodf(i * 97.0f + t * (6 + i), 520);
-        gfx::circle(bx, by, 30 + i * 9, rgba(255, 255, 255, 50), 28);
+        float s = 0.7f + (i % 3) * 0.3f;
+        float cx = fmodf(i * 211.0f + t * (5 + (i % 3) * 3), w + 320) - 160;
+        float cy = 70 + (i * 67) % 300;
+        cloud2D(cx, cy, s, rgba(255, 255, 255, 235));
     }
+}
+
+// Panel de cristal de Resort: borde blanco, relleno blanco-azulado translúcido
+static void glass(float x, float y, float w, float h, float r, float glow) {
+    gfx::roundRect(x + 2, y + 5, w, h, r, rgba(0x08, 0x40, 0x70, 40));
+    if (glow > 0.01f) gfx::roundRect(x - 7, y - 7, w + 14, h + 14, r + 7, withAlpha(UI_TEAL_GLOW, 0.5f * glow));
+    gfx::roundRect(x, y, w, h, r, mixColor(rgba(255, 255, 255, 235), UI_TEAL_GLOW, glow));
+    float bt = 3 + 2 * glow;
+    gfx::roundRectGrad(x + bt, y + bt, w - 2 * bt, h - 2 * bt, fmaxf(r - bt, 2.0f), UI_GLASS_TOP, UI_GLASS_BOTTOM);
 }
 
 void header(const char* title) {
-    float w = font::width(title, 34) + 80;
-    gfx::roundRect(-30, 18, w + 30, 58, 29, rgba(0, 0, 0, 40));
-    gfx::roundRectGrad(-30, 14, w + 30, 58, 29, rgba(0x4C, 0xB4, 0xF4), UI_BLUE_DARK);
-    font::draw(title, 34, 22, 34, UI_WHITE, UI_BLUE_DARK);
+    float w = font::width(title, 32) + 56;
+    glass(-24, 16, w + 24, 56, 16, 0);
+    font::draw(title, 26, 24, 32, UI_TEAL, UI_WHITE);
 }
 
 void panel(float x, float y, float w, float h, Color c) {
-    gfx::roundRect(x + 3, y + 5, w, h, 22, rgba(0, 0, 0, 35));
-    gfx::roundRect(x, y, w, h, 22, rgba(0xD8, 0xE4, 0xEE));
-    gfx::roundRect(x + 3, y + 3, w - 6, h - 6, 19, c);
+    (void)c;
+    glass(x, y, w, h, 18, 0);
 }
 
 void button(float cx, float cy, float w, float h, const char* label, float anim, bool enabled, const char* sub,
             Color accent) {
-    float s = 1.0f + 0.07f * easeOutBack(anim);
+    (void)accent;
+    float s = 1.0f + 0.06f * easeOutBack(anim);
     float bw = w * s, bh = h * s;
     float x = cx - bw / 2, y = cy - bh / 2;
-    float r = bh * 0.45f;
-    gfx::roundRect(x + 2, y + 6, bw, bh, r, rgba(0, 0, 0, 45));
-    if (anim > 0.01f) {
-        gfx::roundRect(x - 6, y - 6, bw + 12, bh + 12, r + 6, withAlpha(accent, 0.35f * anim));
-    }
-    Color border = mixColor(rgba(0xC4, 0xCE, 0xD8), accent, anim);
-    gfx::roundRect(x, y, bw, bh, r, border);
-    float bt = 3 + 2 * anim;
-    gfx::roundRectGrad(x + bt, y + bt, bw - 2 * bt, bh - 2 * bt, r - bt, UI_WHITE,
-                       enabled ? rgba(0xE6, 0xF0, 0xF8) : rgba(0xD8, 0xDA, 0xDE));
-    Color tc = enabled ? UI_TEXT : UI_TEXT_LIGHT;
-    float size = fminf(32.0f, bh * 0.42f) * s;
+    glass(x, y, bw, bh, 14 * s, anim);
+    Color tc = enabled ? UI_TEAL : UI_TEXT_LIGHT;
+    float size = fminf(32.0f, bh * 0.44f) * s;
     if (sub) {
-        font::plain(label, cx, cy - size * 0.95f, size, tc, ALIGN_CENTER);
+        font::draw(label, cx, cy - size * 0.98f, size, tc, UI_WHITE, ALIGN_CENTER);
         font::plain(sub, cx, cy + size * 0.12f, size * 0.62f, UI_TEXT_LIGHT, ALIGN_CENTER);
     } else {
-        font::plain(label, cx, cy - size * 0.62f, size, tc, ALIGN_CENTER);
+        font::draw(label, cx, cy - size * 0.64f, size, tc, UI_WHITE, ALIGN_CENTER);
     }
 }
 
@@ -77,24 +86,20 @@ void buttonIcon(float cx, float cy, const char* letter, float r, Color c) {
     font::plain(letter, cx, cy - size * 0.62f, size, UI_WHITE, ALIGN_CENTER);
 }
 
+// Pastilla de cristal de la barra inferior (como "Back" / "Settings" en Resort); devuelve su ancho
+static float hintPill(float right, const char* letter, const char* label, Color iconCol) {
+    float tw = font::width(label, 22);
+    float pw = tw + 64, x = right - pw;
+    glass(x, 430, pw, 40, 20, 0);
+    buttonIcon(x + 24, 450, letter, 14, iconCol);
+    font::plain(label, x + 44, 438, 22, UI_TEXT);
+    return pw;
+}
+
 void hints(const char* aLabel, const char* bLabel) {
-    float w = gfx::screenW();
-    gfx::rect(0, 438, w, 42, rgba(255, 255, 255, 200));
-    gfx::rect(0, 436, w, 2, rgba(0xB8, 0xD4, 0xEA));
-    float x = w - 30;
-    if (bLabel) {
-        float tw = font::width(bLabel, 22);
-        font::plain(bLabel, x - tw, 446, 22, UI_TEXT);
-        x -= tw + 26;
-        buttonIcon(x, 459, "B", 14, rgba(0x80, 0x88, 0x94));
-        x -= 34;
-    }
-    if (aLabel) {
-        float tw = font::width(aLabel, 22);
-        font::plain(aLabel, x - tw, 446, 22, UI_TEXT);
-        x -= tw + 26;
-        buttonIcon(x, 459, "A", 14);
-    }
+    float x = gfx::screenW() - 20;
+    if (bLabel) x -= hintPill(x, "B", bLabel, rgba(0x80, 0x88, 0x94)) + 12;
+    if (aLabel) hintPill(x, "A", aLabel, UI_BLUE);
 }
 
 void fade(float a, Color c) {

@@ -42,6 +42,7 @@ private:
     void computePose(CharacterPose& pose, Xf& axeXf);
     float impactAngle();
 
+    Appearance look_;
     CharacterModel* model_ = nullptr;
     const Log* log_ = nullptr;
     Phase phase_ = IDLE;

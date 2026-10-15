@@ -41,9 +41,44 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 ## Común a los deportes (`src/game/`)
 - **`sports.h/.cpp`** — registro de deportes y `MatchConfig` (deporte, entrenamiento/lehiaketa, jugadores, rondas,
   perfiles, CPU). El menú "preparar partida" se construye con esta lista. Ver `docs/NUEVO-JUEGO.md`.
-- **`character`** — personaje tipo Mii (cabeza con cara, cuerpo, manos flotantes, txapela). `characterCache(Appearance)`
-  (32 huecos), `drawCharacter(model, CharacterPose)`. Mira hacia +Z con yaw 0.
-- **`world`** — la plaza (prado en anillos, valla, montes, baserris, ikurriña, nubes, 28 espectadores con 10 aspectos).
+- **`character`** — Mii calcado a los de la Wii: cabeza de huevo con barbilla en punta, cara pintada con trazos sobre la
+  superficie (`decalStroke`/`decalEllipse`: ojos, cejas, nariz de gancho, boca de raya), pelo de casco con flequillo en
+  picos (4 peinados, `Profile::hairStyle`), cuerpo estrecho con brazos de manga larga y manos de bola, txapela.
+  `Appearance::casual` = público (pantalón gris, menos polígonos). `characterCache(Appearance)` (32 huecos),
+  `drawCharacter(model, CharacterPose)`. Mira hacia +Z con yaw 0.
+- **`world`** — escenario de aizkolaritza: **el probaleku de Usurbil** (empedrado, muros de cantos con albardilla, gradas
+  con toldo, porterías, iglesia de San Salvador con la torre, frontón cubierto, casas de Etxebeste e Irazu, montes;
+  29 espectadores con 10 aspectos). −Z = sur (iglesia), +X = oeste (Etxebeste); la plataforma a y = 0, calles a −1.
+- **`mii/`** — **Miis de verdad**: piezas (modelos y texturas) de `RFL_Res.dat`: primero la NAND
+  (`/shared2/FaceLib/`, así está en Dolphin) y si no, `RFL_Res.dat` en la carpeta del juego del USB/SD (`save::directory()`;
+  en la Wii real no está en la NAND). Miis del Canal Mii de `/shared2/menu/FaceLib/RFL_DB.dat` con `engine/nand`. `MiiHead` monta la cabeza como
+  la RVLFaceLib (referencia: decompilación pública SMGCommunity/Petari): contorno, máscara, pelo, gorra, frente, nariz,
+  raya de la nariz, barba y gafas con display lists indexadas (formato de vértices 2, s16), y la cara (ojos, cejas,
+  boca, bigote, lunar) pintada en una textura RGB5A3 al empezar el frame (`gfx::offscreen*`, cola `mii::processPending`).
+  Si no hay piezas (Dolphin sin copiarlas), `CharacterModel` usa nuestra cabeza de siempre. **Nada de esto va al repo.**
+- **`mii/body`** — cuerpo de Wii Sports Resort leído de `hk_body.bin` v2 (`mii::readAsset`; lo genera
+  `tools/mii_body.py`): los de los bolos, A6 (hombre) y B6 (mujer) según `MiiInfo::female`, C1 (público) y la mano
+  `hand1`. La geometría es común (una display list por hueso, formato de vértices 4: posición, normal, alfa de oclusión
+  y UV) y `Body` solo guarda colores (camiseta = C0, piel = C1) y si la camiseta es clara (ropa `_awy`). Se dibuja con
+  el **TEV de Resort** (`setMaterial`: ropa = textura + color favorito, piel por máscara; luego la luz). La pose se
+  calcula en espacio del modelo: inclinación del pecho y cabeza. Sin brazos: las manos son la bola de Resort en
+  `handL/handR` (la derecha en espejo) con la ropa del cuerpo; el público mueve sus manos (`handL/handR` del modelo).
+  `draw()` devuelve dónde van la cabeza (`head_set`) y el gerriko. Unidades de Resort × `MII_BODY_UNIT` (tuning.h).
+  Sin escala por altura ni complexión (Resort no la usa). `CharacterModel::body` lo usa si existe; si no, el cuerpo
+  propio de antes.
+  Ropa de los jugadores: la pinta `tools/mii_outfit.py` (UV propias: ángulo alrededor del cuerpo × altura; mitad de
+  textura para el cuerpo y mitad para la chaqueta del hombre), con el mismo material: alfa = color del jugador.
+- **Caché de personajes** (`characterCache`): desaloja el menos usado; **pedir el modelo en cada frame** que se
+  dibuje, nunca guardar el puntero entre frames.
+- **`mii/light`** — la luz de los Miis de Resort: dos lightmaps de 32×32 (lm0 difusa, lm1 brillos y borde) indexadas
+  por la normal en cámara (`GX_TEXCOORD1`, `GX_TEXMTX0` + post-matriz "env camera"), que se repintan en la CPU cuando
+  gira la cámara con el algoritmo de `EGG::LightTexture` y las luces de la bolera (`tuning::MII_LIGHTS`). Cuerpo,
+  manos y cabeza (`MiiHead::draw`) hacen `albedo × (lm0·oclusión + ambiente) + lm1·oclusión`. Usar
+  `miilight::loadModelMtx` en vez de `gfx::loadModelMtx` para todo lo que lleve lightmaps.
+  Jugadores = Miis de la consola: `Profile::mii` (índice + 1) → `Appearance::user`; `linkProfilesToMiis()` (al arrancar)
+  y `setProfileMii()` en `scenes/common`. El público usa también esos Miis (`World::build`).
+- **Fondo de menús**: `ui::setBackground(drawMenuBackdrop)` (en `main.cpp`) pinta el escenario 3D detrás de los paneles
+  de cristal (estilo Wii Sports Resort); `gfx::clearDepth()` borra el Z antes del personaje de vista previa.
   `sharedWorld()` (una sola instancia), `drawSky()` (2D, antes de 3D), `draw()`, `cheer(s)`, `clapLight(s)`,
   `drawShadow(pos, rx, rz)`, `setCameraHide(eye, on)` (oculta el público entre una cámara lejana y la plaza).
 - **`palette.h`** — colores favoritos, piel, pelo, colores de UI y madera.

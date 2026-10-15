@@ -5,6 +5,8 @@
 namespace ui {
 
 void background(float t);
+// El juego puede poner su propio fondo de menús (p. ej. el escenario en 3D); ui no sabe nada del juego.
+void setBackground(void (*draw)(float t));
 void header(const char* title);
 void panel(float x, float y, float w, float h, Color c = 0xFFFFFFF0);
 // Botón grande y redondeado. `anim` 0..1 = cuánto está seleccionado (para animarlo).

@@ -29,6 +29,7 @@ static void buildAxe() {
 
 void Aizkolari::setup(const Appearance& look, const Log* log) {
     buildAxe();
+    look_ = look;
     model_ = characterCache(look);
     log_ = log;
     reset();
@@ -272,6 +273,7 @@ void Aizkolari::computePose(CharacterPose& pose, Xf& axeXf) {
 }
 
 void Aizkolari::draw() {
+    model_ = characterCache(look_);  // en cada frame (ver characterCache)
     if (!model_) return;
     CharacterPose pose;
     Xf axeXf;

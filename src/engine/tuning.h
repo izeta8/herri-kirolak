@@ -57,4 +57,47 @@ constexpr float TURN_ALLOWED = 0.6f;         // profundidad (× radio) para pode
 constexpr float TURN_PROMPT = 0.9f;          // profundidad para mostrar "Buelta eman!"
 constexpr float SIDE_MAX = 1.3f;             // profundidad máxima por lado (× radio)
 
+// --- Cuerpo de Mii (Wii Sports Resort, game/mii/body) ---
+// Unidades del modelo de Resort: hombros a 9.25 sobre los pies, cuello a 9.7
+constexpr float MII_BODY_UNIT = 0.0886f;     // m por unidad: hombros a 0.82 m (como el cuerpo anterior)
+constexpr float MII_HEAD_UNITS = 3.9f;       // ancho de la cara en unidades del cuerpo (bolos de Resort: como el torso)
+constexpr float MII_HEAD_DY = 0.0f;          // barbilla respecto a head_set (unidades)
+constexpr float MII_HEAD_DZ = 0.0f;
+// Sin proporciones por altura ni complexión: Resort no las lee nunca (main.dol: ninguna instrucción extrae esos campos de
+// RFLAdditionalInfo y su GetBodyModelIndex solo mira el tipo de cuerpo y el sexo). Todos los Miis, el mismo cuerpo.
+// Manos sueltas (bola de Resort, 1.6 unidades de diámetro, centro en x = 0.6 de su modelo)
+constexpr float MII_HAND_SCALE = 1.3f;       // en los bolos de Resort la mano mide ~0.55 del ancho de la cara
+constexpr float MII_HAND_CX = 0.6f;
+constexpr float MII_SASH_Y = 5.65f;          // altura del gerriko: donde acaba la camiseta (unidades)
+constexpr float MII_SASH_UNITS = 1.78f;      // su radio: lo más ancho del torso es 1.69 (unidades)
+constexpr float MII_SASH_DEPTH = 1.0f;       // y su fondo respecto al ancho
+// Ropa: Resort usa la textura "_aw"/"_ay"/"_awy" (dibujos oscuros) con el color favorito blanco (10), amarillo (2) o
+// verde lima (3). Con camisetas que no son el color favorito del Mii (CPU de colores), a partir de esta luminancia
+constexpr float MII_SHIRT_LIGHT_LUMA = 0.7f;
+// Público (C1): su textura reparte color favorito y "segundo color" (la base); en los bolos de Resort la base es casi
+// negra (medida en una captura: 0..20 con la luz)
+constexpr int MII_CROWD_BASE_R = 16, MII_CROWD_BASE_G = 16, MII_CROWD_BASE_B = 16;
+
+// --- Luz de los Miis como en Wii Sports Resort (game/mii/light) ---
+// La de la bolera: Common/BwlScene (WS2_bwl_Light.plight, WS2_bwl_Lmap.plmap) y el lightset "Abatar_Lighset" de
+// Stage/BwlScene/Normal (bwg_field_rsca.brres). Dos lightmaps indexadas por la normal en cámara, que EGG pinta cada
+// fotograma: lm0 (difusa) y lm1 (brillos y borde). Color = albedo × (lm0·oclusión + ambiente) + lm1·oclusión
+constexpr int MII_LM_SIZE = 32;              // lado de las lightmaps (EGG::LightTexture, 32 por defecto)
+constexpr int MII_AMBIENT = 100;             // ambiente del lightset de los Miis (0..255)
+struct MiiLight {
+    int map;           // 0 = lm0, 1 = lm1
+    int type;          // 0 dirección de mundo, 1 brillo (medio ángulo con la cámara), 2 fija en la cámara, 4 contraluz
+    float x, y, z;     // posición de la luz; alumbra hacia el origen
+    int gradient;      // degradado de EGG (0..9) en función de n·L
+    float intensity;
+    int r, g, b;
+};
+constexpr MiiLight MII_LIGHTS[] = {
+    {0, 0, 0, 100000, 0, 1, 1.0f, 255, 255, 255},            // cenital, en media lambert (de arriba blanco a abajo negro)
+    {1, 4, 0, 0, 0, 7, 0.4f, 255, 255, 200},                 // contraluz cálido: el borde de la silueta
+    {1, 2, 0, 5000, 8000, 4, 0.05f, 255, 255, 255},          // desde la cámara, algo por arriba
+    {1, 1, -50000, 100000, -30000, 6, 0.3f, 255, 255, 255},  // brillo de arriba
+    {1, 1, 15000, -15000, 20000, 5, 0.1f, 255, 255, 255},    // brillo de abajo
+};
+
 }  // namespace tuning

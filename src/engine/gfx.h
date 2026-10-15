@@ -53,12 +53,26 @@ void setBlend(bool on);
 void setCull(bool on);
 void setFog(bool on, float start = 0, float end = 0, Color c = 0);
 void drawMesh(const Mesh& mesh, const Xf& model);
+// Para módulos con su propio formato de vértices (los Miis): carga la matriz del modelo (posición y normales) en
+// PNMTX0, y después restore3D() deja otra vez el estado que esperan drawMesh y el resto del motor.
+void loadModelMtx(const Xf& model, float normalScale = 1.0f);  // normalScale deshace una escala uniforme en las normales
+MtxP viewMtx();  // matriz de vista de la cámara de begin3D
+void restore3D();
+
+// Dibujo fuera de pantalla para generar texturas (p. ej. la cara de un Mii). Solo entre frames: se hace al empezar
+// el frame, mediante el callback de inicio de frame. Usa la esquina (0,0)-(size,size) del EFB con alfa.
+void setFrameStartCallback(void (*cb)());
+void offscreenBegin(u16 size);                       // EFB con alfa, borrado a (0,0,0,0), proyección 1 unidad = 1 píxel
+void offscreenCopy(void* dst, u16 size, u8 texFmt);  // copia la esquina a una textura y la borra
+void offscreenEnd();                                 // vuelve el formato del EFB, el color de borrado y el viewport
 // Proyecta un punto del mundo a coordenadas 2D virtuales. Devuelve false si queda detrás de la cámara.
 bool project(const Vec3& p, float& sx, float& sy);
 void use3DFormat();  // deja el formato de vértice 3D activo (para construir display lists)
 
 // ---------- 2D ----------
 void begin2D();
+// Borra el Z-buffer (para dibujar 3D encima de una escena 3D ya pintada, p. ej. el fondo de los menús)
+void clearDepth();
 void rect(float x, float y, float w, float h, Color c);
 void rectGrad(float x, float y, float w, float h, Color top, Color bottom);
 void roundRect(float x, float y, float w, float h, float r, Color c);

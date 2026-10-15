@@ -17,16 +17,40 @@ editar código ─► compilar ─► probar en Dolphin (capturas + teclas) ─�
 | make directo (bash de devkitPro) | `make OUTDIR=build-rec DEFS='-DSTART_SCENE=8'`: escena N **sin** DEBUG_INPUT (para mandar a la Wii) |
 
 `START_SCENE` (en `main.cpp`): 0 título · 1 menú · 2 preparar partida · 3 jugadores · 4 récords · 5 entrenamiento ·
-6 lehiaketa 4 CPU a la vez · 7 entrenamiento con la CPU · 8 Kolpe proba. **Al crear algo nuevo, añadir su número.**
+6 lehiaketa 4 CPU a la vez · 7 entrenamiento con la CPU · 8 Kolpe proba · 9 galería de Miis (de cerca; el zoom cambia
+solo cada 4 s). **Al crear algo nuevo, añadir su número.**
 
 ## 2. Probar en Dolphin
 - `scripts/run.ps1 [-Dol ruta]` cierra Dolphin si estaba abierto y arranca el .dol.
-- `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png` (leerla con la herramienta Read para verla).
+- `scripts/screenshot.ps1 -Name x` → `build/screenshots/x.png` (leerla con la herramienta Read para verla). Usa
+  PrintWindow: captura aunque Dolphin esté tapado y **no le quita el foco** al usuario (`-Focus` = método antiguo).
 - `scripts/keys.ps1 X,DOWN,X,"K>",700,"M+250","K<"` pulsa teclas: X=A, Z=B, flechas, 1, 2, Q=−, E=+, ENTER=HOME,
   I/K/J/L inclinar, M/N/O swing; `"K+800"` mantener; `"K>"`/`"K<"` pulsar/soltar; un número = pausa en ms.
 - Para varias capturas seguidas, unir en una cuadrícula con PIL y mirar una sola imagen.
 - Probar siempre la CPU (escenas 6 y 7) tras tocar animaciones o la escena de partida.
 - Dolphin no sirve para el tacto del gesto (no gira más de 90°): eso se valida en la Wii con telemetría.
+
+- **Vídeo para el usuario** (cuando no está en casa): `scripts/record.ps1 -Dol build-test/boot.dol -Seconds 75 -Name x`
+  vuelca cada fotograma de Dolphin (vale con la pantalla apagada, donde PrintWindow sale en blanco) y deja
+  `build/screenshots/x.gif`; mandarlo con SendUserFile. Restaura la configuración de Dolphin al terminar.
+- En este PC Dolphin tarda **~40 s** en abrir la ventana: esperar con un bucle, no darlo por colgado a los 15 s.
+
+## 2b. Miis de verdad en Dolphin — `scripts/pull-miis.ps1`
+Con el juego abierto en la Wii (versión con "HKPL"), copia `RFL_Res.dat` y `RFL_DB.dat` de la consola a la NAND de
+Dolphin (`D:\Tools\Dolphin\Dolphin-x64\User\Wii\shared2\...`). Solo hace falta una vez. Son ficheros de Nintendo de la
+consola del usuario: **nunca al repositorio**.
+- **`RFL_Res.dat` no está en la NAND de la Wii** (va dentro de cada juego): `pull-miis.ps1` solo trae `RFL_DB.dat`. Las
+  piezas se sacaron del disco de Wii Sports Resort (CleanRip por wiiload → USB; `DolphinTool extract` de
+  `Common/Kokeshi/common.carc`, Yaz0 + U8). Van a `User\Wii\shared2\FaceLib\` (Dolphin) y a `apps\herri-kirolak\` (USB).
+- `scripts/wii-ls.ps1 /ruta/ …`: lista carpetas de la NAND con el juego abierto ("HKPL" con la ruta acabada en `/`).
+  Solo rutas de Miis (`allowedPull` en `updater.cpp`); la nota `# nand: … (err N)` de la telemetría da el error de ISFS
+  (-106 = no existe). `/title/.../content` no se puede listar desde el Homebrew Channel.
+- **Cuerpos de Resort**: `python tools/mii_body.py D:\Tools\wsr-tmp\u8\Kokeshi\G3D D:\Tools\wsr-tmp\hk_body.bin` y copiar
+  `hk_body.bin` a `User\Wii\shared2\FaceLib\` (Dolphin) y a `F:\apps\herri-kirolak\` (USB). Un tercer argumento elige la ropa de los jugadores: `vasca` (por defecto,
+  `tools/mii_outfit.py`) o `resort` (la de los bolos). Es la versión 2 (`HKB2`:
+  geometría, UV, oclusión y texturas de ropa); con un `hk_body.bin` viejo el juego usa los cuerpos propios.
+  `tools/brres_mdl0.py x.brres x.obj` lista huesos y objetos de un modelo y lo exporta en reposo (para mirarlo);
+  `tools/brres_tex0.py x.brres carpeta` vuelca sus texturas en PNG.
 
 ## 3. Mandar a la Wii — `scripts/deploy.ps1 [-Dol ruta]`
 1. Si el juego está abierto: **actualización en caliente** (TCP 4301). La Wii muestra "Eguneratzen…" y salta a la

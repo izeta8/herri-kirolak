@@ -1,5 +1,6 @@
 #pragma once
-// Escenario: plaza de pueblo con prado, montes, baserris, valla y público.
+// Escenario de aizkolaritza: el probaleku de Usurbil (empedrado, gradas con toldo, iglesia de San Salvador,
+// frontón cubierto y casas de Etxebeste e Irazu) con su público.
 #include "engine/mesh.h"
 #include "game/character.h"
 
@@ -15,7 +16,8 @@ public:
     void clapLight(float seconds);   // aplauso suave (solo manos)
     void drawShadow(const Vec3& pos, float rx, float rz, float alpha = 1.0f);
 
-    static constexpr Color HORIZON = rgba(0xC4, 0xE6, 0xF8);
+    static constexpr Color HORIZON = rgba(0xC8, 0xE2, 0xF2);
+    static constexpr int MAX_SPECTATORS = 32;
 
 private:
     struct Spectator {
@@ -24,8 +26,8 @@ private:
         Appearance look;
         CharacterModel* model;
     };
-    Mesh scenery_, clouds_, shadow_, crowdMesh_;
-    Spectator spectators_[28];
+    Mesh scenery_, clouds_, shadow_;
+    Spectator spectators_[MAX_SPECTATORS];
     int numSpectators_ = 0;
     float time_ = 0, cheerT_ = 0, clapT_ = 0;
     Vec3 hideCam_;

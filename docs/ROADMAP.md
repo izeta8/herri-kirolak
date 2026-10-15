@@ -57,6 +57,51 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Registro de deportes (`src/game/sports.cpp`) y `MatchConfig` común
 - [ ] Récords por deporte en save.dat (ahora son de aizkolaritza)
 
+## Estilo Wii (rama `estilo-wii-sports-resort`, pendiente de que el usuario lo vea en la Wii)
+- [x] UI y menús estilo Wii Sports Resort; fondo de menús = escenario 3D
+- [x] Aizkolaritza en el probaleku de Usurbil (iglesia, frontón, gradas, porterías, casas, empedrado, muros de cantos)
+- [x] Miis calcados a los de la Wii + peinado en el editor (Orrazkera); escena 9 = galería de Miis — **descartado**:
+  el usuario quiere las piezas oficiales, no imitaciones
+- [x] Módulo `mii/`: piezas oficiales y montaje de la cabeza y la cara; **probado en Dolphin** con los Miis del usuario
+  (galería, escena 9) comparando con Wii Sports Resort: se parecen. Gafas en espejo y cara de 256 px para jugadores
+- [x] `RFL_Res.dat` no está en la NAND de la Wii: sacado del disco de Wii Sports Resort del usuario y copiado a
+  `F:pps\herri-kirolak\` (USB) y a la NAND de Dolphin; el juego lo lee del USB si no está en la NAND
+- [ ] Ver los Miis en la Wii real (USB ya instalado) y comparar con Wii Sports Resort
+- [ ] Revisar caras: algún Mii se ve con los ojos pixelados de cerca (escala grande del ojo)
+- [x] Cada jugador elige uno de sus Miis del Canal Mii (Jokalariak: Mii + txapela); al arrancar se enlazan solos los
+  perfiles sin Mii; público con Miis de la consola (compila; **sin probar**)
+- [x] Cuerpo de Wii Sports Resort **sin brazos** (como en Resort): torso y piernas de `WS2_avaA1` sin los huesos del
+  brazo, manos sueltas `WS2_ava_hand1` (bola) y público `WS2_avaC1` (bala, base oscura, manos del color de la
+  camiseta); gerriko en la cintura. Comparado con los bolos de Resort en Dolphin y probado en las escenas 7 y 9.
+  (Primer intento con brazos y dedos —el cuerpo del paracaidismo— descartado: "parecen Pinocho")
+- [x] **Material de Resort** sacado del disco y de las decompilaciones (ogws, Skyward Sword): cuerpo, manos, público y
+  cabeza con el TEV de Resort y las dos lightmaps de EGG (difusa y brillos) calculadas en la CPU con las luces de la
+  bolera (`game/mii/light`); ropa con sus texturas (camisa hawaiana de los bolos). Cuerpos de los bolos: **A6 (hombre)
+  y B6 (mujer)**, que ya vienen sin brazos. `hk_body.bin` pasa a la versión 2 (`HKB2`). Probado en Dolphin (escenas 6,
+  7 y 9) y comparado con los bolos de Resort
+- [x] Cuerpos que se veían transparentes (se pintaba su interior): ahora con la cara frontal de GX, como Resort
+- [x] Altura/complexión: Resort **no las usa** (ninguna lectura en su `main.dol`; `GetBodyModelIndex` las ignora):
+  quitada nuestra escala aproximada, todos los Miis con el mismo cuerpo
+- [ ] Ver los cuerpos nuevos en la Wii real: **copiar el `hk_body.bin` v2 (con la ropa vasca)** (`D:\Tools\wsr-tmp\hk_body.bin`) al USB
+  (`F:pps\herri-kirolak\`); con el v1 el juego vuelve a los cuerpos propios
+- [ ] Público: Resort usa sus propios modelos (`Audience/G3D/WS2_common_avaC1.brres`, en otro archivo del disco); ahora
+  va el C1 de Kokeshi con la base casi negra medida en una captura
+- [ ] Luces por deporte: ahora siempre las de la bolera (`tuning::MII_LIGHTS`); cada escena de Resort trae las suyas
+  (`Common/<Escena>/Env/*.plight`, `*.plmap`)
+- [x] **Ropa vasca** en los jugadores (`tools/mii_outfit.py`, UV propias): hombre con chaqueta azul marino abierta,
+  camisa blanca, pañuelo de cuadros del color del jugador, gerriko rojo, pantalón azul a rayas, calcetines con las
+  cintas de las abarkas; mujer con chal oscuro (dibujo del color del jugador) y flecos, delantal blanco, blusa,
+  medias negras y alpargatas blancas. Público sin cambios (colores lisos). Probado en Dolphin (escenas 6 y 9)
+- [x] Caché de personajes: el espectador 33 pisaba al primer aizkolari (salía con cuerpo de público); ahora se
+  desaloja el menos usado y los modelos se piden en cada frame
+- [ ] Revisar el traje con el usuario (colores, pañuelo, chal) y en la Wii real
+- [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
+- [x] Tutorial "Nola jokatu" animado estilo Resort: Wii Remote en 3D, estela, JO!, tronco en V, 5 pasos
+  (`games/aizkolaritza/howto.cpp`); grabado en Dolphin, sin probar aún en la Wii
+- [ ] Marcador de la partida al estilo Resort
+- [ ] Más caras a elegir (ojos, cejas, bocas, narices) como en el editor de Miis
+- [ ] Juntar con `main` cuando lo apruebe
+
 ## Próximo
 - [ ] **Puntero IR en los menús** (además de la cruceta)
 - [ ] Probar la lehiaketa con 2-4 mandos reales
