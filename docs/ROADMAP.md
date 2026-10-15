@@ -115,9 +115,10 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Aviso de nunchuk obligatorio
 - [ ] Probar en la Wii real: moverse con el nunchuk, saque con A y latigazo (en Dolphin las teclas no llegaron: sin foco)
 - [ ] Ajustar el ritmo: velocidad de la pelota, alcance, ventana de tiempo, errores de la CPU (largos peloteos)
-- [ ] Choque entre los dos pelotaris (ahora se pueden solapar)
+- [x] Choque entre los dos pelotaris (`PLAYER_GAP`)
+- [x] Pantalla de prueba del latigazo con grabación guiada (escena 14)
 - [ ] Marca de bote: quitarla cuando el juego se lea bien sin ella (`SHOW_LANDING`)
-- [ ] Gesto del latigazo con datos reales (momento y fuerza) + pantalla de prueba
+- [ ] Gesto del latigazo con datos reales (momento y fuerza): grabar en la Wii con la pantalla de prueba
 - [ ] Entrenamendua (peloteo) y Lehiaketa 1v1 + resultados + récord
 - [ ] Frontón de Zarautz (fotos del usuario)
 - [ ] 2v2

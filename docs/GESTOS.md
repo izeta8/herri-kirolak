@@ -60,6 +60,10 @@ Decide el **momento** (el pico es el instante del golpe) y la **fuerza**; el lad
 | Resolver | en el pico (\|a\| < 0,85 × pico) si el pico ≥ `WHIP_MIN_G` (2,6 g) → evento `whip` | `WHIP_MIN_G`, `PEAK_DROP` |
 | Fuerza | (pico − 2,6) / (7,5 − 2,6) → 0..1 | `WHIP_FULL_G` |
 
+Pantalla de prueba: Jokatu → Pala → Kolpe proba (`games/pala/whiptest.cpp`, escena 14): gráfica de los 3 ejes y de
+\|a\| con las líneas de inicio y de golpe mínimo, fuerza y pico del último latigazo. **Botón 1 = grabación guiada**:
+pide por turnos LEUN eskuinetik / GOGOR eskuinetik / EZKERRETIK (revés) y etiqueta las lecturas con `S` / `F` / `B`.
+
 Valores puestos a ojo a partir del hachazo: **falta grabar latigazos reales** (suaves, normales, fuertes; de derecha
 y de revés) y ajustar con datos. También: comprobar el retraso entre el golpe real y el evento.
 

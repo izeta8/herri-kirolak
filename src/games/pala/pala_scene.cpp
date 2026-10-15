@@ -543,6 +543,18 @@ void PalaScene::update(float dt) {
     }
 
     for (int i = 0; i < n_; i++) updatePlayer(i, dt);
+    if (n_ == 2) {
+        // No se atraviesan: cada uno se aparta la mitad
+        Vec3 d = pl_[1].pel.pos - pl_[0].pel.pos;
+        d.y = 0;
+        float len = length(d);
+        if (len < PLAYER_GAP) {
+            Vec3 dir = len > 0.01f ? d * (1.0f / len) : Vec3(1, 0, 0);
+            Vec3 push = dir * ((PLAYER_GAP - len) * 0.5f);
+            pl_[0].pel.pos -= push;
+            pl_[1].pel.pos += push;
+        }
+    }
     for (int i = 0; i < numLabels_; i++) labels_[i].t += dt;
     while (numLabels_ > 0 && labels_[0].t > 1.4f) {
         memmove(labels_, labels_ + 1, sizeof(FloatLabel) * (numLabels_ - 1));

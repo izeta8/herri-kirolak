@@ -111,6 +111,8 @@ jugadores → rondas → personajes, con − para CPU) → escena del deporte. `
   pelota pasa más cerca del pelotari (historial hacia atrás + trayectoria prevista hacia delante); si está a menos de
   `REACH`, el adelanto/retraso da la dirección y la fuerza la profundidad (`doHit` calcula la velocidad para botar
   donde toca). Un golpe que llega pronto queda pendiente hasta que la pelota llega a su lado. Sin Nunchuk se para todo.
+  Los dos pelotaris no se acercan a menos de `PLAYER_GAP`.
+- `whiptest` — "Pala: kolpe proba": el latigazo en directo y grabación guiada para calibrarlo.
 
 ## Convenciones
 - Caras en orden antihorario → `GX_CULL_FRONT`; `MeshBuilder::tri()` orienta las caras solo con un vector "hacia fuera".

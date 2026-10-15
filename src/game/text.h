@@ -177,5 +177,8 @@ constexpr const char* STREAK = "Jarraian";
 constexpr const char* BEST = "Onena";
 constexpr const char* EARLY = "Goiz";
 constexpr const char* LATE = "Berandu";
+constexpr const char* WHIP_TEST = "Pala: kolpe proba";
+constexpr const char* WHIP_GUIDE[3] = {"LEUN eskuinetik", "GOGOR eskuinetik", "EZKERRETIK"};
+constexpr const char* WHIP_GUIDE_SHORT[3] = {"Leun", "Gogor", "Ezker"};
 
 }  // namespace txt

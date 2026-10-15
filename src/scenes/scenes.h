@@ -13,6 +13,7 @@ Scene* makeSwingTestScene();
 Scene* makeMiiGalleryScene();  // prueba: Miis de cerca
 Scene* makeAizkoScene(const MatchConfig& cfg);
 Scene* makePalaScene(const MatchConfig& cfg);
+Scene* makeWhipTestScene();  // pala: prueba del latigazo
 
 // Escenario compartido (se construye una vez)
 World& sharedWorld();

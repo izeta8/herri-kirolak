@@ -107,6 +107,7 @@ constexpr float REACH = 1.35f;          // m: distancia horizontal máxima a la 
 constexpr float REACH_Y_MIN = 0.1f, REACH_Y_MAX = 2.4f;
 constexpr float PLAYER_SPEED = 6.5f;    // m/s corriendo con el stick
 constexpr float PLAYER_ACCEL = 14.0f;   // suavizado de la carrera
+constexpr float PLAYER_GAP = 0.8f;      // m: los dos pelotaris no se acercan más que esto
 constexpr bool SHOW_LANDING = true;     // marca dónde va a botar la pelota (ayuda del prototipo)
 // CPU
 constexpr float BOT_TIMING_NOISE = 0.09f;  // s de error en el momento del golpe
