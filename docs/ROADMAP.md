@@ -100,7 +100,8 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
   (`games/aizkolaritza/howto.cpp`); grabado en Dolphin, sin probar aún en la Wii
 - [ ] Marcador de la partida al estilo Resort
 - [ ] Más caras a elegir (ojos, cejas, bocas, narices) como en el editor de Miis
-- [ ] Juntar con `main` cuando lo apruebe
+- [x] Juntado en `develop` (2026-10-15, aprobado el estilo: "me gusta el estilo conseguido")
+- [ ] Juntar `develop` con `main` cuando lo apruebe (tras probarlo en la Wii real)
 
 ## Próximo
 - [ ] **Puntero IR en los menús** (además de la cruceta)
