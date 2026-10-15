@@ -82,13 +82,19 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Cuerpos que se veían transparentes (se pintaba su interior): ahora con la cara frontal de GX, como Resort
 - [x] Altura/complexión: Resort **no las usa** (ninguna lectura en su `main.dol`; `GetBodyModelIndex` las ignora):
   quitada nuestra escala aproximada, todos los Miis con el mismo cuerpo
-- [ ] Ver los cuerpos nuevos en la Wii real: **copiar el `hk_body.bin` v2** (`D:\Tools\wsr-tmp\hk_body.bin`) al USB
+- [ ] Ver los cuerpos nuevos en la Wii real: **copiar el `hk_body.bin` v2 (con la ropa vasca)** (`D:\Tools\wsr-tmp\hk_body.bin`) al USB
   (`F:pps\herri-kirolak\`); con el v1 el juego vuelve a los cuerpos propios
 - [ ] Público: Resort usa sus propios modelos (`Audience/G3D/WS2_common_avaC1.brres`, en otro archivo del disco); ahora
   va el C1 de Kokeshi con la base casi negra medida en una captura
 - [ ] Luces por deporte: ahora siempre las de la bolera (`tuning::MII_LIGHTS`); cada escena de Resort trae las suyas
   (`Common/<Escena>/Env/*.plight`, `*.plmap`)
-- [ ] Ropa propia de aizkolari sobre el cuerpo de Resort (camisa blanca, pantalón) si el usuario la quiere
+- [x] **Ropa vasca** en los jugadores (`tools/mii_outfit.py`, UV propias): hombre con chaqueta azul marino abierta,
+  camisa blanca, pañuelo de cuadros del color del jugador, gerriko rojo, pantalón azul a rayas, calcetines con las
+  cintas de las abarkas; mujer con chal oscuro (dibujo del color del jugador) y flecos, delantal blanco, blusa,
+  medias negras y alpargatas blancas. Público sin cambios (colores lisos). Probado en Dolphin (escenas 6 y 9)
+- [x] Caché de personajes: el espectador 33 pisaba al primer aizkolari (salía con cuerpo de público); ahora se
+  desaloja el menos usado y los modelos se piden en cada frame
+- [ ] Revisar el traje con el usuario (colores, pañuelo, chal) y en la Wii real
 - [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
 - [x] Tutorial "Nola jokatu" animado estilo Resort: Wii Remote en 3D, estela, JO!, tronco en V, 5 pasos
   (`games/aizkolaritza/howto.cpp`); grabado en Dolphin, sin probar aún en la Wii

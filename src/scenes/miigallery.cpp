@@ -23,6 +23,12 @@ public:
             looks_[i].casual = i >= 3;
             if (i < mii::userCount()) looks_[i].user = (s8)i;  // los Miis de la consola, en su orden
         }
+        // El segundo jugador, la primera mujer de la consola: así se ven los dos trajes (hombre y mujer)
+        for (int k = 0; k < mii::userCount(); k++)
+            if (mii::user(k).female) {
+                looks_[1].user = (s8)k;
+                break;
+            }
     }
 
     void update(float dt) override {

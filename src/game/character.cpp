@@ -323,13 +323,8 @@ void CharacterModel::build(const Appearance& a) {
     const MiiInfo bodyInfo = mii ? miiFor(a) : MiiInfo();
     const int bodyKind = a.casual ? miibody::CROWD : miibody::playerKind(bodyInfo.female);
     if (mii && miibody::available(bodyKind)) {
+        // La ropa vasca (gerriko incluido, bajo la chaqueta) va en la textura del cuerpo: tools/mii_outfit.py
         body.build(bodyKind, shirt, skin, a.user >= 0 ? (int)bodyInfo.favColor : -1);
-        if (!a.casual) {
-            Color sashCol = (a.color == 0 || a.color == 7) ? rgba(0x22, 0x22, 0x2A) : rgba(0xC8, 0x1E, 0x1E);
-            b.cylinder(Vec3(0, -0.04f, 0), 1.0f, 1.0f, 0.08f, sashCol, sashCol, 18, true);
-            b.build(sash);
-            b.clear();
-        }
     }
     // Torso de Mii: estrecho, un poco más ancho en la cintura que en los hombros
     const float ys[] = {-0.03f, 0.0f, 0.12f, 0.26f, 0.37f, 0.44f, 0.475f, 0.48f};
@@ -472,15 +467,24 @@ void drawCharacter(const CharacterModel& m, const CharacterPose& p) {
 }
 
 // ------------------------------------------------------------------ caché
-static const int CACHE_SIZE = 32;
+// Se desaloja el que lleva más tiempo sin pedirse: quien dibuja un personaje lo pide en cada frame, así que un modelo
+// en uso nunca se reutiliza para otro (en rueda, el espectador 33 pisaba al primer aizkolari)
+static const int CACHE_SIZE = 48;
 static CharacterModel s_cache[CACHE_SIZE];
-static int s_next = 0;
+static u32 s_tick = 0;
 
 CharacterModel* characterCache(const Appearance& a) {
+    s_tick++;
     for (int i = 0; i < CACHE_SIZE; i++)
-        if (s_cache[i].built && s_cache[i].look == a) return &s_cache[i];
-    CharacterModel* m = &s_cache[s_next];
-    s_next = (s_next + 1) % CACHE_SIZE;
+        if (s_cache[i].built && s_cache[i].look == a) {
+            s_cache[i].lastUse = s_tick;
+            return &s_cache[i];
+        }
+    int oldest = 0;  // un hueco libre o el menos usado últimamente
+    for (int i = 0; i < CACHE_SIZE && s_cache[oldest].built; i++)
+        if (!s_cache[i].built || s_cache[i].lastUse < s_cache[oldest].lastUse) oldest = i;
+    CharacterModel* m = &s_cache[oldest];
     m->build(a);
+    m->lastUse = s_tick;
     return m;
 }

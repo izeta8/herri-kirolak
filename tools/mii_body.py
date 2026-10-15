@@ -3,7 +3,7 @@
 Los modelos y texturas son de Nintendo y salen del disco del propio usuario (Common/Kokeshi/common.carc, ver
 docs/WII-NOTAS.md): este script está en el repo, pero ni los .brres ni el .bin resultante se suben nunca.
 
-Uso: python tools/mii_body.py <carpeta G3D> <salida hk_body.bin>
+Uso: python tools/mii_body.py <carpeta G3D> <salida hk_body.bin> [vasca|resort]
 
 Formato (big endian, para la Wii):
   'HKB2', u32 numTexturas, u32 numCuerpos
@@ -31,7 +31,11 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from brres_mdl0 import Model, find_mdl0  # noqa: E402
-from brres_tex0 import BLOCKS, textures  # noqa: E402
+from brres_tex0 import BLOCKS, encode, textures  # noqa: E402
+import mii_outfit  # noqa: E402
+
+# Ropa de los jugadores: 'vasca' (tools/mii_outfit.py, arte propio) o 'resort' (la de los bolos, del disco)
+OUTFIT = sys.argv[3] if len(sys.argv) > 3 else 'vasca'
 
 CLOTHES = 'clothes.brres'
 # (nombre en el juego, modelo, material, (texA, texAWY, texB) y de qué brres salen), en el orden de miibody::Kind
@@ -67,7 +71,7 @@ def convert(path):
     wrap = wrap_tex0(d, m)
     bones = m.bones
     verts = []
-    for obj in m.objs:
+    for k_obj, obj in enumerate(m.objs):
         ids = obj['ids']
         pos = m.arrays['pos'][ids[0]]['data']
         nrm = m.arrays['nrm'][ids[1]]['data'] if ids[1] >= 0 else None
@@ -89,7 +93,7 @@ def convert(path):
                     if b is None:
                         b = bones[0]
                 n = n / (np.linalg.norm(n) + 1e-9)
-                verts.append((b['index'], p[:3], n, alpha, uv))
+                verts.append((b['index'], p[:3], n, alpha, uv, k_obj))
     # Triángulos entre dos huesos (cuello, tobillos): todo al hueso más cercano a la raíz, en reposo. El juego apenas
     # dobla esas articulaciones, así que se ven igual.
     def depth(i):
@@ -103,12 +107,30 @@ def convert(path):
         if all(v[0] == owner for v in tri):
             continue
         inv = np.linalg.inv(bones[owner]['world'])
-        for k, (bi, p, n, a, uv) in enumerate(tri):
+        for k, (bi, p, n, a, uv, ko) in enumerate(tri):
             w = bones[bi]['world']
             p2 = inv @ (w @ np.append(p, 1.0))
             n2 = inv[:3, :3] @ (w[:3, :3] @ n)
-            verts[t + k] = (owner, p2[:3], n2 / (np.linalg.norm(n2) + 1e-9), a, uv)
+            verts[t + k] = (owner, p2[:3], n2 / (np.linalg.norm(n2) + 1e-9), a, uv, ko)
     return bones, verts, wrap
+
+
+def basque(name, bones, verts, texs, tex_index):
+    """Ropa vasca (tools/mii_outfit.py): UV propias y texturas pintadas; la chaqueta del hombre es el objeto 0"""
+    jacket = 0 if name == 'player_m' else -1
+    uvs = []
+    for bi, p, n, a, _, ko in verts:
+        mp = bones[bi]['world'] @ np.append(p, 1.0)
+        uvs.append(mii_outfit.uv(bones[bi]['name'], None, ko, mp[:3], jacket))
+    uvs = mii_outfit.fix_seams(uvs)
+    verts = [v[:4] + (uvs[i], v[5]) for i, v in enumerate(verts)]
+    img, skin = mii_outfit.OUTFITS[name]()
+    ta, tb = f'hk_{name}_a', f'hk_{name}_b'
+    for tn, im, fmt in ((ta, img, 5), (tb, mii_outfit.skin_mask(skin), 0)):
+        im = np.clip(im, 0, 255).astype(np.uint8)
+        tex_index[tn] = len(texs)
+        texs.append((tn, fmt, im.shape[1], im.shape[0], encode(im, fmt)))
+    return verts, [tex_index[ta], -1, tex_index[tb]], (1, 0)  # repetir en u (vuelta), recortar en v
 
 
 def main():
@@ -129,10 +151,16 @@ def main():
 
     bodies = []
     for name, file, mat, tnames, tsrc in BODIES:
-        ti = [add_tex(tsrc or f'{file}.brres', t) for t in tnames]
         bones, verts, wrap = convert(f'{src}/{file}.brres')
+        if OUTFIT == 'vasca' and name in mii_outfit.OUTFITS:
+            verts, ti, wrap = basque(name, bones, verts, texs, tex_index)
+        else:
+            ti = [add_tex(tsrc or f'{file}.brres', t) for t in tnames]
+        if OUTFIT == 'vasca' and name == 'hand':  # la mano toma la piel de la ropa vasca
+            verts = [v[:4] + (mii_outfit.HAND_UV, v[5]) for v in verts]
         bodies.append((name, mat, ti, wrap, bones, verts))
-        print(f'{name}: {file}, {len(bones)} huesos, {len(verts) // 3} triángulos, texturas {tnames}')
+        used = [texs[i][0] for i in ti if i >= 0]
+        print(f'{name}: {file}, {len(bones)} huesos, {len(verts) // 3} triángulos, texturas {used}')
 
     blob = bytearray(b'HKB2' + struct.pack('>II', len(texs), len(bodies)))
     for name, fmt, w, h, data in texs:
@@ -144,7 +172,7 @@ def main():
             blob += b['name'].encode()[:15].ljust(16, b'\0')
             blob += struct.pack('>iI', b['parent'], 0)
             blob += struct.pack('>12f', *b['world'][:3, :].flatten())
-        for bi, p, n, a, uv in verts:
+        for bi, p, n, a, uv, _ in verts:
             blob += struct.pack('>BB2x8f', bi, a, *p, *n, *uv)
     open(out, 'wb').write(blob)
     print(out, len(blob), 'bytes,', len(texs), 'texturas')

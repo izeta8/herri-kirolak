@@ -60,6 +60,29 @@ def decode(d, o):
     return fmt, img
 
 
+def encode(img, fmt):
+    """Codifica un array RGBA uint8 (alto x ancho x 4) en formato GX: 0 = I4 (del canal R), 5 = RGB5A3"""
+    h, w = img.shape[:2]
+    bw, bh, _ = BLOCKS[fmt]
+    out = bytearray()
+    for by in range(0, h, bh):
+        for bx in range(0, w, bw):
+            blk = img[by:by + bh, bx:bx + bw].reshape(-1, 4).astype(int)
+            if fmt == 0:
+                v = blk[:, 0] >> 4
+                out += bytes(((v[0::2] << 4) | v[1::2]).astype(np.uint8))
+            elif fmt == 5:
+                for r, g, b, a in blk:
+                    if a >= 0xE0:
+                        x = 0x8000 | (r >> 3) << 10 | (g >> 3) << 5 | (b >> 3)
+                    else:
+                        x = (a >> 5) << 12 | (r >> 4) << 8 | (g >> 4) << 4 | (b >> 4)
+                    out += struct.pack('>H', x)
+            else:
+                raise ValueError(f'formato {fmt} no soportado')
+    return bytes(out)
+
+
 if __name__ == '__main__':
     from PIL import Image
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

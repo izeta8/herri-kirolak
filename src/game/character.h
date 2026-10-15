@@ -25,6 +25,7 @@ class MiiHead;
 
 struct CharacterModel {
     Appearance look;
+    u32 lastUse = 0;         // para la caché (characterCache)
     MiiHead* mii = nullptr;  // cabeza de Mii de verdad (si la consola tiene las piezas); si no, la nuestra
     Mesh beret;              // txapela para ponerla encima de la cabeza Mii
     miibody::Body body;      // cuerpo de Wii Sports Resort (si están sus modelos); si no, el nuestro
@@ -55,4 +56,5 @@ void drawCharacter(const CharacterModel& m, const CharacterPose& p);
 // Transformación del torso (para calcular dónde caen hombros, etc.)
 Xf characterTorsoXf(const CharacterPose& p);
 // Una caché sencilla de modelos para no reconstruirlos
+// Modelo de un aspecto, de la caché. Pedirlo en cada frame que se dibuje (no guardar el puntero entre frames)
 CharacterModel* characterCache(const Appearance& a);

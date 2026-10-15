@@ -547,7 +547,7 @@ void World::draw() {
 
     for (int i = 0; i < numSpectators_; i++) {
         Spectator& s = spectators_[i];
-        if (!s.model) s.model = characterCache(s.look);
+        s.model = characterCache(s.look);  // en cada frame: así la caché sabe que está en uso
         if (hidden(s)) continue;
         drawShadow(s.pos, 0.3f, 0.3f);
     }
