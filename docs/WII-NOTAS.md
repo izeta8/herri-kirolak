@@ -64,6 +64,9 @@
   pintadas cada frame; cada luz suma `lerp(negro, color·intensidad, degradado[32 + 31·n·L])` (10 degradados de 64
   texels, ver `game/mii/light.cpp`). Luces y lightmaps de cada escena en `Common/<Escena>/Env/*.plight` y `*.plmap`
   (formatos LGHT/LOBJ y LMAP/LTEX de EGG); el lightset de los Miis en el SCN0 de la escena ("Abatar_Lighset").
+- **Los modelos de Nintendo van en orden horario** (el frontal de GX; sus materiales dicen "cull back") y el motor
+  dibuja lo suyo al revés (`GX_CULL_FRONT`): los `.brres` hay que dibujarlos con `GX_CULL_BACK` (y la mano en espejo con
+  FRONT). Con el del motor se pintaba el interior y los cuerpos parecían transparentes en la cintura.
 - **GX escala las coordenadas de textura por coordenada, no por textura**: dos texturas de tamaño distinto no pueden
   compartir `GX_TEXCOORDn` (la ropa salía revuelta). Resort usa coordenadas separadas para texA (64×64) y texB (16×16).
 - Ropa: `clothes.brres` trae, por cuerpo, `_a` (dibujos claros), `_aw`/`_ay`/`_awy` (dibujos oscuros, para el favorito

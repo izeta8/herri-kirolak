@@ -79,6 +79,7 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
   bolera (`game/mii/light`); ropa con sus texturas (camisa hawaiana de los bolos). Cuerpos de los bolos: **A6 (hombre)
   y B6 (mujer)**, que ya vienen sin brazos. `hk_body.bin` pasa a la versión 2 (`HKB2`). Probado en Dolphin (escenas 6,
   7 y 9) y comparado con los bolos de Resort
+- [x] Cuerpos que se veían transparentes (se pintaba su interior): ahora con la cara frontal de GX, como Resort
 - [x] Altura/complexión: Resort **no las usa** (ninguna lectura en su `main.dol`; `GetBodyModelIndex` las ignora):
   quitada nuestra escala aproximada, todos los Miis con el mismo cuerpo
 - [ ] Ver los cuerpos nuevos en la Wii real: **copiar el `hk_body.bin` v2** (`D:\Tools\wsr-tmp\hk_body.bin`) al USB

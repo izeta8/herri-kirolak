@@ -138,6 +138,8 @@ void stage(u8 st, u8 coord, u32 map, u8 chan, u8 a, u8 b, u8 c, u8 d, u8 dest) {
 // El material del modelo, tal cual lo trae Resort (C0 = color favorito, C1 = piel, C2 = albedo)
 void setMaterial(const BodyDef& def, const Body& b, const BodyDef& clothes) {
     setVtxFormat();
+    // Los modelos de Nintendo van en orden horario (el frontal de GX, material "cull back"); el motor usa el contrario
+    GX_SetCullMode(GX_CULL_BACK);
     miilight::bind(def.material != MAT_CROWD);
     // Las dos texturas de ropa tienen tamaños distintos: cada una necesita su coordenada (GX escala por coordenada)
     GX_SetNumTexGens(3);
@@ -305,9 +307,9 @@ void draw(const Body& b, const Pose& p, Xf* head, Xf* waist) {
             Xf m = translation(c) * rotationOf(p.root) * rotationOf(chest >= 0 ? P[chest] : Xf()) *
                    Xf().scale(Vec3(hs * (s < 0 ? -1.0f : 1.0f), hs, hs)) * translation(Vec3(-tuning::MII_HAND_CX, 0, 0));
             miilight::loadModelMtx(m, hs);
-            if (s < 0) GX_SetCullMode(GX_CULL_BACK);  // el espejo da la vuelta a los triángulos (el motor usa FRONT)
+            if (s < 0) GX_SetCullMode(GX_CULL_FRONT);  // el espejo da la vuelta a los triángulos
             GX_CallDispList(hand.bones[0].dl, hand.bones[0].dlSize);
-            if (s < 0) GX_SetCullMode(GX_CULL_FRONT);
+            if (s < 0) GX_SetCullMode(GX_CULL_BACK);
         }
     }
     gfx::restore3D();
