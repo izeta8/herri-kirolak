@@ -108,20 +108,35 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [ ] Probar la lehiaketa con 2-4 mandos reales
 - [x] Siguiente deporte elegido: **palas** (reglas y controles en SPEC §6 y DECISIONES)
 
-## Fase 5 — Palas
-- [x] Prototipo en frontón provisional: cancha, pelota con física (frontis, pared, botes, chapa), pelotari con nunchuk,
-  golpe con botones (modo test) y saque (rama `palas`; probado en Dolphin con la CPU: escenas 11 y 13)
-- [x] CPU rival y reglas (tanto, falta, pasa, chapa, bi bote, kanpora; marcador a 10/15/22)
-- [x] Aviso de nunchuk obligatorio
-- [ ] Probar en la Wii real: moverse con el nunchuk, saque con A y latigazo (en Dolphin las teclas no llegaron: sin foco)
-- [ ] Ajustar el ritmo: velocidad de la pelota, alcance, ventana de tiempo, errores de la CPU (largos peloteos)
-- [x] Choque entre los dos pelotaris (`PLAYER_GAP`)
-- [x] Pantalla de prueba del latigazo con grabación guiada (escena 14)
-- [ ] Marca de bote: quitarla cuando el juego se lea bien sin ella (`SHOW_LANDING`)
-- [ ] Gesto del latigazo con datos reales (momento y fuerza): grabar en la Wii con la pantalla de prueba
-- [ ] Entrenamendua (peloteo) y Lehiaketa 1v1 + resultados + récord
-- [ ] Frontón de Zarautz (fotos del usuario)
-- [ ] 2v2
+## Fase 5 — Pala
+Diseño en `docs/SPEC.md` §6 (v2, habilidad). Código en `src/games/pala/`; constantes en `tuning.h` (sección Palas).
+**Cada paso es una sesión corta**: hacerlo, compilar, probar con la CPU en Dolphin (escenas 11 y 13), marcarlo aquí,
+commit + push en la rama `palas`. No hace falta la Wii hasta el paso 5.9.
+
+Hecho (prototipo v1):
+- [x] Frontón provisional, pelota con física y predicción, pelotari con pala, reglas, marcador 10/15/22, CPU básica
+- [x] Nunchuk obligatorio, choque entre pelotaris, sonidos, escenas 10–14, pantalla de prueba del latigazo
+
+Diseño v2 (en orden):
+- [ ] **5.1 Cámara isométrica cerca**: `PalaScene::updateCamera` con dirección fija desde atrás-derecha (p. ej.
+  (+0.55, +0.65, +0.75) normalizado), distancia ~12 m, FOV ~32; mira al punto medio entre pelotaris y pelota, con
+  límites dentro de la cancha; sin girar. Revisar con capturas: frontis, pared y pelotaris grandes a la vista.
+- [ ] **5.2 Punto dulce**: en `tryHit`/`doHit`, calidad = f(tiempo) × f(distancia) con `SWEET_TIME`, `SWEET_DIST`,
+  `SWEET_DIST_TOL`; calidad baja → menos velocidad, más altura y error de dirección; muy baja → chapa o fuera.
+  Etiqueta *Bikain! / Ondo / Txarto* y destello. Ventanas más estrechas que ahora (`HIT_EARLY/LATE`, `REACH`).
+- [ ] **5.3 Apuntar con el stick**: guardar el stick de los últimos ~150 ms en `Player`; en `doHit` el destino sale
+  del stick (← pared, → ancho, ↓ ras de chapa, ↑ globo) más el error de la calidad. Al empezar el latigazo el
+  pelotari frena (pregunta abierta en SPEC). En test: WASD + 1/2.
+- [ ] **5.4 Riesgo con la fuerza**: las ventanas de 5.2 se estrechan con la fuerza; suave + ↓ = dejada.
+- [ ] **5.5 Volea y bote pronto**: en `closest`/`doHit`, saber si es antes del bote o <80 ms tras él; ventana más
+  corta, pelota más rápida, etiqueta *Bolea! / Bote pronto!*.
+- [ ] **5.6 Peloteo que se acelera**: `RALLY_SPEEDUP` por golpe bueno, con tope; se reinicia en cada tanto.
+- [ ] **5.7 CPU por niveles**: `BotLevel` (Erraza/Normala/Zaila) con error, velocidad, riesgo y colocación; que use
+  la puntería (pared/chapa) como el jugador. Elegir el nivel en `setup` (paso propio de la pala).
+- [ ] **5.8 HUD de habilidad**: indicador del último golpe (tiempo y sitio) y tarjeta "Nola jo" del entrenamiento.
+- [ ] **5.9 Wii real**: calibrar el latigazo con la grabación guiada (escena 14) y probar el tacto con el usuario.
+- [ ] 5.10 Entrenamendua y Lehiaketa completos + resultados + récord (récords por deporte en save.dat)
+- [ ] 5.11 Frontón de Zarautz (fotos del usuario) · 5.12 2v2
 
 ## Más adelante
 - [ ] Cansancio bien diseñado (desactivado ahora)

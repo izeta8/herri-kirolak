@@ -78,7 +78,7 @@ El aizkolari se sube **encima de un tronco tumbado** y corta **entre sus pies**.
 - Rival de la CPU (fantasma).
 - Distintos troncos (grosor y tipo de madera).
 
-## 6. Juego 2 — Palas (en diseño, 15/10/2026)
+## 6. Juego 2 — Pala (diseño v2 de habilidad, 16/10/2026)
 
 ### Cómo es en la vida real
 Pelota vasca con **pala de madera** en frontón (frontis + pared izquierda; el lado derecho abierto, con la grada).
@@ -87,27 +87,59 @@ izquierda) y **solo puede botar una vez** antes de devolverla (o se le da de vol
 la golpea; tiene que volver del frontis y caer entre la línea de **falta** y la de **pasa**. En la vida real se juega
 sobre todo por parejas (delantero y zaguero) y a 35–40 tantos.
 
-### Lo que hemos decidido
-- **1v1 primero** (mano a mano); después se amplía a **2v2**.
-- **Moverse con el nunchuk** (stick); el Wii Remote, en la otra mano, es la pala. **Nunchuk obligatorio**: sin él no
-  se juega a palas y se avisa en pantalla. La CPU no lo necesita.
-- **Golpe**: el **latigazo** del Wii Remote. Derecha o revés sale solo según por dónde viene la pelota. El gesto decide:
-  - **el momento**: pronto = pelota cruzada hacia el ancho (lado abierto); tarde = pegada a la pared izquierda;
-  - **la fuerza**: latigazo fuerte = pelota rápida y larga; suave = dejada.
-- **Saque**: pulsar **A** → el pelotari bota la pelota → **latigazo** cuando sube. Mal hecho (corto/largo) = falta.
-- **Partido a 10, 15 o 22 tantos** (se elige al empezar, como las rondas de aizkolaritza).
-- **Cámara detrás, viendo el frontis**, algo alta (como desde la grada del fondo). Los dos miran al mismo lado: una
-  sola pantalla, sin partirla.
-- Sitio: **frontón de Zarautz** (más adelante; primero un frontón provisional para el prototipo).
+### Diseño v2: juego de HABILIDAD (16/10/2026)
+El prototipo era demasiado permisivo (casi cualquier latigazo devolvía la pelota). Objetivo: que ganar dependa de
+**colocarse bien, golpear en el momento justo y elegir cuándo arriesgar**, como de verdad.
 
-### Reglas del prototipo (propuesta, ajustable)
+**Base que se mantiene**: 1v1 primero (luego 2v2) · moverse con el **Nunchuk (obligatorio)** · golpe = **latigazo**
+del Wii Remote · derecha/revés automático según el lado de la pelota · saque con **A (bota) + latigazo** · partidos a
+**10/15/22** · frontón provisional ahora, **Zarautz** después.
+
+**1. Punto dulce (tiempo + sitio).** Cada golpe tiene una *calidad* 0..1 = tiempo × sitio:
+- *Tiempo*: diferencia entre el pico del latigazo y el instante ideal (pelota a la altura de la pala). Perfecto
+  ±`SWEET_TIME` (≈40 ms); fuera de eso cae hasta 0 en `HIT_EARLY/LATE`.
+- *Sitio*: distancia horizontal pelota–pala respecto a la ideal (`SWEET_DIST`, el largo del brazo + pala). Muy cerca
+  (encima) o muy lejos (estirándose) = peor.
+- Calidad alta → la pelota va a donde se apunta, rápida y baja. Calidad baja → sale floja, alta y desviada; muy baja →
+  chapa o fuera. Se ve en pantalla: *Bikain! / Ondo / Txarto* + un destello en la pala.
+
+**2. Apuntar con el stick.** Lo que marca el stick en el momento del golpe (últimos ~150 ms) decide el golpe:
+- ← **pegada a la pared** · → **al ancho** (lado abierto) · neutro = **al centro**;
+- ↓ **a ras de chapa** (rápida y baja: gana tantos pero arriesga chapa) · ↑ **globo largo** (alta, al fondo, para
+  ganar tiempo). Las diagonales combinan.
+- El *momento* ya no decide la dirección: decide la **calidad** (y el error que se suma a la dirección elegida).
+
+**3. Riesgo con la fuerza.** Latigazo fuerte = pelota más rápida pero **punto dulce más pequeño** (ventana de tiempo y
+de sitio más estrechas). Suave = más control; suave + ↓ = **dejada**.
+
+**4. Volea y bote pronto.** Darle **antes del bote** (volea) o **justo al botar** (bote pronto, <~80 ms tras el bote)
+tiene una ventana más corta, pero la pelota sale más rápida y el rival tiene menos tiempo. Se anuncia (*Bolea!*,
+*Bote pronto!*).
+
+**5. Peloteo que se acelera.** Cada golpe bueno del peloteo sube la velocidad base un poco (`RALLY_SPEEDUP`, con tope);
+en el tanto siguiente vuelve a la base.
+
+**6. CPU por niveles.** Erraza / Normala / Zaila (se elige al preparar el partido). El nivel cambia su error de tiempo,
+su velocidad, lo que arriesga (chapa, pared) y lo bien que se coloca. La difícil busca la pared y la chapa.
+
+**7. Cámara isométrica, más cerca.** Fija en diagonal desde **atrás y a la derecha** (lado de la grada), en alto
+(~35–40°), con FOV estrecho; **no gira**, solo se desplaza siguiendo el centro entre los pelotaris y la pelota (con
+límites). Los pelotaris se ven grandes; el frontis y la pared izquierda siguen a la vista.
+
+Se mantiene la **marca de bote** (ayuda) de momento.
+
+### Reglas (sin cambios)
 - Tanto perdido si la pelota: da en la chapa o por debajo, por encima de la línea de arriba, fuera de la cancha o del
   lado abierto antes de botar, bota dos veces, o no llega al frontis.
-- Saca el que ganó el tanto anterior (como en pelota). Saque a un bote entre falta y pasa.
+- Saca el que ganó el tanto anterior. Saque a un bote entre falta y pasa.
 
 ### Modos
-1. **Entrenamendua**: peloteo contra el frontis (sin rival) con tarjeta "Nola jo".
-2. **Lehiaketa**: 1v1 humano contra humano o contra la CPU. Resultados y récord (tantos de diferencia / racha).
+1. **Entrenamendua**: peloteo contra el frontis con tarjeta "Nola jo"; cuenta la racha.
+2. **Lehiaketa**: 1v1 humano contra humano o contra la CPU (con nivel). Resultados y récord.
+
+### Preguntas abiertas
+- ¿El stick apunta y mueve a la vez? Propuesta: al empezar el latigazo (`whipStart`) el pelotari frena y el stick de
+  ese momento es la puntería (estilo Mario Tennis). Decidir al probar.
 
 ## 7. Otros juegos (después del MVP, uno por uno)
 Harri-jasotzea, Sokatira, Trontza, Txingak, Lasto altxatzea, Estropadak, Segalariak.
