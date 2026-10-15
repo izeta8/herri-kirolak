@@ -124,9 +124,12 @@ Diseño v2 (en orden):
 - [ ] **5.2 Punto dulce**: en `tryHit`/`doHit`, calidad = f(tiempo) × f(distancia) con `SWEET_TIME`, `SWEET_DIST`,
   `SWEET_DIST_TOL`; calidad baja → menos velocidad, más altura y error de dirección; muy baja → chapa o fuera.
   Etiqueta *Bikain! / Ondo / Txarto* y destello. Ventanas más estrechas que ahora (`HIT_EARLY/LATE`, `REACH`).
-- [ ] **5.3 Apuntar con el stick**: guardar el stick de los últimos ~150 ms en `Player`; en `doHit` el destino sale
-  del stick (← pared, → ancho, ↓ ras de chapa, ↑ globo) más el error de la calidad. Al empezar el latigazo el
-  pelotari frena (pregunta abierta en SPEC). En test: WASD + 1/2.
+- [ ] **5.3 Apuntar con Z + stick (mira en las paredes) y biparetas**: con Z mantenida el pelotari se planta y el
+  stick mueve una mira (por jugador) sobre el frontis y la pared izquierda (un recorrido continuo: pared → txoko →
+  frontis); dibujarla en 3D sobre la pared. En `doHit`, resolver la velocidad para que la pelota dé en la mira
+  (si es la pared, sale bipareta con la física de `Ball`) con la velocidad de la fuerza; error según la calidad.
+  Comprobar con `BallPath` que la bipareta vuelve dentro de la cancha. CPU: elige mira (también biparetas).
+  Test en Dolphin: LSHIFT = Z, WASD.
 - [ ] **5.4 Riesgo con la fuerza**: las ventanas de 5.2 se estrechan con la fuerza; suave + ↓ = dejada.
 - [ ] **5.5 Volea y bote pronto**: en `closest`/`doHit`, saber si es antes del bote o <80 ms tras él; ventana más
   corta, pelota más rápida, etiqueta *Bolea! / Bote pronto!*.

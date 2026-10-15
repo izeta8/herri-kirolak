@@ -103,11 +103,19 @@ del Wii Remote · derecha/revés automático según el lado de la pelota · saqu
 - Calidad alta → la pelota va a donde se apunta, rápida y baja. Calidad baja → sale floja, alta y desviada; muy baja →
   chapa o fuera. Se ve en pantalla: *Bikain! / Ondo / Txarto* + un destello en la pala.
 
-**2. Apuntar con el stick.** Lo que marca el stick en el momento del golpe (últimos ~150 ms) decide el golpe:
-- ← **pegada a la pared** · → **al ancho** (lado abierto) · neutro = **al centro**;
-- ↓ **a ras de chapa** (rápida y baja: gana tantos pero arriesga chapa) · ↑ **globo largo** (alta, al fondo, para
-  ganar tiempo). Las diagonales combinan.
-- El *momento* ya no decide la dirección: decide la **calidad** (y el error que se suma a la dirección elegida).
+**2. Apuntar con Z + stick (16/10, idea del usuario).** El stick **mueve** al pelotari por la cancha (tiene que estar
+físicamente bien colocado para llegar a la pelota). **Manteniendo Z**, el pelotari se planta y el stick mueve una
+**mira sobre las paredes** (frontis y pared izquierda): adónde va el golpe. Moverse y apuntar no se pueden hacer a la
+vez: hay que decidir cuándo dejar de correr para apuntar.
+- La mira recorre el frontis (izquierda/derecha, arriba/abajo: cerca de la chapa = rápida y arriesgada; alta = globo)
+  y sigue por la **pared izquierda**. Si se apunta a la pared, la pelota da primero en ella y luego en el frontis:
+  **bipareta**, sale muy desviada hacia el ancho. Cuanto más cerca del frontis (txoko), más desvío.
+- El golpe se calcula para que la pelota **dé en el punto de la mira** con la velocidad de la fuerza; la física hace
+  el resto (rebotes reales en las dos paredes).
+- Sin Z la mira se queda donde estaba la última vez (al principio, en el centro del frontis).
+- El *momento* y el *sitio* deciden la **calidad**: con calidad baja, la pelota se desvía de la mira (error) y pierde
+  velocidad.
+- La **fuerza** sale de la aceleración del Wii Remote en el golpe (el pico del latigazo, como ahora).
 
 **3. Riesgo con la fuerza.** Latigazo fuerte = pelota más rápida pero **punto dulce más pequeño** (ventana de tiempo y
 de sitio más estrechas). Suave = más control; suave + ↓ = **dejada**.
@@ -136,10 +144,6 @@ Se mantiene la **marca de bote** (ayuda) de momento.
 ### Modos
 1. **Entrenamendua**: peloteo contra el frontis con tarjeta "Nola jo"; cuenta la racha.
 2. **Lehiaketa**: 1v1 humano contra humano o contra la CPU (con nivel). Resultados y récord.
-
-### Preguntas abiertas
-- ¿El stick apunta y mueve a la vez? Propuesta: al empezar el latigazo (`whipStart`) el pelotari frena y el stick de
-  ese momento es la puntería (estilo Mario Tennis). Decidir al probar.
 
 ## 7. Otros juegos (después del MVP, uno por uno)
 Harri-jasotzea, Sokatira, Trontza, Txingak, Lasto altxatzea, Estropadak, Segalariak.

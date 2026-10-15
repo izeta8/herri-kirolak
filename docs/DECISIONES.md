@@ -52,6 +52,7 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-16 | **Juego de habilidad**: punto dulce (tiempo + sitio), apuntar con el stick, riesgo con la fuerza, volea y bote pronto, peloteo que se acelera, CPU por niveles (SPEC §6 v2) | "Ahora no es en absoluto un juego de habilidad" |
 | 2026-10-16 | Cámara **isométrica y más cerca**, fija desde **atrás-derecha** (lado de la grada) | Descartó la lateral |
 | 2026-10-16 | No probar en la Wii todavía: **iterar el diseño primero**, por pasos pequeños apuntados en el ROADMAP | Tiene pocos tokens |
+| 2026-10-16 | **Apuntar con Z + stick**: el stick mueve; con Z mantenida el pelotari se planta y el stick mueve una mira en el frontis y la pared izquierda (biparetas). Fuerza = aceleración del golpe | Idea del usuario: "así es habilidad de la persona adónde tira" |
 | 2026-10-16 | De momento **se queda la marca de bote**; sin valoración de calidad por puntos en entrenamiento | No los eligió |
 
 ## Desarrollo
