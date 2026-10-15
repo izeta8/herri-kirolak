@@ -57,6 +57,26 @@
 - Navegar Resort en Dolphin: `IR/Auto-Hide = True` en `WiimoteNew.ini` (sin Nunchuk); el puntero solo sigue al ratón
   si se mueve poco a poco (`SetCursorPos` a saltos lo deja pegado al borde); en la elección de Mii, la **cruceta**
   (`keys.ps1 DOWN`, con la marca de tecla extendida) mueve la mano. Los bolos dan la mejor vista de cuerpo entero.
+- **Material de los Miis de Resort** (sacado de los `.brres` y de las decompilaciones públicas ogws —Wii Sports— y
+  zeldaret/ss —EGG—; nada de su código va al repo): TEV del cuerpo = `lerp(texA.rgb, C0 favorito, texA.a)` →
+  `lerp(·, C1 piel, texB.i)` → C2; luego `C2 × (lm0·RASA + RASC) + lm1·RASA`, con RASC = ambiente (100 en el lightset
+  de los Miis) y RASA = alfa del vértice (oclusión horneada). lm0/lm1 son `EGG::LightTexture`: matcaps de 32×32
+  pintadas cada frame; cada luz suma `lerp(negro, color·intensidad, degradado[32 + 31·n·L])` (10 degradados de 64
+  texels, ver `game/mii/light.cpp`). Luces y lightmaps de cada escena en `Common/<Escena>/Env/*.plight` y `*.plmap`
+  (formatos LGHT/LOBJ y LMAP/LTEX de EGG); el lightset de los Miis en el SCN0 de la escena ("Abatar_Lighset").
+- **GX escala las coordenadas de textura por coordenada, no por textura**: dos texturas de tamaño distinto no pueden
+  compartir `GX_TEXCOORDn` (la ropa salía revuelta). Resort usa coordenadas separadas para texA (64×64) y texB (16×16).
+- Ropa: `clothes.brres` trae, por cuerpo, `_a` (dibujos claros), `_aw`/`_ay`/`_awy` (dibujos oscuros, para el favorito
+  blanco 10, amarillo 2 o verde lima 3) y `_b` (máscara de piel). Bolos: A6 (camisa hawaiana abierta, pantalón corto
+  gris) y B6. La mano tiene una sola UV, que cae en la piel de la máscara. El público de los partidos es otro modelo
+  (`Audience/G3D/WS2_common_avaC1.brres`) con la base casi negra.
+- **`main.dol` de Resort** (7,3 MB, todo el juego): sale con `DolphinTool extract -i RZTP01.iso -p DATA -o carpeta`
+  (queda en `DATA/sys/`; con `-s sys/main.dol` no sale) y se desensambla con el objdump de devkitPPC
+  (`powerpc-eabi-objdump -D -b binary -m powerpc:750 -M 750cl -EB --adjust-vma=…` por sección). r2 = 0x806FE720.
+  Hallazgos: gestor de cuerpos en 0x80245EA0–0x80246CC8 (`GetBodyFileName` 0x8024604C con `G3D/WS2_ava%s.brres`,
+  `GetBodyModelIndex` 0x80246328 —solo tipo y sexo—, `GetClothesName` 0x80245FF4, variante por color 0x80245FCC),
+  escala de la cabeza RFL 0.08 (constructor 0x80246BE0). **Altura y complexión no se leen en ningún sitio**.
+  Desensamblado y archivos sueltos en `D:\Tools\wsr-tmp\re`, `full` (partición entera, 0,8 GB), `bwl` y `arc`.
 - Copia del disco en `D:\Tools\wsr-tmp` (ver su `LEEME.txt`): ISO para comparar en Dolphin y volver a sacar piezas.
   Se puede borrar cuando los Miis (cabeza y cuerpo) estén aprobados en la Wii; `cleanrip-usb\` es redundante ya.
 

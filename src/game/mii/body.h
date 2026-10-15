@@ -1,27 +1,29 @@
 #pragma once
 // Cuerpos de Mii de Wii Sports Resort, leídos de hk_body.bin: lo genera tools/mii_body.py a partir del disco del usuario y
-// NO va en el repositorio (ver docs/WII-NOTAS.md). Como en Resort, sin brazos: torso en pera y piernas (jugadores) o
-// torso de bala (público), y manos sueltas. Cada hueso se dibuja como una malla rígida.
-#include <vector>
-#include "engine/mesh.h"
+// NO va en el repositorio (ver docs/WII-NOTAS.md). Los de los bolos: A6 (hombre) y B6 (mujer), sin brazos y con manos
+// sueltas, y C1 (público, torso de bala). Se dibujan con su material de Resort: la ropa sale de su textura (camiseta del
+// color favorito, piel) y la luz de las lightmaps de game/mii/light. Cada hueso es una malla rígida.
+#include <gccore.h>
+#include "engine/gfx.h"
 
 namespace miibody {
 
-enum Kind { PLAYER = 0, CROWD = 1, HAND = 2, NUM_KINDS };
-enum Zone { SKIN = 0, SHIRT = 1, PANTS = 2, SHOE = 3 };
+enum Kind { PLAYER_M = 0, PLAYER_F = 1, CROWD = 2, HAND = 3, NUM_KINDS };
 
 bool init();             // carga hk_body.bin (false si no está: se usan los cuerpos propios)
 bool available(int kind);
+inline int playerKind(bool female) { return female ? PLAYER_F : PLAYER_M; }
 
-// Cuerpo de un Mii ya coloreado (una malla por hueso) y sus manos
+// Un cuerpo concreto: la geometría es común a todos los Miis (Resort no cambia las proporciones con la altura ni la
+// complexión); aquí van sus colores
 struct Body {
-    int kind = PLAYER;
-    std::vector<Mesh> parts;  // índice = hueso
-    Mesh hand;                // mano suelta (jugadores; el público las lleva en su modelo)
-    float sy = 1, sxz = 1;    // proporciones según la altura y la complexión del Mii
-    bool valid() const { return !parts.empty(); }
-    void build(int kind, const Color zoneColors[4], u8 height, u8 build);
-    void release();
+    int kind = -1;
+    GXColor shirt = {255, 255, 255, 255}, skin = {255, 255, 255, 255};
+    bool lightShirt = false;  // camiseta clara: ropa con los dibujos oscuros
+    bool valid() const { return kind >= 0; }
+    // favColor: color favorito del Mii (0..11) si la camiseta es ese color; -1 si es otro (se mira lo clara que es)
+    void build(int kind, Color shirt, Color skin, int favColor);
+    void release() { kind = -1; }
 };
 
 // Postura en coordenadas de mundo (la misma que usa CharacterPose)

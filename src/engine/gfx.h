@@ -56,6 +56,7 @@ void drawMesh(const Mesh& mesh, const Xf& model);
 // Para módulos con su propio formato de vértices (los Miis): carga la matriz del modelo (posición y normales) en
 // PNMTX0, y después restore3D() deja otra vez el estado que esperan drawMesh y el resto del motor.
 void loadModelMtx(const Xf& model, float normalScale = 1.0f);  // normalScale deshace una escala uniforme en las normales
+MtxP viewMtx();  // matriz de vista de la cámara de begin3D
 void restore3D();
 
 // Dibujo fuera de pantalla para generar texturas (p. ej. la cara de un Mii). Solo entre frames: se hace al empezar

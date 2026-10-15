@@ -319,11 +319,11 @@ void CharacterModel::build(const Appearance& a) {
         }
     }
     Color pantsCol = a.casual ? PANTS_MII : PANTS_WHITE;
-    // Cuerpo de Wii Sports Resort (con brazos y dedos) para los Miis de verdad
-    if (mii && miibody::available(a.casual ? miibody::CROWD : miibody::PLAYER)) {
-        const MiiInfo info = miiFor(a);
-        const Color zones[4] = {skin, shirt, pantsCol, rgba(0x4A, 0x48, 0x4C)};
-        body.build(a.casual ? miibody::CROWD : miibody::PLAYER, zones, info.height, info.build);
+    // Cuerpo de Wii Sports Resort (el de los bolos, según el sexo del Mii) para los Miis de verdad
+    const MiiInfo bodyInfo = mii ? miiFor(a) : MiiInfo();
+    const int bodyKind = a.casual ? miibody::CROWD : miibody::playerKind(bodyInfo.female);
+    if (mii && miibody::available(bodyKind)) {
+        body.build(bodyKind, shirt, skin, a.user >= 0 ? (int)bodyInfo.favColor : -1);
         if (!a.casual) {
             Color sashCol = (a.color == 0 || a.color == 7) ? rgba(0x22, 0x22, 0x2A) : rgba(0xC8, 0x1E, 0x1E);
             b.cylinder(Vec3(0, -0.04f, 0), 1.0f, 1.0f, 0.08f, sashCol, sashCol, 18, true);
@@ -422,7 +422,7 @@ static void drawResortCharacter(const CharacterModel& m, const CharacterPose& p)
     Xf head, waist;
     miibody::draw(m.body, bp, &head, &waist);
     if (m.sash.valid()) {
-        float r = tuning::MII_SASH_UNITS * tuning::MII_BODY_UNIT * m.body.sxz;
+        float r = tuning::MII_SASH_UNITS * tuning::MII_BODY_UNIT;
         gfx::drawMesh(m.sash, waist * Xf().scale(Vec3(r, 1, r * tuning::MII_SASH_DEPTH)));
     }
     if (m.mii && m.mii->ready()) {

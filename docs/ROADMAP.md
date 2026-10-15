@@ -74,10 +74,19 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
   brazo, manos sueltas `WS2_ava_hand1` (bola) y público `WS2_avaC1` (bala, base oscura, manos del color de la
   camiseta); gerriko en la cintura. Comparado con los bolos de Resort en Dolphin y probado en las escenas 7 y 9.
   (Primer intento con brazos y dedos —el cuerpo del paracaidismo— descartado: "parecen Pinocho")
-- [ ] Ver los cuerpos en la Wii real (USB ya con `hk_body.bin`)
-- [ ] Piernas algo más gruesas en Resort que las nuestras (o el pantalón blanco lo parece): revisar con el usuario
-- [ ] Proporciones por altura/complexión: fórmula aproximada (`MII_BODY_SY*`, `MII_BODY_SXZ*` en tuning.h); calibrar
-  con un Mii alto y uno bajo contra Resort
+- [x] **Material de Resort** sacado del disco y de las decompilaciones (ogws, Skyward Sword): cuerpo, manos, público y
+  cabeza con el TEV de Resort y las dos lightmaps de EGG (difusa y brillos) calculadas en la CPU con las luces de la
+  bolera (`game/mii/light`); ropa con sus texturas (camisa hawaiana de los bolos). Cuerpos de los bolos: **A6 (hombre)
+  y B6 (mujer)**, que ya vienen sin brazos. `hk_body.bin` pasa a la versión 2 (`HKB2`). Probado en Dolphin (escenas 6,
+  7 y 9) y comparado con los bolos de Resort
+- [x] Altura/complexión: Resort **no las usa** (ninguna lectura en su `main.dol`; `GetBodyModelIndex` las ignora):
+  quitada nuestra escala aproximada, todos los Miis con el mismo cuerpo
+- [ ] Ver los cuerpos nuevos en la Wii real: **copiar el `hk_body.bin` v2** (`D:\Tools\wsr-tmp\hk_body.bin`) al USB
+  (`F:pps\herri-kirolak\`); con el v1 el juego vuelve a los cuerpos propios
+- [ ] Público: Resort usa sus propios modelos (`Audience/G3D/WS2_common_avaC1.brres`, en otro archivo del disco); ahora
+  va el C1 de Kokeshi con la base casi negra medida en una captura
+- [ ] Luces por deporte: ahora siempre las de la bolera (`tuning::MII_LIGHTS`); cada escena de Resort trae las suyas
+  (`Common/<Escena>/Env/*.plight`, `*.plmap`)
 - [ ] Ropa propia de aizkolari sobre el cuerpo de Resort (camisa blanca, pantalón) si el usuario la quiere
 - [ ] Revisar con el usuario en la Wii: parecido de Miis y plaza, y fluidez (hay muchos más polígonos)
 - [x] Tutorial "Nola jokatu" animado estilo Resort: Wii Remote en 3D, estela, JO!, tronco en V, 5 pasos

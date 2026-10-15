@@ -56,12 +56,21 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
   raya de la nariz, barba y gafas con display lists indexadas (formato de vértices 2, s16), y la cara (ojos, cejas,
   boca, bigote, lunar) pintada en una textura RGB5A3 al empezar el frame (`gfx::offscreen*`, cola `mii::processPending`).
   Si no hay piezas (Dolphin sin copiarlas), `CharacterModel` usa nuestra cabeza de siempre. **Nada de esto va al repo.**
-- **`mii/body`** — cuerpo de Wii Sports Resort leído de `hk_body.bin` (`mii::readAsset`; lo genera
-  `tools/mii_body.py`). Una malla rígida por hueso coloreada por zonas (piel, camiseta, pantalón, zapato; la zona va
-  en cada vértice); la pose se calcula en espacio del modelo: inclinación del pecho y cabeza. Sin brazos: las manos son
-  la bola de Resort en `handL/handR` (la derecha en espejo); el público mueve sus manos (`handL/handR` del modelo).
+- **`mii/body`** — cuerpo de Wii Sports Resort leído de `hk_body.bin` v2 (`mii::readAsset`; lo genera
+  `tools/mii_body.py`): los de los bolos, A6 (hombre) y B6 (mujer) según `MiiInfo::female`, C1 (público) y la mano
+  `hand1`. La geometría es común (una display list por hueso, formato de vértices 4: posición, normal, alfa de oclusión
+  y UV) y `Body` solo guarda colores (camiseta = C0, piel = C1) y si la camiseta es clara (ropa `_awy`). Se dibuja con
+  el **TEV de Resort** (`setMaterial`: ropa = textura + color favorito, piel por máscara; luego la luz). La pose se
+  calcula en espacio del modelo: inclinación del pecho y cabeza. Sin brazos: las manos son la bola de Resort en
+  `handL/handR` (la derecha en espejo) con la ropa del cuerpo; el público mueve sus manos (`handL/handR` del modelo).
   `draw()` devuelve dónde van la cabeza (`head_set`) y el gerriko. Unidades de Resort × `MII_BODY_UNIT` (tuning.h).
-  `CharacterModel::body` lo usa si existe; si no, el cuerpo propio de antes.
+  Sin escala por altura ni complexión (Resort no la usa). `CharacterModel::body` lo usa si existe; si no, el cuerpo
+  propio de antes.
+- **`mii/light`** — la luz de los Miis de Resort: dos lightmaps de 32×32 (lm0 difusa, lm1 brillos y borde) indexadas
+  por la normal en cámara (`GX_TEXCOORD1`, `GX_TEXMTX0` + post-matriz "env camera"), que se repintan en la CPU cuando
+  gira la cámara con el algoritmo de `EGG::LightTexture` y las luces de la bolera (`tuning::MII_LIGHTS`). Cuerpo,
+  manos y cabeza (`MiiHead::draw`) hacen `albedo × (lm0·oclusión + ambiente) + lm1·oclusión`. Usar
+  `miilight::loadModelMtx` en vez de `gfx::loadModelMtx` para todo lo que lleve lightmaps.
   Jugadores = Miis de la consola: `Profile::mii` (índice + 1) → `Appearance::user`; `linkProfilesToMiis()` (al arrancar)
   y `setProfileMii()` en `scenes/common`. El público usa también esos Miis (`World::build`).
 - **Fondo de menús**: `ui::setBackground(drawMenuBackdrop)` (en `main.cpp`) pinta el escenario 3D detrás de los paneles

@@ -1,4 +1,5 @@
 #include "game/mii/mii.h"
+#include "game/mii/light.h"
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
@@ -656,30 +657,34 @@ void MiiHead::bakeMasks() {
 
 void MiiHead::draw(const Xf& model, bool blink) const {
     if (!ready()) return;
-    gfx::loadModelMtx(model * Xf().scale(scale_).translate(Vec3(-center_[0], -center_[1], -center_[2])), scale_);
+    miilight::loadModelMtx(model * Xf().scale(scale_).translate(Vec3(-center_[0], -center_[1], -center_[2])), scale_);
     GX_InvVtxCache();
-    // Luz del motor (luces 0 y 1 y el ambiente de begin3D) sobre un material blanco; el color sale de la TEV
-    GX_SetNumChans(1);
-    GX_SetChanCtrl(GX_COLOR0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0 | GX_LIGHT1, GX_DF_CLAMP, GX_AF_NONE);
-    GX_SetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHTNULL, GX_DF_NONE, GX_AF_NONE);
-    GX_SetChanMatColor(GX_COLOR0, (GXColor){255, 255, 255, 255});
-    GX_SetNumTexGens(1);
-    GX_SetNumTevStages(2);
+    // Material de RFL en Wii Sports: el color de cada pieza (etapa 0) va a C2 y se ilumina con las lightmaps de Resort:
+    // C2 × (lm0 + ambiente) + lm1 (game/mii/light)
+    miilight::bind(false);
+    GX_SetNumTexGens(2);
+    GX_SetNumTevStages(4);
     GX_SetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     GX_SetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_BLUE, GX_CH_GREEN);
-    GX_SetTevDirect(GX_TEVSTAGE0);
-    GX_SetTevDirect(GX_TEVSTAGE1);
-    // Etapa 1: multiplicar por la luz
-    GX_SetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GX_SetTevOrder(GX_TEVSTAGE1, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GX_SetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
-    GX_SetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-    GX_SetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GX_SetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    for (int st = GX_TEVSTAGE0; st <= GX_TEVSTAGE3; st++) {
+        GX_SetTevDirect(st);
+        GX_SetTevSwapMode(st, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    }
+    for (int st = GX_TEVSTAGE1; st <= GX_TEVSTAGE3; st++) {
+        GX_SetTevAlphaIn(st, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        GX_SetTevColorOp(st, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GX_SetTevAlphaOp(st, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    }
+    GX_SetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);  // lm0 + ambiente
+    GX_SetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASA, GX_CC_RASC);
+    GX_SetTevOrder(GX_TEVSTAGE2, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLORNULL);  // × color de la pieza
+    GX_SetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_C2, GX_CC_CPREV, GX_CC_ZERO);
+    GX_SetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD1, GX_TEXMAP2, GX_COLOR0A0);  // + lm1
+    GX_SetTevColorIn(GX_TEVSTAGE3, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASA, GX_CC_CPREV);
     // Etapa 0: color constante de cada pieza
     GX_SetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
     GX_SetTevKAlphaSel(GX_TEVSTAGE0, GX_TEV_KASEL_1);
-    GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG2);
     GX_SetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GX_SetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
     GX_SetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -716,11 +721,11 @@ void MiiHead::draw(const Xf& model, bool blink) const {
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLORNULL);
     if (cap_.dl && capTexBuf_) {
         GX_SetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_KONST, GX_CC_TEXC, GX_CC_KONST);
-        GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_DIVIDE_2, GX_TRUE, GX_TEVPREV);
+        GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_DIVIDE_2, GX_TRUE, GX_TEVREG2);
         GX_SetTevKColor(GX_KCOLOR0, FAVORITE[info_.favColor % 12]);
         GX_LoadTexObj((GXTexObj*)&capTex_, GX_TEXMAP0);
         drawPart(cap_);
-        GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG2);
     }
     if (info_.hairFlip) GX_SetCullMode(cullOn);
     if (faceTexBuf_) {

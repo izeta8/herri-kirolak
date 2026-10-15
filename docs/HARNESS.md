@@ -46,8 +46,10 @@ consola del usuario: **nunca al repositorio**.
   Solo rutas de Miis (`allowedPull` en `updater.cpp`); la nota `# nand: … (err N)` de la telemetría da el error de ISFS
   (-106 = no existe). `/title/.../content` no se puede listar desde el Homebrew Channel.
 - **Cuerpos de Resort**: `python tools/mii_body.py D:\Tools\wsr-tmp\u8\Kokeshi\G3D D:\Tools\wsr-tmp\hk_body.bin` y copiar
-  `hk_body.bin` a `User\Wii\shared2\FaceLib\` (Dolphin) y a `F:\apps\herri-kirolak\` (USB). `tools/brres_mdl0.py x.brres
-  x.obj` lista huesos y objetos de un modelo y lo exporta en reposo (para mirarlo).
+  `hk_body.bin` a `User\Wii\shared2\FaceLib\` (Dolphin) y a `F:\apps\herri-kirolak\` (USB). Es la versión 2 (`HKB2`:
+  geometría, UV, oclusión y texturas de ropa); con un `hk_body.bin` viejo el juego usa los cuerpos propios.
+  `tools/brres_mdl0.py x.brres x.obj` lista huesos y objetos de un modelo y lo exporta en reposo (para mirarlo);
+  `tools/brres_tex0.py x.brres carpeta` vuelca sus texturas en PNG.
 
 ## 3. Mandar a la Wii — `scripts/deploy.ps1 [-Dol ruta]`
 1. Si el juego está abierto: **actualización en caliente** (TCP 4301). La Wii muestra "Eguneratzen…" y salta a la

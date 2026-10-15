@@ -285,6 +285,8 @@ void loadModelMtx(const Xf& model, float normalScale) {
     GX_SetCurrentMtx(GX_PNMTX0);
 }
 
+MtxP viewMtx() { return s_view; }
+
 void restore3D() {
     s_mode = MODE_NONE;
     use3DFormat();
