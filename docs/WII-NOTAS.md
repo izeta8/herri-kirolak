@@ -69,6 +69,9 @@
   FRONT). Con el del motor se pintaba el interior y los cuerpos parecían transparentes en la cintura.
 - **GX escala las coordenadas de textura por coordenada, no por textura**: dos texturas de tamaño distinto no pueden
   compartir `GX_TEXCOORDn` (la ropa salía revuelta). Resort usa coordenadas separadas para texA (64×64) y texB (16×16).
+- En A6/B6 el pantalón, la cadera y las piernas tienen **una sola UV por hueso** (color plano de una tira de muestras
+  de la textura); solo la camisa y los zapatos tienen UV de verdad. Para pintar ropa propia hay que dar UV nuevas
+  (lo hace `tools/mii_outfit.py`).
 - Ropa: `clothes.brres` trae, por cuerpo, `_a` (dibujos claros), `_aw`/`_ay`/`_awy` (dibujos oscuros, para el favorito
   blanco 10, amarillo 2 o verde lima 3) y `_b` (máscara de piel). Bolos: A6 (camisa hawaiana abierta, pantalón corto
   gris) y B6. La mano tiene una sola UV, que cae en la piel de la máscara. El público de los partidos es otro modelo

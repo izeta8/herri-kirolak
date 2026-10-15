@@ -66,6 +66,10 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
   `draw()` devuelve dónde van la cabeza (`head_set`) y el gerriko. Unidades de Resort × `MII_BODY_UNIT` (tuning.h).
   Sin escala por altura ni complexión (Resort no la usa). `CharacterModel::body` lo usa si existe; si no, el cuerpo
   propio de antes.
+  Ropa de los jugadores: la pinta `tools/mii_outfit.py` (UV propias: ángulo alrededor del cuerpo × altura; mitad de
+  textura para el cuerpo y mitad para la chaqueta del hombre), con el mismo material: alfa = color del jugador.
+- **Caché de personajes** (`characterCache`): desaloja el menos usado; **pedir el modelo en cada frame** que se
+  dibuje, nunca guardar el puntero entre frames.
 - **`mii/light`** — la luz de los Miis de Resort: dos lightmaps de 32×32 (lm0 difusa, lm1 brillos y borde) indexadas
   por la normal en cámara (`GX_TEXCOORD1`, `GX_TEXMTX0` + post-matriz "env camera"), que se repintan en la CPU cuando
   gira la cámara con el algoritmo de `EGG::LightTexture` y las luces de la bolera (`tuning::MII_LIGHTS`). Cuerpo,
