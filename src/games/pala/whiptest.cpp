@@ -166,6 +166,19 @@ public:
             font::plain(txt::DO_A_STROKE, px + 105, 200, 18, UI_TEXT_LIGHT, ALIGN_CENTER);
         }
 
+        // Nunchuk: el stick (arriba = hacia el frontis) y los botones, para comprobar que todo responde
+        {
+            float nx = W - 30 - 150, ny = 366;
+            gfx::circle(nx, ny, 26, rgba(255, 255, 255, 200), 28);
+            gfx::ring(nx, ny, 26, 28, UI_TEAL, 28);
+            if (p.nunchuk) gfx::circle(nx + p.stickX * 19, ny - p.stickY * 19, 8, UI_TEAL, 16);
+            else font::plain(txt::CONNECT_NUNCHUK, nx, ny - 10, 13, UI_RED, ALIGN_CENTER);
+            const char* names[4] = {"Z", "C", "A", "B"};
+            const u32 bits[4] = {WPAD_NUNCHUK_BUTTON_Z, WPAD_NUNCHUK_BUTTON_C, WPAD_BUTTON_A, WPAD_BUTTON_B};
+            for (int k = 0; k < 4; k++)
+                ui::buttonIcon(nx + 46 + (k / 2) * 28, ny - 13 + (k % 2) * 26, names[k], 11,
+                               (p.held & bits[k]) ? UI_TEAL : rgba(0xB0, 0xB8, 0xC0));
+        }
         // Estado del detector y grabación
         bool swinging = p.whipSt == 1;
         font::draw(swinging || flash_ > 0.5f ? txt::HIT : "", W - 40, 26, 30, UI_RED, UI_BLUE_DARK, ALIGN_RIGHT);

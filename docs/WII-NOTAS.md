@@ -98,3 +98,10 @@
   cambia de escena. Cada "Berriro jokatu" crea otra escena → fuga. Solución: liberar en el destructor del objeto que la
   tiene (como `Fronton`, `Log` y `Chips`, sin copias) o hacerla `static`.
 
+## Nunchuk (pala)
+- El stick se lee de `WPADData::exp.nunchuk.js` (`ang` en grados desde arriba en el sentido del reloj, `mag` 0..1):
+  `stickX = sin(ang)`, `stickY = cos(ang)` (en `input.cpp`). **Sin comprobar en la Wii real**: en "Pala: kolpe proba"
+  (escena 14) el punto del stick tiene que ir hacia donde se empuja y Z/C/A/B se encienden al pulsarlos. Si va girado,
+  cambiar ahí la fórmula.
+- Z y C llegan en `WPAD_ButtonsHeld` como `WPAD_NUNCHUK_BUTTON_Z/C` (bits altos).
+
