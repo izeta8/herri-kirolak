@@ -5,6 +5,7 @@ namespace txt {
 constexpr const char* GAME_TITLE = "HERRI KIROLAK";
 constexpr const char* PRESS = "Sakatu";
 constexpr const char* PRESS_A_TAIL = "botoia";
+constexpr const char* TURN_ON_REMOTE = "Piztu Wii Remote-a";
 
 constexpr const char* PLAY = "Jokatu";
 constexpr const char* PLAYERS = "Jokalariak";

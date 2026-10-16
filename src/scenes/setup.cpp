@@ -16,9 +16,16 @@ namespace {
 
 enum Step { STEP_SPORT, STEP_MODE, STEP_PLAYERS, STEP_ROUNDS, STEP_LEVEL, STEP_CHARS };
 
+// Lo último que se eligió (mientras el juego esté encendido): "Jokatu" empieza con eso marcado
+MatchConfig s_last;
+
 class SetupScene : public Scene {
 public:
-    SetupScene() { enter(STEP_SPORT); }
+    SetupScene() {
+        cfg_ = s_last;
+        cfg_.demo = false;
+        enter(STEP_SPORT);
+    }
 
     void update(float dt) override {
         t_ += dt;
@@ -91,23 +98,26 @@ private:
             case STEP_PLAYERS:
                 menu_.count = clampv(sport(cfg_.sport).maxPlayers, 1, 4);
                 menu_.horizontal = true;
-                menu_.sel = cfg_.numPlayers - 1;
+                menu_.sel = clampv(cfg_.numPlayers - 1, 0, menu_.count - 1);  // lo recordado puede no caber en este deporte
                 break;
             case STEP_ROUNDS:
                 menu_.count = clampv(sport(cfg_.sport).maxRounds, 1, 3);
                 menu_.horizontal = true;
-                menu_.sel = cfg_.rounds - 1;
+                menu_.sel = clampv(cfg_.rounds - 1, 0, menu_.count - 1);
                 break;
             case STEP_LEVEL:
                 menu_.count = 3;
                 menu_.horizontal = true;
-                menu_.sel = cfg_.level;
+                menu_.sel = clampv(cfg_.level, 0, 2);
                 break;
             case STEP_CHARS:
                 charIdx_ = 0;
+                // Los mismos personajes que la última vez (si siguen existiendo y no se repiten); si no, el siguiente libre
                 for (int i = 0; i < 4; i++) {
-                    cfg_.profile[i] = nextFree(i, -1, 1);
-                    cfg_.bot[i] = false;
+                    int p = s_last.profile[i];
+                    bool ok = p >= 0 && p < MAX_PROFILES && save::data().profiles[p].used && !takenByOther(p, i);
+                    cfg_.profile[i] = ok ? p : nextFree(i, -1, 1);
+                    cfg_.bot[i] = i > 0 && s_last.bot[i];
                 }
                 break;
         }
@@ -175,6 +185,7 @@ private:
                 cfg_.profile[charIdx_] = nextFree(charIdx_, -1, 1);
                 spin_ = 1;
             } else {
+                s_last = cfg_;
                 scenes::go(sport(cfg_.sport).makeMatch(cfg_));
             }
         } else if (down & WPAD_BUTTON_B) {

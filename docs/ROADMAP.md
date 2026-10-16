@@ -153,6 +153,8 @@ Hallazgos y mejoras, en orden de impacto:
 - [x] Tutoriales "Nola jokatu": salen solos solo la primera vez (luego, en la pausa de los dos deportes) y se saltan
   con +
 - [x] Pausa en la lehiaketa: "Berriz hasi" y "Menura itzuli" piden confirmación (`ui::Confirm`)
+- [x] "Jokatu" recuerda lo último elegido (deporte, modo, jugadores, tantos/troncos, nivel, personajes y CPU)
+- [x] Título sin mandos: "Piztu Wii Remote-a"; ayudas de abajo dentro de la zona segura de la tele
 - [x] **Aukerak** (ajustes) en el menú principal: vibración, marca de bote de la pala, sensibilidad e inversiones del
   hachazo, y dónde se guarda
 

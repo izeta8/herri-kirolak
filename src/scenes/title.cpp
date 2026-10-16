@@ -130,7 +130,9 @@ public:
                    ALIGN_CENTER);
         font::draw(txt::GAME_TITLE, W / 2, y, 78, rgba(0x18, 0x8C, 0xDC), UI_WHITE, ALIGN_CENTER);
         float blink = 0.55f + 0.45f * sinf(t_ * 4);
-        if (t_ > 0.8f) {
+        if (t_ > 0.8f && input::connectedCount() == 0) {
+            font::draw(txt::TURN_ON_REMOTE, W / 2, 384, 30, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_CENTER, blink);
+        } else if (t_ > 0.8f) {
             float tw = font::width(txt::PRESS, 30) + font::width(txt::PRESS_A_TAIL, 30) + 48;
             float x = W / 2 - tw / 2;
             font::draw(txt::PRESS, x, 384, 30, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_LEFT, blink);
