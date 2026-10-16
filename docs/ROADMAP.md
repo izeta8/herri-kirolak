@@ -140,8 +140,8 @@ Pendiente:
 - [ ] Juntar `palas` con `develop` cuando el usuario lo apruebe
 
 ## Arreglos pendientes
-- [ ] Aizkolaritza: las mallas de `Log` (y `Chips`) no se liberan al cambiar de escena (fuga en cada "Berriro jokatu";
-  ver WII-NOTAS)
+- [x] Aizkolaritza: las mallas de `Log` y `Chips` se liberan al cambiar de escena (antes, fuga en cada "Berriro
+  jokatu"; ver WII-NOTAS)
 
 ## Más adelante
 - [ ] Cansancio bien diseñado (desactivado ahora)

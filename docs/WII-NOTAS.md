@@ -96,5 +96,5 @@
 ## Memoria: mallas dentro de una escena
 - `Mesh` no tiene destructor (a propósito): una malla que es miembro de una escena **se queda en memoria** cuando se
   cambia de escena. Cada "Berriro jokatu" crea otra escena → fuga. Solución: liberar en el destructor del objeto que la
-  tiene (como `Fronton`, sin copias) o hacerla `static`. Aizkolaritza (`Log`, `Chips`) todavía tiene esta fuga.
+  tiene (como `Fronton`, `Log` y `Chips`, sin copias) o hacerla `static`.
 

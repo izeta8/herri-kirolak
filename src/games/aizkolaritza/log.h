@@ -4,6 +4,15 @@
 
 class Log {
 public:
+    // Libera sus mallas al borrar la escena (si no, cada partida nueva las dejaba en memoria). No se copia.
+    Log() = default;
+    Log(const Log&) = delete;
+    Log& operator=(const Log&) = delete;
+    ~Log() {
+        half_[0].release();
+        half_[1].release();
+        stakes_.release();
+    }
     Vec3 pos{0, 0, 0};  // punto del suelo bajo el centro del tronco
     float depth[2] = {0, 0};  // profundidad de cada V (m): 0 = delante (+Z), 1 = detrás (-Z)
 
@@ -33,6 +42,13 @@ private:
 // Astillas que salen volando con cada hachazo
 class Chips {
 public:
+    Chips() = default;
+    Chips(const Chips&) = delete;
+    Chips& operator=(const Chips&) = delete;
+    ~Chips() {
+        mesh_[0].release();
+        mesh_[1].release();
+    }
     void init();
     void spawn(const Vec3& at, const Vec3& outward, int n, float energy);
     void update(float dt);
