@@ -22,7 +22,7 @@
 // START_SCENE (solo para pruebas): 0 título, 1 menú, 2 preparar partida, 3 jugadores, 4 récords,
 // 5 entrenamiento, 6 lehiaketa 4 CPU a la vez, 7 entrenamiento con la CPU, 8 kolpe proba, 9 galería de Miis,
 // 10 pala: entrenamiento, 11 pala: CPU contra CPU, 12 pala: jugador contra la CPU, 13 pala: entrenamiento de la CPU,
-// 14 pala: kolpe proba (latigazo)
+// 14 pala: kolpe proba (latigazo), 15 pala: CPU Zaila contra CPU Zaila a 2 tantos (final y biparetas)
 #ifndef START_SCENE
 #define START_SCENE 0
 #endif
@@ -54,14 +54,16 @@ static Scene* firstScene() {
         case 14: return makeWhipTestScene();
         case 10:
         case 11:
+        case 15:
         case 12:
         case 13:
             cfg.sport = 1;
             cfg.training = START_SCENE == 10 || START_SCENE == 13;
-            cfg.numPlayers = START_SCENE == 11 ? 2 : 1;
+            cfg.numPlayers = START_SCENE == 11 || START_SCENE == 15 ? 2 : 1;
             cfg.rounds = 1;
-            cfg.bot[0] = START_SCENE == 11 || START_SCENE == 13;
-            cfg.bot[1] = START_SCENE == 11;
+            cfg.bot[0] = START_SCENE == 11 || START_SCENE == 13 || START_SCENE == 15;
+            cfg.bot[1] = START_SCENE == 11 || START_SCENE == 15;
+            if (START_SCENE == 15) cfg.level = 2;  // la difícil: biparetas, dejadas
             return makePalaScene(cfg);
         default: return makeTitleScene();
     }

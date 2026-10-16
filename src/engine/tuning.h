@@ -142,14 +142,15 @@ constexpr BotLevel BOT_LEVELS[3] = {
 constexpr float BOT_MISTAKE_NOISE = 0.13f;
 // Cámara isométrica (desde atrás a la derecha, en alto) con zoom según la distancia de la pelota al frontis
 constexpr float CAM_DIR_X = 0.42f, CAM_DIR_Y = 0.38f, CAM_DIR_Z = 0.78f;  // del objetivo a la cámara (se normaliza)
-constexpr float CAM_FOV = 32.0f;
+constexpr float CAM_FOV = 30.0f;
+constexpr float CAM_FOV_MAX = 44.0f;      // para que quepa todo se abre el ángulo antes de alejarse (más perspectiva)
 constexpr float CAM_LOOK_UP = 1.6f;       // m por encima del objetivo a los que mira (para ver el frontis)
-constexpr float CAM_DIST_NEAR = 8.5f;      // pelota junto al frontis
-constexpr float CAM_DIST_FAR = 15.0f;      // pelota al fondo
-constexpr float CAM_DIST_MAX = 22.0f;      // tope al abrirse para no perder al pelotari
+constexpr float CAM_DIST_NEAR = 7.0f;      // pelota junto al frontis
+constexpr float CAM_DIST_FAR = 12.0f;      // pelota al fondo
+constexpr float CAM_DIST_MAX = 19.0f;      // tope al abrirse para no perder al pelotari
 constexpr float CAM_BALL_WEIGHT = 0.6f;    // el objetivo es la pelota con este peso; el resto, el pelotari que golpea
 constexpr float CAM_RATE = 2.6f;           // suavizado
-constexpr float CAM_MARGIN = 0.82f;        // fracción de la pantalla en la que tiene que caber el pelotari
+constexpr float CAM_MARGIN = 0.9f;         // fracción de la pantalla en la que tiene que caber el pelotari
 
 // --- Cuerpo de Mii (Wii Sports Resort, game/mii/body) ---
 // Unidades del modelo de Resort: hombros a 9.25 sobre los pies, cuello a 9.7

@@ -36,6 +36,7 @@ const int HIST_N = 32;  // 0.32 s de pelota hacia atrás (golpes tardíos)
 const int TRAIL_N = 8;  // estela de la pelota (frames)
 const int SWOOSH_N = 9; // estela de la pala (frames)
 const float XL = -COURT_W / 2, XR = COURT_W / 2;
+const float HOWTO_W = 256;  // ancho de la tarjeta "Nola jo"
 
 // Lo que "aprieta" cada jugador este frame: lo rellena el mando o la CPU
 struct Ctl {
@@ -117,6 +118,9 @@ public:
         fronton_.build();
         n_ = cfg_.training ? 1 : 2;
         target_ = palaPoints(cfg_.rounds);
+#if defined(START_SCENE) && START_SCENE == 15
+        target_ = 2;  // prueba: partido corto para ver el final y los resultados
+#endif
         level_ = BOT_LEVELS[clampv(cfg_.level, 0, 2)];
         for (int i = 0; i < n_; i++) {
             Player& p = pl_[i];
@@ -188,7 +192,8 @@ private:
     float shake_ = 0, hitstop_ = 0;
     Vec3 camTarget_;
     float camDist_ = 12;
-    mutable float camDistTry_ = 12;
+    mutable float camDistTry_ = 12, camFovTry_ = CAM_FOV;
+    float camFov_ = CAM_FOV;
     bool paused_ = false;
     ui::ListMenu pauseMenu_, resultsMenu_;
     float resultsT_ = 0;
@@ -420,7 +425,7 @@ void PalaScene::doHit(int i, const HitInfo& h) {
     else addLabel(txt::HIT_BAD, lp, rgba(0xC8, 0xC8, 0xD0), 0.9f);
     if (h.volley) addLabel(txt::VOLLEY, lp + Vec3(0, 0.9f, 0), UI_TEAL_GLOW, 0.8f);
     else if (h.bp) addLabel(txt::BOTE_PRONTO, lp + Vec3(0, 0.9f, 0), UI_TEAL_GLOW, 0.8f);
-    if (u < -1.05f && !serve) addLabel(txt::BIPARETA, aimPoint(u, 2.5f), UI_GOLD, 0.9f);
+    if (u < -1.05f && !serve) addLabel(txt::BIPARETA, lp + Vec3(0, h.volley || h.bp ? 1.8f : 0.9f, 0), UI_GOLD, 0.8f);
     addFx(1, P, h.q >= Q_GREAT ? UI_GOLD : UI_WHITE, 0.6f + 0.8f * h.strength * h.q);
     float pan = clampv(P.x / 6.0f, -1.0f, 1.0f);
     audio::play(SFX_PALA, 0.5f + 0.5f * h.strength, frand(0.95f, 1.05f) + 0.12f * h.strength + (h.q < Q_GOOD ? -0.15f : 0), pan);
@@ -827,7 +832,7 @@ bool PalaScene::inView(const Vec3& eye, const Vec3& q) const {
     if (z < 1.0f) return false;
     Vec3 right = normalize(cross(f, Vec3(0, 1, 0)));
     Vec3 up = cross(right, f);
-    float t = tanf(CAM_FOV * 0.5f * DEG) * CAM_MARGIN;
+    float t = tanf(camFovTry_ * 0.5f * DEG) * CAM_MARGIN;
     float aspect = gfx::widescreen() ? 16.0f / 9.0f : 4.0f / 3.0f;
     return fabsf(dot(v, up) / z) < t && fabsf(dot(v, right) / z) < t * aspect;
 }
@@ -844,16 +849,19 @@ void PalaScene::updateCamera(float dt) {
     float zk = clampv(ball.z / COURT_LEN, 0.0f, 1.0f);
     float dist = lerpf(CAM_DIST_NEAR, CAM_DIST_FAR, smooth01(zk));
     if (state_ == ST_SERVE || (state_ == ST_RALLY && ball_.drop)) dist = CAM_DIST_NEAR + 1.0f;
-    // Que quepan el que golpea (pies y cabeza), la pelota y los humanos
-    for (int k = 0; k < 40 && dist < CAM_DIST_MAX; k++) {
+    // Que quepan el que golpea (pies y cabeza), la pelota y los humanos: primero se abre el ángulo, luego se aleja
+    float fov = CAM_FOV;
+    for (int k = 0; k < 60 && dist < CAM_DIST_MAX; k++) {
         Vec3 eye = target + dir * dist;
         camDistTry_ = dist;
+        camFovTry_ = fov;
         bool ok = inView(eye, pl_[focus].pel.pos) && inView(eye, pl_[focus].pel.pos + Vec3(0, 1.7f, 0)) &&
                   inView(eye, ball);
         for (int i = 0; i < n_; i++)
             if (!pl_[i].bot) ok = ok && inView(eye, pl_[i].pel.pos) && inView(eye, pl_[i].pel.pos + Vec3(0, 1.7f, 0));
         if (ok) break;
-        dist += 0.5f;
+        if (fov < CAM_FOV_MAX) fov += 2.0f;
+        else dist += 0.5f;
     }
     if (state_ == ST_INTRO) {
         float k = smooth01(stateT_ / 2.2f);
@@ -865,6 +873,7 @@ void PalaScene::updateCamera(float dt) {
     }
     camTarget_ = approachv(camTarget_, target, CAM_RATE, dt);
     camDist_ = approach(camDist_, dist, CAM_RATE * 0.8f, dt);
+    camFov_ = approach(camFov_, state_ == ST_INTRO || state_ == ST_FINISH || state_ == ST_RESULTS ? CAM_FOV : fov, CAM_RATE, dt);
 }
 
 void PalaScene::draw() {
@@ -876,7 +885,7 @@ void PalaScene::draw() {
     Vec3 dir = normalize(Vec3(CAM_DIR_X, CAM_DIR_Y, CAM_DIR_Z));
     cam.eye = camTarget_ + dir * camDist_ + jitter;
     cam.target = camTarget_ + Vec3(0, CAM_LOOK_UP, 0) + jitter * 0.5f;
-    cam.fov = CAM_FOV;
+    cam.fov = camFov_;
     cam.zfar = 400;
     gfx::begin3D(cam);
     gfx::setFog(true, 70.0f, 260.0f, World::HORIZON);
@@ -1071,21 +1080,25 @@ void PalaScene::drawHud() {
                 float x = cx + (t - 1) * 104;
                 bool on = t == type;
                 gfx::roundRect(x - 48, cy - 16, 96, 32, 16, on ? UI_TEAL : rgba(0x10, 0x30, 0x48, 110));
-                if (keys[t][0]) ui::buttonIcon(x - 34, cy, keys[t], 11, on ? UI_WHITE : rgba(0x80, 0x88, 0x94));
-                font::plain(txt::SHOT_NAMES[t], x + (keys[t][0] ? 8 : 0), cy - 11, 19, on ? UI_WHITE : rgba(0xD0, 0xE0, 0xE8), ALIGN_CENTER);
+                if (keys[t][0]) ui::buttonIcon(x - 33, cy, keys[t], 11, on ? UI_TEAL_GLOW : rgba(0x80, 0x88, 0x94));
+                font::plain(txt::SHOT_NAMES[t], x + (keys[t][0] ? 10 : 0), cy - 11, 19, on ? UI_WHITE : rgba(0xD0, 0xE0, 0xE8), ALIGN_CENTER);
             }
         }
     }
 
-    // Saque
+    // Saque (en el entrenamiento, a la izquierda de la tarjeta "Nola jo")
+    bool howTo = cfg_.training && (state_ == ST_SERVE || state_ == ST_INTRO) && !pl_[0].bot;
     if (state_ == ST_SERVE && !pl_[server_].bot) {
+        // Abajo a la derecha, sobre la contracancha: arriba están el frontis y la mira
+        float cx = W * 0.78f, cy = 286;
         float s = 1.0f + 0.04f * sinf(time_ * 6);
-        font::draw(txt::SERVE, W / 2, 128, 48 * s, UI_GOLD, rgba(0x60, 0x30, 0x10), ALIGN_CENTER);
-        float tw = font::width(txt::SERVE_HOW, 28);
-        font::draw(txt::SERVE_HOW, W / 2 + 14, 184, 28, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_CENTER);
-        ui::buttonIcon(W / 2 - tw / 2 - 8, 200, "A", 15);
+        font::draw(txt::SERVE, cx, cy, 46 * s, UI_GOLD, rgba(0x60, 0x30, 0x10), ALIGN_CENTER);
+        float tw = font::width(txt::SERVE_HOW, 24);
+        font::draw(txt::SERVE_HOW, cx + 13, cy + 52, 24, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_CENTER);
+        ui::buttonIcon(cx - tw / 2 - 6, cy + 66, "A", 13);
+        (void)howTo;
     }
-    if (cfg_.training && (state_ == ST_SERVE || state_ == ST_INTRO) && !pl_[0].bot) drawHowTo();
+    if (howTo) drawHowTo();
     if (state_ == ST_POINT && !cfg_.training && lastWinner_ >= 0 && stateT_ > 0.5f) {
         snprintf(buf, sizeof(buf), txt::POINT_FOR, pl_[lastWinner_].prof->name);
         font::draw(buf, W / 2, 140, 44, UI_WHITE, UI_TEAL, ALIGN_CENTER, smooth01((stateT_ - 0.5f) / 0.3f));
@@ -1114,13 +1127,13 @@ void PalaScene::drawHud() {
 // Tarjeta "Nola jo" del entrenamiento: los controles de la pala
 void PalaScene::drawHowTo() {
     const float W = gfx::screenW();
-    float pw = 300, ph = 36 + 6 * 34, px = W - pw - 24, py = 110;
+    float pw = HOWTO_W, ph = 36 + 6 * 32, px = 20, py = 112;
     gfx::roundRectGrad(px, py, pw, ph, 20, UI_GLASS_TOP, UI_GLASS_BOTTOM);
     font::plain(txt::HOW_TO, px + pw / 2, py + 6, 26, UI_TEAL, ALIGN_CENTER);
     for (int i = 0; i < 6; i++) {
-        float y = py + 40 + i * 34;
-        font::plain(txt::PALA_HOW[i][0], px + 16, y, 20, UI_TEXT);
-        font::plain(txt::PALA_HOW[i][1], px + 128, y + 2, 17, UI_TEXT_LIGHT);
+        float y = py + 40 + i * 32;
+        font::plain(txt::PALA_HOW[i][0], px + 14, y, 19, UI_TEXT);
+        font::plain(txt::PALA_HOW[i][1], px + 128, y + 2, 16, UI_TEXT_LIGHT);
     }
 }
 

@@ -118,19 +118,20 @@ Hecho (prototipo v1):
 - [x] Nunchuk obligatorio, choque entre pelotaris, sonidos, escenas 10–14, pantalla de prueba del latigazo
 
 Diseño v2 (en orden; trabajo autónomo del 16/10, ver SPEC §6):
-- [ ] **5.1 Cámara isométrica cerca que sigue a la pelota** (`updateCamera`): dirección fija atrás-derecha, distancia
+- [x] **5.1 Cámara isométrica cerca que sigue a la pelota** (`updateCamera`): dirección fija atrás-derecha, distancia
   y posición a lo largo de la cancha según la z de la pelota, tirando hacia el humano.
-- [ ] **5.2 Controles**: `Ctl` por jugador (stick, Z, A, B, latigazo) que rellena el mando o la CPU; Z + stick mueve
+- [x] **5.2 Controles**: `Ctl` por jugador (stick, Z, A, B, latigazo) que rellena el mando o la CPU; Z + stick mueve
   la mira (pared izquierda → txoko → frontis) y planta al pelotari; A/B/nada = largo/dejada/media. Mira 3D en la pared.
-- [ ] **5.3 Golpe nuevo** (`doHit`): dirección hacia la mira (bipareta si es la pared), velocidad por la fuerza, altura
+- [x] **5.3 Golpe nuevo** (`doHit`): dirección hacia la mira (bipareta si es la pared), velocidad por la fuerza, altura
   buscada simulando con `Ball` para que bote a la profundidad del tipo de golpe; punto dulce (tiempo × sitio) que da
   error y pierde velocidad; ventanas más estrechas con la fuerza; volea / bote pronto; peloteo que se acelera.
-- [ ] **5.4 CPU por niveles** (Erraza/Normala/Zaila) usando los mismos `Ctl` (se coloca, planta, apunta, A/B, golpea);
+- [x] **5.4 CPU por niveles** (Erraza/Normala/Zaila) usando los mismos `Ctl` (se coloca, planta, apunta, A/B, golpea);
   paso de nivel en `setup`.
 - [ ] **5.5 HUD y efectos**: valoración del golpe (Bikain!/Ondo/Txarto, Bolea!, Bote pronto!, Bipareta!), estela de la
   pelota, destello en el impacto, indicador de tipo de golpe y mira, "Nola jo" de la pala.
 - [ ] **5.6 Estilo Resort**: frontón con más detalle (bloques, números de cuadro, grada con público Mii que reacciona,
   fondo de monte), animaciones (preparado con saltito, carrera, giro de cuerpo en el golpe, celebración y bajón).
+- [x] Escena 15 (CPU Zaila, 2 tantos) para probar el final; repaso con capturas de 10/11/13/15 y aizkolaritza (6)
 - [ ] **5.7 Repaso**: escenas 11 y 13 con capturas, aizkolaritza (6), docs.
 - [ ] **5.9 Wii real**: calibrar el latigazo con la grabación guiada (escena 14) y probar el tacto con el usuario.
 - [ ] 5.10 Entrenamendua y Lehiaketa completos + resultados + récord (récords por deporte en save.dat)

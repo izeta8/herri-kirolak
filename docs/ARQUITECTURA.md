@@ -45,7 +45,8 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 - **`character`** — Mii calcado a los de la Wii: cabeza de huevo con barbilla en punta, cara pintada con trazos sobre la
   superficie (`decalStroke`/`decalEllipse`: ojos, cejas, nariz de gancho, boca de raya), pelo de casco con flequillo en
   picos (4 peinados, `Profile::hairStyle`), cuerpo estrecho con brazos de manga larga y manos de bola, txapela.
-  `Appearance::casual` = público (pantalón gris, menos polígonos). `characterCache(Appearance)` (32 huecos),
+  `Appearance::casual` = público (pantalón gris, menos polígonos). Con el cuerpo de Resort, `CharacterPose` también
+  mueve las piernas (`legL/legR` muslo hacia delante, `kneeL/kneeR` rodilla; huesos `leg_l1/leg_l2/...`). `characterCache(Appearance)` (32 huecos),
   `drawCharacter(model, CharacterPose)`. Mira hacia +Z con yaw 0.
 - **`world`** — escenario de aizkolaritza: **el probaleku de Usurbil** (empedrado, muros de cantos con albardilla, gradas
   con toldo, porterías, iglesia de San Salvador con la torre, frontón cubierto, casas de Etxebeste e Irazu, montes;
@@ -99,19 +100,34 @@ jugadores → rondas → personajes, con − para CPU) → escena del deporte. `
   Entrenamiento: 1 jugador, cámara que gira con él. Lehiaketa: hasta 4 a la vez en fila (`SPACING` 2.1 m), cámara fija,
   un panel por jugador.
 
-## Pala (`src/games/pala/`) — prototipo en frontón provisional
-- `fronton` — malla del frontón: frontis (z = 0) con chapa y línea de arriba, pared izquierda (x = −COURT_W/2) con las
-  rayas de los cuadros, falta y pasa en rojo, contracancha, rebote y grada. Medidas en `tuning.h` (sección Palas).
+## Pala (`src/games/pala/`) — diseño v2 de habilidad (SPEC §6), frontón provisional
+- `fronton` — malla del frontón: frontis (z = 0) y pared izquierda (x = −COURT_W/2) de bloques de piedra con color
+  algo distinto, chapa, línea de arriba, rayas de los cuadros (falta y pasa en rojo), suelo con sombra suave junto a las
+  paredes, rebote, grada con barandilla; lejos, casas y montes. Público Mii sentado en la grada (`cheer`, `clap`) y
+  números de los cuadros en 2D (`drawLabels`). Medidas en `tuning.h` (sección Palas).
 - `ball` — `Ball`: física con subpasos (suelo, frontis, pared izquierda, rebote) y estado de la jugada (`needFrontis`,
   `bounces`, `drop` = saque botado). `step()` devuelve eventos con el estado de ese instante; las reglas las aplica la
-  escena. `BallPath::predict()` simula hacia delante (golpe, CPU y marca de bote).
-- `pelotari` — `Pelotari`: personaje mirando al frontis (−Z) con la pala en la mano derecha; carrera, preparación
-  (derecha/revés según el lado de la pelota), golpe en arco (`swing`) y bote del saque (`dropBall`).
-- `pala_scene` — la partida 1v1 (o peloteo en entrenamiento). Golpe: al llegar el latigazo se busca el momento en que la
-  pelota pasa más cerca del pelotari (historial hacia atrás + trayectoria prevista hacia delante); si está a menos de
-  `REACH`, el adelanto/retraso da la dirección y la fuerza la profundidad (`doHit` calcula la velocidad para botar
-  donde toca). Un golpe que llega pronto queda pendiente hasta que la pelota llega a su lado. Sin Nunchuk se para todo.
-  Los dos pelotaris no se acercan a menos de `PLAYER_GAP`.
+  escena. `BallPath::predict()` simula hacia delante (con botes y tiempo desde el bote: volea / bote pronto).
+- `pelotari` — `Pelotari`: Mii mirando al frontis (−Z) con la pala en la mano derecha. Piernas con los huesos del cuerpo
+  de Resort (`CharacterPose::legL/legR/kneeL/kneeR`): espera flexionado, carrera, plantado al apuntar, paso al golpear.
+  `swing(lado, altura, contactoEn, fuerza)` hace que la pala llegue a la pelota justo en el impacto (se reajusta si ya
+  iba). Celebración y lamento (`setMood`). `palaTip()/palaCenter()` para la estela.
+- `pala_scene` — la partida. Cada jugador rellena un `Ctl` (stick, Z, A, B, latigazo) desde el mando (`readHuman`) o
+  la CPU (`updateBot`), y el resto del código es el mismo para los dos.
+  - **Golpe** (`tryHit`): `closest()` busca cuándo pasa la pelota más cerca (historial hacia atrás + `BallPath`); calidad
+    = tiempo × sitio × altura con ventanas que se estrechan con la fuerza y en volea/bote pronto. Si llega pronto,
+    queda pendiente hasta que la pelota llega.
+  - **Tiro** (`doHit` + `solveShot`): la mira `u` (frontis −1..1, pared izquierda < −1) da el punto; el botón
+    (B / nada / A) la profundidad; la fuerza la velocidad; `solveShot` prueba alturas simulando `Ball` y elige la que
+    bota más cerca de la profundidad pedida (las biparetas salen solas de la física). La calidad mete error y quita
+    velocidad. El peloteo se acelera (`rallyHits_`).
+  - **CPU** por niveles (`tuning::BOT_LEVELS`, `MatchConfig::level`): elige dónde golpear en la trayectoria, se coloca a
+    `SWEET_DIST`, se planta y apunta con su Z, elige tipo de golpe según el rival y golpea con su error de tiempo.
+  - **Cámara** (`updateCamera`): dirección fija desde atrás-derecha; objetivo entre el pelotari que golpea y la pelota;
+    distancia según la z de la pelota (cerca del frontis = cerca); si no caben el que golpea, la pelota y los humanos,
+    primero abre el FOV (hasta `CAM_FOV_MAX`) y luego se aleja (hasta `CAM_DIST_MAX`).
+  - Efectos 2D: estela de la pala, anillo en el frontis, chispa del golpe, mira; HUD con marcador, tiempo/sitio del
+    último golpe, tipo de golpe según los botones y tarjeta "Nola jo" (entrenamiento).
 - `whiptest` — "Pala: kolpe proba": el latigazo en directo y grabación guiada para calibrarlo.
 
 ## Convenciones

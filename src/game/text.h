@@ -188,7 +188,7 @@ constexpr const char* PLACE = "Tokia";
 constexpr const char* AIMING = "Zuzentzen";
 // Tarjeta "Nola jo" de la pala: tecla y qué hace
 constexpr const char* PALA_HOW[6][2] = {
-    {"Nunchuk", "mugitu"}, {"Z + makila", "zuzendu"}, {"Wii Remote", "jo: zenbat eta bizkorrago, indartsuago"},
+    {"Nunchuk", "mugitu"}, {"Z + makila", "zuzendu"}, {"Wii Remote", "jo (indarra)"},
     {"B + jo", "dejada"}, {"jo", "erdira"}, {"A + jo", "luzea"},
 };
 constexpr const char* LEVELS[3] = {"Erraza", "Normala", "Zaila"};
