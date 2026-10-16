@@ -195,7 +195,7 @@ private:
     int numLabels_ = 0;
     Fx fx_[12];
     float shake_ = 0, hitstop_ = 0, newRecord_ = 0;
-    Vec3 camTarget_;
+    Vec3 camTarget_, camEyeDraw_, camTargetDraw_;
     float camDist_ = 12;
     mutable float camDistTry_ = 12, camFovTry_ = CAM_FOV;
     float camFov_ = CAM_FOV;
@@ -887,11 +887,13 @@ void PalaScene::updateCamera(float dt) {
     // Isométrica fija desde atrás a la derecha. Mira a la pelota y al pelotari que tiene que golpear; se acerca cuando
     // la pelota está junto al frontis y se aleja con ella, pero sin dejar nunca fuera a ese pelotari
     const Vec3 dir = normalize(Vec3(CAM_DIR_X, CAM_DIR_Y, CAM_DIR_Z));
-    int focus = rally_ ? mustHit_ : server_;
+    int focus = rally_ ? mustHit_ : state_ == ST_POINT && lastWinner_ >= 0 ? lastWinner_ : server_;
     const Vec3 me = pl_[focus].pel.pos + Vec3(0, 0.9f, 0);
     Vec3 ball = ball_.live ? ball_.pos : me + Vec3(0.4f, 0.2f, -1.5f);
     ball.y = clampv(ball.y, 0.0f, 4.0f);
-    Vec3 target = lerpv(me, ball, CAM_BALL_WEIGHT);
+    // Tras el tanto la pelota está muerta: la cámara se queda con el pelotari
+    bool deadBall = state_ == ST_POINT || !ball_.live;
+    Vec3 target = lerpv(me, ball, deadBall ? 0.15f : CAM_BALL_WEIGHT);
     float zk = clampv(ball.z / COURT_LEN, 0.0f, 1.0f);
     float dist = lerpf(CAM_DIST_NEAR, CAM_DIST_FAR, smooth01(zk));
     if (state_ == ST_SERVE || (state_ == ST_RALLY && ball_.drop)) dist = CAM_DIST_NEAR + 1.0f;
@@ -902,7 +904,7 @@ void PalaScene::updateCamera(float dt) {
         camDistTry_ = dist;
         camFovTry_ = fov;
         bool ok = inView(eye, pl_[focus].pel.pos) && inView(eye, pl_[focus].pel.pos + Vec3(0, 1.7f, 0)) &&
-                  inView(eye, ball);
+                  (deadBall || inView(eye, ball));
         // Los humanos siempre; al sacar, los dos (que se vea al que resta)
         for (int i = 0; i < n_; i++)
             if (!pl_[i].bot || state_ == ST_SERVE) ok = ok && inView(eye, pl_[i].pel.pos) && inView(eye, pl_[i].pel.pos + Vec3(0, 1.7f, 0));
@@ -946,6 +948,8 @@ void PalaScene::draw() {
     }
     cam.zfar = 400;
     gfx::begin3D(cam);
+    camEyeDraw_ = cam.eye;
+    camTargetDraw_ = cam.target;
     gfx::setFog(true, 70.0f, 260.0f, World::HORIZON);
     fronton_.draw();
     gfx::setFog(false);
@@ -1017,6 +1021,16 @@ void PalaScene::draw() {
 
 // Efectos en 2D sobre la escena: estela de la pala, anillos en el frontis, chispas del golpe y la mira
 void PalaScene::drawEffects2D() {
+    // Contorno de la pelota para que se lea siempre sobre el suelo claro y el frontis
+    if (ball_.live) {
+        Vec3 f = normalize(camTargetDraw_ - camEyeDraw_);
+        Vec3 up = normalize(cross(normalize(cross(f, Vec3(0, 1, 0))), f));
+        float sx, sy, ux, uy;
+        if (gfx::project(ball_.pos, sx, sy) && gfx::project(ball_.pos + up * BALL_DRAW_R, ux, uy)) {
+            float r = fmaxf(2.5f, sqrtf((ux - sx) * (ux - sx) + (uy - sy) * (uy - sy)));
+            gfx::ring(sx, sy, r, r + 1.6f, rgba(0x20, 0x30, 0x40, 150), 16);
+        }
+    }
     for (int i = 0; i < n_; i++) {
         const Player& p = pl_[i];
         for (int k = 0; k + 1 < p.swN; k++) {
