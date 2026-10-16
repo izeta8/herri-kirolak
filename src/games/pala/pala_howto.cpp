@@ -196,7 +196,7 @@ void PalaHowTo::drawAim(float cx, float cy) {
         font::draw(txt::BIPARETA, fx + fw * 0.6f, fy - 34, 26, UI_GOLD, rgba(0x80, 0x48, 0x00), ALIGN_CENTER);
     }
     float stick = a >= 0 ? a : a / 2.0f;
-    drawNunchuk(cx - 150, cy + 20, stick, 0, true);
+    drawNunchuk(cx - (gfx::widescreen() ? 150 : 138), cy + 20, stick, 0, true);
 }
 
 // Paso 3: el Wii Remote en 3D hace el latigazo; se llena la fuerza y sale la pelota
@@ -352,12 +352,14 @@ void PalaHowTo::draw() {
     ui::header(txt::HOWTO);
     const float px = W * 0.05f, pw = W * 0.9f, py = 90, ph = 320;
     ui::panel(px, py, pw, ph);
-    const float sx = px + pw * 0.27f, sy = py + ph * 0.56f;
+    // En 4:3 el panel es más estrecho: la ilustración un poco más a la derecha y el texto más estrecho (se encoge solo)
+    const bool wide = gfx::widescreen();
+    const float sx = px + pw * (wide ? 0.27f : 0.31f), sy = py + ph * 0.56f;
     gfx::circle(sx, sy - 10, 150, rgba(255, 255, 255, 90), 48);
     gfx::circle(sx, sy - 10, 110, rgba(255, 255, 255, 70), 48);
 
     // Texto del paso
-    const float tx = px + pw * 0.54f;
+    const float tx = px + pw * (wide ? 0.54f : 0.63f);
     gfx::circle(tx + 20, py + 52, 20, UI_TEAL, 24);
     char num[2] = {(char)('1' + step_), 0};
     font::plain(num, tx + 20, py + 37, 28, UI_WHITE, ALIGN_CENTER);
