@@ -16,15 +16,28 @@ int Ball::step(float dt, BallEvent* ev, int maxEv) {
         dt -= h;
         vel.y -= BALL_G * h;
         pos += vel * h;
-        if (pos.y < BALL_R && vel.y < 0) {
+        if (pos.y < BALL_R && vel.y <= 0) {
             pos.y = BALL_R;
-            vel.y = -vel.y * FLOOR_E;
-            if (vel.y < 0.4f) vel.y = 0;  // ya rueda
-            vel.x *= FLOOR_F;
-            vel.z *= FLOOR_F;
-            if (vel.y > 0) {
+            if (!rolling) {
+                vel.y = -vel.y * FLOOR_E;
+                vel.x *= FLOOR_F;
+                vel.z *= FLOOR_F;
+                if (vel.y < 0.4f) {  // ya no bota: rueda (y cuenta como bote, si no el tanto no acabaría)
+                    vel.y = 0;
+                    rolling = true;
+                }
                 if (!needFrontis) bounces++;
                 add(BE_FLOOR, false);
+                // Si ya rueda en el primer bote, está muerta: es como el segundo bote
+                if (rolling && !needFrontis && bounces == 1) {
+                    bounces = 2;
+                    add(BE_FLOOR, false);
+                }
+            } else {
+                vel.y = 0;
+                float k = fmaxf(0.0f, 1.0f - 1.5f * h);  // rozamiento al rodar
+                vel.x *= k;
+                vel.z *= k;
             }
         }
         if (pos.z < BALL_R && vel.z < 0) {

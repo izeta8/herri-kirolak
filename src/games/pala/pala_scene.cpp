@@ -415,6 +415,7 @@ void PalaScene::doHit(int i, const HitInfo& h) {
     ball_.needFrontis = true;
     ball_.bounces = 0;
     ball_.drop = false;
+    ball_.rolling = false;
     serving_ = serve;
     hitter_ = i;
     mustHit_ = other(i);

@@ -20,6 +20,7 @@ struct Ball {
     bool needFrontis = false;  // el último golpe todavía no ha llegado al frontis
     int bounces = 0;           // botes desde el frontis (o desde que se bota para sacar)
     bool drop = false;         // saque: el pelotari la ha botado y tiene que darle tras el bote
+    bool rolling = false;      // ya no bota: rueda por el suelo (empezar a rodar cuenta como un bote)
 
     // Avanza dt segundos; apunta los eventos (como mucho maxEv) y devuelve cuántos hubo
     int step(float dt, BallEvent* ev, int maxEv);
