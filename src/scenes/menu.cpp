@@ -16,7 +16,7 @@ namespace {
 class MainMenu : public Scene {
 public:
     explicit MainMenu(int sel) {
-        menu_.count = 4;
+        menu_.count = 5;
         menu_.sel = sel;
     }
 
@@ -26,7 +26,8 @@ public:
         if (r == 0) scenes::go(makeSetupScene());
         else if (r == 1) scenes::go(makeProfilesScene());
         else if (r == 2) scenes::go(makeRecordsScene());
-        else if (r == 3) scenes::openExitDialog();  // el mismo diálogo que HOME
+        else if (r == 3) scenes::go(makeSettingsScene());
+        else if (r == 4) scenes::openExitDialog();  // el mismo diálogo que HOME
         else if (r == -2) scenes::go(makeTitleScene());
     }
 
@@ -38,11 +39,11 @@ public:
                              0);
         gfx::begin2D();
         ui::header(txt::GAME_TITLE);
-        const char* items[4] = {txt::PLAY, txt::PLAYERS, txt::RECORDS, txt::EXIT};
+        const char* items[5] = {txt::PLAY, txt::PLAYERS, txt::RECORDS, txt::SETTINGS, txt::EXIT};
         float cx = W * 0.36f;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             float in = easeOutBack(clampv((t_ - i * 0.06f) / 0.35f, 0.0f, 1.0f));
-            ui::menuButton(menu_, i, cx - (1 - in) * 300, 140 + i * 84, 360, 68, items[i]);
+            ui::menuButton(menu_, i, cx - (1 - in) * 300, 128 + i * 68, 360, 58, items[i]);
         }
         ui::hints(txt::SELECT, txt::BACK);
     }

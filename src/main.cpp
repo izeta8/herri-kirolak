@@ -23,7 +23,7 @@
 // 5 entrenamiento, 6 lehiaketa 4 CPU a la vez, 7 entrenamiento con la CPU, 8 kolpe proba, 9 galería de Miis,
 // 10 pala: entrenamiento, 11 pala: CPU contra CPU, 12 pala: jugador contra la CPU, 13 pala: entrenamiento de la CPU,
 // 14 pala: kolpe proba (latigazo), 15 pala: CPU Zaila contra CPU Zaila a 2 tantos (final y biparetas),
-// 16 pala: animaciones del pelotari de cerca
+// 16 pala: animaciones del pelotari de cerca, 17 Aukerak (ajustes)
 #ifndef START_SCENE
 #define START_SCENE 0
 #endif
@@ -54,6 +54,7 @@ static Scene* firstScene() {
             return makeAizkoScene(cfg);
         case 14: return makeWhipTestScene();
         case 16: return makePelotariShowcase();
+        case 17: return makeSettingsScene();
         case 10:
         case 11:
         case 15:

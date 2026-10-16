@@ -1010,7 +1010,7 @@ void PalaScene::draw() {
     if (ball_.live) {
         world.drawShadow(Vec3(ball_.pos.x, 0, ball_.pos.z), 0.1f, 0.1f);
         // Ayuda: dónde va a botar
-        if (SHOW_LANDING && rally_ && path_.landing >= 0) {
+        if (SHOW_LANDING && !save::data().settings.hideLanding && rally_ && path_.landing >= 0) {
             static Mesh ring;
             if (!ring.valid()) {
                 MeshBuilder b;

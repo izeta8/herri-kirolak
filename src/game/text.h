@@ -10,6 +10,13 @@ constexpr const char* PLAY = "Jokatu";
 constexpr const char* PLAYERS = "Jokalariak";
 constexpr const char* RECORDS = "Errekorrak";
 constexpr const char* EXIT = "Irten";
+constexpr const char* SETTINGS = "Aukerak";
+constexpr const char* SET_RUMBLE = "Bibrazioa";
+constexpr const char* SET_LANDING = "Pala: botearen marka";
+constexpr const char* SET_AIZKO_SENS = "Aizkora: sentikortasuna";
+constexpr const char* SET_AIZKO_LR = "Aizkora: ezker/eskuin alderantziz";
+constexpr const char* SET_AIZKO_UD = "Aizkora: gora/behera alderantziz";
+constexpr const char* SAVE_WHERE = "Gordetzen da: %s";
 
 constexpr const char* SELECT = "Aukeratu";
 constexpr const char* BACK = "Atzera";

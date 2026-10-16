@@ -20,7 +20,7 @@ editar código ─► compilar ─► probar en Dolphin (capturas + teclas) ─�
 6 lehiaketa 4 CPU a la vez · 7 entrenamiento con la CPU · 8 Kolpe proba · 9 galería de Miis (de cerca; el zoom cambia
 solo cada 4 s) · **pala**: 10 entrenamiento · 11 CPU contra CPU · 12 jugador contra la CPU · 13 entrenamiento de la CPU ·
 14 kolpe proba de la pala (latigazo, grabación guiada S/F/B) · 15 CPU Zaila contra CPU Zaila a 2 tantos (para ver
-el final, los resultados y las biparetas) · 16 animaciones del pelotari de cerca. La escena 10 empieza con el tutorial
+el final, los resultados y las biparetas) · 16 animaciones del pelotari de cerca · 17 Aukerak (ajustes). La escena 10 empieza con el tutorial
 animado (sin tocar nada avanza solo).
 Con `-Test`, en la pala 1 = latigazo suave y 2 = fuerte; el saque con A (X en Dolphin) y el stick del Nunchuk con WASD. **Al crear algo nuevo, añadir su número.**
 

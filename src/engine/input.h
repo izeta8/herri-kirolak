@@ -85,6 +85,7 @@ const Pad& pad(int chan);
 int anyDown(u32 mask);
 u32 allDown();
 void rumble(int chan, float seconds);
+void setRumbleEnabled(bool on);  // ajuste "Bibrazioa"
 void stopRumble();
 int connectedCount();
 // Ajustes del jugador (se guardan en save.dat)

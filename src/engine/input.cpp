@@ -306,7 +306,14 @@ u32 allDown() {
     return r;
 }
 
+static bool s_rumbleOn = true;
+void setRumbleEnabled(bool on) {
+    s_rumbleOn = on;
+    if (!on) stopRumble();
+}
+
 void rumble(int chan, float seconds) {
+    if (!s_rumbleOn) return;
     if (chan < 0 || chan >= MAX_PADS || !s_pads[chan].connected) return;
     s_pads[chan].rumbleT = seconds;
     WPAD_Rumble(chan, 1);

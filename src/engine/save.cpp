@@ -97,6 +97,7 @@ void applySettings() {
     input::setTiltInverted(s_data.settings.tiltInverted != 0);
     input::setSensitivity(s_data.settings.sensitivity);
     input::setRaiseInverted(s_data.settings.raiseInverted != 0);
+    input::setRumbleEnabled(s_data.settings.rumbleOff == 0);
 }
 
 bool write() {

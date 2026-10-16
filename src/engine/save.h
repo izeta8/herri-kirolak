@@ -28,7 +28,9 @@ struct Settings {
     u8 tiltInverted;  // 1 = cambiar izquierda/derecha
     u8 sensitivity;   // 0 suave, 1 normal, 2 fuerte
     u8 raiseInverted; // 1 = "arriba" es -Y en vez de +Y
-    u8 pad[13];
+    u8 rumbleOff;     // 1 = sin vibración (desde el 16/10; en partidas viejas es 0: con vibración)
+    u8 hideLanding;   // 1 = la pala sin la marca de dónde va a botar la pelota
+    u8 pad[11];
 };
 
 // Récords de la pala (desde la versión 4)

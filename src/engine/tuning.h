@@ -125,7 +125,7 @@ constexpr float RALLY_SPEEDUP_MAX = 0.3f;
 constexpr float PLAYER_SPEED = 6.5f;       // m/s corriendo con el stick
 constexpr float PLAYER_ACCEL = 14.0f;      // suavizado de la carrera
 constexpr float PLAYER_GAP = 0.8f;         // m: los dos pelotaris no se acercan más que esto
-constexpr bool SHOW_LANDING = true;        // marca dónde va a botar la pelota (ayuda)
+constexpr bool SHOW_LANDING = true;        // marca dónde va a botar la pelota (ayuda; se puede quitar en Aukerak)
 // CPU por niveles (0 erraza, 1 normala, 2 zaila)
 struct BotLevel {
     float timingNoise;  // s de error en el momento del golpe

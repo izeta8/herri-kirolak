@@ -9,6 +9,7 @@ Scene* makeMainMenu(int sel = 0);
 Scene* makeSetupScene();
 Scene* makeProfilesScene();
 Scene* makeRecordsScene();
+Scene* makeSettingsScene();
 Scene* makeSwingTestScene();
 Scene* makeMiiGalleryScene();  // prueba: Miis de cerca
 Scene* makeAizkoScene(const MatchConfig& cfg);
