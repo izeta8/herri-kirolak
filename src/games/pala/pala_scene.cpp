@@ -683,10 +683,12 @@ void PalaScene::updatePlayer(int i, float dt) {
     if (state_ == ST_SERVE && server_ == i) want = Vec3(want.x, 0, 0);  // al sacar, solo de lado
     pel.vel = approachv(pel.vel, want, PLAYER_ACCEL, dt);
     if (canPlay) {
-        if (state_ == ST_SERVE && server_ == i && c.aDown) startDrop(i);
+        // (la A con la que se salta la intro no saca: hace falta otra pulsación)
+        if (state_ == ST_SERVE && server_ == i && c.aDown && stateT_ > 0.3f) startDrop(i);
         if (c.whipStart && rally_ && mustHit_ == i && ball_.live) {
             int side = ball_.pos.x < pel.pos.x ? -1 : 1;
             pel.swing(side, ball_.pos.y, 0.09f, fmaxf(c.strength, 0.5f));  // la pala ya va hacia la pelota
+            audio::play(SFX_WHOOSH, 0.3f, frand(1.15f, 1.3f), clampv(pel.pos.x / 6.0f, -1.0f, 1.0f));
         }
         if (c.whip) tryHit(i);
     }
