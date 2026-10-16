@@ -7,9 +7,9 @@
 
 using namespace tuning;
 
-static const Color WALL = rgba(0x52, 0xA2, 0x72);       // frontis y pared izquierda, verdes
+static const Color WALL = rgba(0x5A, 0xAE, 0x7C);       // frontis y pared izquierda, verdes
 static const Color WALL_TOP = rgba(0xE8, 0xE2, 0xD4);   // remate de piedra clara
-static const Color FLOOR = rgba(0x98, 0xB0, 0xA4);      // cancha de cemento
+static const Color FLOOR = rgba(0xA4, 0xB8, 0xAC);      // cancha de cemento
 static const Color FLOOR_OUT = rgba(0xC4, 0xC2, 0xB8);  // contracancha
 static const Color LINE = rgba(0xFA, 0xFA, 0xF6);
 static const Color LINE_RED = rgba(0xE0, 0x3C, 0x30);
@@ -116,6 +116,28 @@ void Fronton::build() {
     // Barandilla blanca entre la contracancha y la grada
     for (float z = 1.0f; z < back; z += 2.0f) b.box(Vec3(out + 0.05f, 0.5f, z), Vec3(0.03f, 0.5f, 0.03f), LINE);
     b.box(Vec3(out + 0.05f, 1.0f, back / 2), Vec3(0.04f, 0.03f, back / 2), LINE);
+    // Paneles de colores en la barandilla (como los carteles de los frontones, sin letras)
+    const Color panels[5] = {rgba(0xE0, 0x3A, 0x30), rgba(0xFF, 0xD0, 0x30), rgba(0xF6, 0xF6, 0xF0), rgba(0x2C, 0x9C, 0xE8),
+                             rgba(0x3C, 0xB8, 0x48)};
+    for (int i = 0; i * 2.6f + 1.2f < back; i++) {
+        float z = 1.2f + i * 2.6f;
+        Color c = panels[i % 5];
+        b.box(Vec3(out - 0.01f, 0.5f, z + 1.15f), Vec3(0.02f, 0.4f, 1.1f), c);
+        b.box(Vec3(out - 0.03f, 0.5f, z + 1.15f), Vec3(0.005f, 0.08f, 0.9f), i % 5 == 2 ? rgba(0xE0, 0x3A, 0x30) : LINE);
+    }
+    // Ikurriña en un mástil sobre la esquina del frontis con la grada
+    {
+        Vec3 base(XR + 3.2f, WALL_H + 0.35f, -0.3f);
+        b.cylinder(base, 0.05f, 0.04f, 3.6f, rgba(0xE8, 0xE8, 0xE8), LINE, 8, true);
+        const float w = 1.8f, h = 1.1f, t = 0.11f;
+        Vec3 o = base + Vec3(0.05f, 3.6f - h - 0.05f, 0.06f), n(0, 0, 1);
+        b.quad(o, o + Vec3(w, 0, 0), o + Vec3(w, h, 0), o + Vec3(0, h, 0), rgba(0xD5, 0x2B, 0x1E), n);
+        Vec3 o2 = o + Vec3(0, 0, 0.01f), o3 = o + Vec3(0, 0, 0.02f);
+        b.quad(o2 + Vec3(0, t, 0), o2 + Vec3(t, 0, 0), o2 + Vec3(w, h - t, 0), o2 + Vec3(w - t, h, 0), rgba(0x00, 0x96, 0x3E), n);
+        b.quad(o2 + Vec3(0, h - t, 0), o2 + Vec3(t, h, 0), o2 + Vec3(w, t, 0), o2 + Vec3(w - t, 0, 0), rgba(0x00, 0x96, 0x3E), n);
+        b.quad(o3 + Vec3(w / 2 - 0.06f, 0, 0), o3 + Vec3(w / 2 + 0.06f, 0, 0), o3 + Vec3(w / 2 + 0.06f, h, 0), o3 + Vec3(w / 2 - 0.06f, h, 0), LINE, n);
+        b.quad(o3 + Vec3(0, h / 2 - 0.06f, 0), o3 + Vec3(w, h / 2 - 0.06f, 0), o3 + Vec3(w, h / 2 + 0.06f, 0), o3 + Vec3(0, h / 2 + 0.06f, 0), LINE, n);
+    }
     b.build(mesh_);
 
     // Lejos: casas blancas de tejado rojo detrás de la grada y montes verdes alrededor

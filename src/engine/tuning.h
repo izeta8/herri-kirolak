@@ -141,7 +141,7 @@ constexpr BotLevel BOT_LEVELS[3] = {
 };
 constexpr float BOT_MISTAKE_NOISE = 0.13f;
 // Cámara isométrica (desde atrás a la derecha, en alto) con zoom según la distancia de la pelota al frontis
-constexpr float CAM_DIR_X = 0.42f, CAM_DIR_Y = 0.38f, CAM_DIR_Z = 0.78f;  // del objetivo a la cámara (se normaliza)
+constexpr float CAM_DIR_X = 0.3f, CAM_DIR_Y = 0.38f, CAM_DIR_Z = 0.8f;  // del objetivo a la cámara (se normaliza)
 constexpr float CAM_FOV = 30.0f;
 constexpr float CAM_FOV_MAX = 44.0f;      // para que quepa todo se abre el ángulo antes de alejarse (más perspectiva)
 constexpr float CAM_LOOK_UP = 1.6f;       // m por encima del objetivo a los que mira (para ver el frontis)

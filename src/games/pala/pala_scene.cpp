@@ -1115,7 +1115,11 @@ void PalaScene::drawHud() {
     }
 
     // Saque (en el entrenamiento, a la izquierda de la tarjeta "Nola jo")
-    bool howTo = cfg_.training && (state_ == ST_SERVE || state_ == ST_INTRO) && !pl_[0].bot;
+    // También en el primer saque de la lehiaketa si juega algún humano
+    bool anyHuman = false;
+    for (int i = 0; i < n_; i++) anyHuman |= !pl_[i].bot;
+    bool firstPoint = !cfg_.training && pl_[0].score + pl_[n_ - 1].score == 0;
+    bool howTo = (cfg_.training || firstPoint) && (state_ == ST_SERVE || state_ == ST_INTRO) && anyHuman;
     if (state_ == ST_SERVE && !pl_[server_].bot) {
         // Abajo a la derecha, sobre la contracancha: arriba están el frontis y la mira
         float cx = W * 0.78f, cy = 286;
