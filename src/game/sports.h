@@ -29,6 +29,7 @@ struct Sport {
     const int* roundValues = nullptr;         // lo que se enseña en cada opción de rondas (nullptr = 1, 2, 3)
     const char* chooseChar = nullptr;         // "Aukeratu aizkolaria" (nullptr = el de aizkolaritza)
     bool botLevels = false;                   // lehiaketa: preguntar el nivel de la CPU
+    bool nunchuk = false;                     // se juega con Nunchuk (se avisa al elegir personaje si falta)
 };
 
 int sportCount();

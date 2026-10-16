@@ -40,14 +40,15 @@ static void drawHome() {
     float py = 240 - ph / 2 + (1 - easeOutCubic(a)) * 60;
     ui::panel(w / 2 - pw / 2, py, pw, ph);
     font::plain(txt::EXIT_QUESTION, w / 2, py + 34, 32, UI_TEXT, ALIGN_CENTER);
-    ui::button(w / 2 - 120, py + 150, 200, 70, txt::YES, s_homeMenu.anim[0]);
-    ui::button(w / 2 + 120, py + 150, 200, 70, txt::NO, s_homeMenu.anim[1]);
+    ui::menuButton(s_homeMenu, 0, w / 2 - 120, py + 150, 200, 70, txt::YES);
+    ui::menuButton(s_homeMenu, 1, w / 2 + 120, py + 150, 200, 70, txt::NO);
 }
 
 static bool s_openRequest = false;
 void openExitDialog() { s_openRequest = true; }
 
 bool frame(float dt) {
+    ui::updatePointer();
     // Diálogo de HOME: congela la escena actual
     bool justOpened = false;
     if (!s_homeOpen && !transitioning() && (s_openRequest || input::anyDown(WPAD_BUTTON_HOME) >= 0)) {
@@ -91,6 +92,7 @@ bool frame(float dt) {
     gfx::begin2D();
     ui::fade(s_fade);
     if (s_homeOpen) drawHome();
+    ui::drawPointers();  // la mano de cada mando, si la escena (o el diálogo de HOME) usa el puntero
     gfx::endFrame();
     return !s_exit;
 }

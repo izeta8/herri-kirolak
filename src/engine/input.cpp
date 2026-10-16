@@ -23,11 +23,25 @@ static void onData(s32 chan, const WPADData* d) {
     if (s_queued[chan] < QUEUE) s_queue[chan][s_queued[chan]++] = Vec3(d->gforce.x, d->gforce.y, d->gforce.z);
 }
 
+static int s_vresW = 640, s_vresH = 480;
+
 void init() {
     WPAD_Init();
-    WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC);
+    WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);  // con IR: el puntero de los menús
+    WPAD_SetVRes(WPAD_CHAN_ALL, s_vresW, s_vresH);
     WPAD_SetIdleTimeout(300);
     s_t0 = gettime();
+}
+
+void setPointerArea(int w, int h) {
+    s_vresW = w;
+    s_vresH = h;
+    WPAD_SetVRes(WPAD_CHAN_ALL, w, h);
+}
+
+int batteryBars(int chan) {
+    if (chan < 0 || chan >= MAX_PADS || !s_pads[chan].connected) return -1;
+    return clampv((int)s_pads[chan].battery / 0x30, 0, 4);
 }
 
 void setTiltInverted(bool inv) { s_tiltSign = inv ? -1.0f : 1.0f; }
@@ -204,10 +218,12 @@ void update(float dt) {
         p.whip = Whip();
         p.swingStart = p.swingAbort = p.whipStart = false;
         u32 type;
+        bool wasConnected = p.connected;
         p.connected = WPAD_Probe(i, &type) == WPAD_ERR_NONE;
         if (!p.connected) {
             p.held = p.down = 0;
             p.state = SW_IDLE;
+            p.irValid = false;
             p.nunchuk = false;
             p.stickX = p.stickY = 0;
             continue;
@@ -215,6 +231,17 @@ void update(float dt) {
         p.held = WPAD_ButtonsHeld(i);
         p.down = WPAD_ButtonsDown(i);
         WPADData* wd = WPAD_Data(i);
+        if (!wasConnected) {
+            // Un mando que se acaba de conectar: su formato y el tamaño del puntero
+            WPAD_SetDataFormat(i, WPAD_FMT_BTNS_ACC_IR);
+            WPAD_SetVRes(i, s_vresW, s_vresH);
+        }
+        p.irValid = wd && wd->ir.valid;
+        if (p.irValid) {
+            p.irX = wd->ir.x;
+            p.irY = wd->ir.y;
+        }
+        p.battery = wd ? wd->battery_level : 0;
         p.nunchuk = wd && wd->exp.type == WPAD_EXP_NUNCHUK;
         p.stickX = p.stickY = 0;
         if (p.nunchuk) {

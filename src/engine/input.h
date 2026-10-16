@@ -48,6 +48,10 @@ struct Pad {
     // Latigazo (palas)
     Whip whip;               // evento de este frame
     bool whipStart = false;  // evento: empieza un latigazo (para animar)
+    // Puntero IR (coordenadas 2D virtuales de la pantalla, ver setPointerArea) y pilas
+    bool irValid = false;
+    float irX = 0, irY = 0;
+    u8 battery = 0;  // byte crudo del mando: ~0xC0 con pilas nuevas (escala sin comprobar en la Wii)
     // Nunchuk
     bool nunchuk = false;
     float stickX = 0, stickY = 0;  // -1..1 (derecha +X, arriba +Y), con zona muerta
@@ -73,7 +77,10 @@ struct Sample {
 typedef void (*SampleSink)(int chan, const Sample& s);
 
 void init();
+// Tamaño de la pantalla 2D virtual (854×480 o 640×480): el puntero IR se da en esas coordenadas
+void setPointerArea(int w, int h);
 void update(float dt);
+int batteryBars(int chan);  // 0..4 (−1 si el mando no está)
 const Pad& pad(int chan);
 int anyDown(u32 mask);
 u32 allDown();

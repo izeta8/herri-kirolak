@@ -739,8 +739,8 @@ void AizkoScene::drawResults() {
         font::draw(buf, W / 2, py + ph - 50, 34, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, a);
     }
     float by = fminf(430.0f, py + ph + 44);
-    ui::button(W / 2 - 150, by, 260, 60, txt::PLAY_AGAIN, resultsMenu_.anim[0]);
-    ui::button(W / 2 + 150, by, 260, 60, txt::TO_MENU, resultsMenu_.anim[1]);
+    ui::menuButton(resultsMenu_, 0, W / 2 - 150, by, 260, 60, txt::PLAY_AGAIN);
+    ui::menuButton(resultsMenu_, 1, W / 2 + 150, by, 260, 60, txt::TO_MENU);
 }
 
 void AizkoScene::drawPause() {
@@ -750,7 +750,7 @@ void AizkoScene::drawPause() {
     ui::panel(W / 2 - pw / 2, 240 - ph / 2, pw, ph);
     font::plain(txt::PAUSE, W / 2, 240 - ph / 2 + 18, 38, UI_TEXT, ALIGN_CENTER);
     const char* items[3] = {txt::CONTINUE, txt::RESTART, txt::TO_MENU};
-    for (int i = 0; i < 3; i++) ui::button(W / 2, 175 + i * 76, 320, 62, items[i], pauseMenu_.anim[i]);
+    for (int i = 0; i < 3; i++) ui::menuButton(pauseMenu_, i, W / 2, 175 + i * 76, 320, 62, items[i]);
 }
 
 }  // namespace

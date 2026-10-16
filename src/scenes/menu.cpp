@@ -42,7 +42,7 @@ public:
         float cx = W * 0.36f;
         for (int i = 0; i < 4; i++) {
             float in = easeOutBack(clampv((t_ - i * 0.06f) / 0.35f, 0.0f, 1.0f));
-            ui::button(cx - (1 - in) * 300, 140 + i * 84, 360, 68, items[i], menu_.anim[i]);
+            ui::menuButton(menu_, i, cx - (1 - in) * 300, 140 + i * 84, 360, 68, items[i]);
         }
         ui::hints(txt::SELECT, txt::BACK);
     }
@@ -57,6 +57,13 @@ public:
     void update(float dt) override {
         t_ += dt;
         u32 down = input::allDown();
+        // Puntero: A sobre una flecha cambia de página; A en otro sitio (o B) vuelve al menú
+        ui::usePointer();
+        if (down & WPAD_BUTTON_A) {
+            const float W = gfx::screenW();
+            if (ui::pointerOver(W / 2 - 170, 60, 50, 50) || ui::pointerOver(W / 2 + 120, 60, 50, 50))
+                down = (down & ~WPAD_BUTTON_A) | WPAD_BUTTON_RIGHT;
+        }
         if (down & (WPAD_BUTTON_B | WPAD_BUTTON_A)) scenes::go(makeMainMenu(2));
         if (down & (WPAD_BUTTON_LEFT | WPAD_BUTTON_RIGHT)) {
             page_ = 1 - page_;

@@ -8,7 +8,7 @@ static const int PALA_POINTS[3] = {10, 15, 22};
 // Orden = orden en el menú. Los que tienen makeMatch = nullptr salen como "Laster!" (próximamente).
 static const Sport SPORTS[] = {
     {txt::AIZKOLARITZA, txt::AIZKO_DESC, txt::HOW_MANY_LOGS, 3, makeAizkoScene, makeSwingTestScene},
-    {txt::PALA, txt::PALA_DESC, txt::HOW_MANY_POINTS, 3, makePalaScene, makeWhipTestScene, 2, PALA_POINTS, txt::CHOOSE_PELOTARI, true},
+    {txt::PALA, txt::PALA_DESC, txt::HOW_MANY_POINTS, 3, makePalaScene, makeWhipTestScene, 2, PALA_POINTS, txt::CHOOSE_PELOTARI, true, true},
     {txt::HARRI, txt::SOON, nullptr, 3, nullptr, nullptr},
     {txt::SOKATIRA, txt::SOON, nullptr, 3, nullptr, nullptr},
     {txt::TRONTZA, txt::SOON, nullptr, 3, nullptr, nullptr},

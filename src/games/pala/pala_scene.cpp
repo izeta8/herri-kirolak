@@ -1320,8 +1320,8 @@ void PalaScene::drawResults() {
     snprintf(buf, sizeof(buf), "%s: %s!", txt::WINNER, pl_[first].prof->name);
     font::draw(buf, px + pw / 2, py + ph - 48, 32, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, a);
     float bw = (pw - 16) / 2, by = py + ph + 42;
-    ui::button(px + bw / 2, by, bw, 58, txt::PLAY_AGAIN, resultsMenu_.anim[0]);
-    ui::button(px + pw - bw / 2, by, bw, 58, txt::TO_MENU, resultsMenu_.anim[1]);
+    ui::menuButton(resultsMenu_, 0, px + bw / 2, by, bw, 58, txt::PLAY_AGAIN);
+    ui::menuButton(resultsMenu_, 1, px + pw - bw / 2, by, bw, 58, txt::TO_MENU);
 }
 
 void PalaScene::drawPause() {
@@ -1331,7 +1331,7 @@ void PalaScene::drawPause() {
     ui::panel(W / 2 - pw / 2, 240 - ph / 2, pw, ph);
     font::plain(txt::PAUSE, W / 2, 240 - ph / 2 + 16, 36, UI_TEXT, ALIGN_CENTER);
     const char* items[4] = {txt::CONTINUE, txt::HOWTO, txt::RESTART, txt::TO_MENU};
-    for (int i = 0; i < 4; i++) ui::button(W / 2, 148 + i * 68, 320, 56, items[i], pauseMenu_.anim[i]);
+    for (int i = 0; i < 4; i++) ui::menuButton(pauseMenu_, i, W / 2, 148 + i * 68, 320, 56, items[i]);
 }
 
 }  // namespace

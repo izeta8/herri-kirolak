@@ -2,6 +2,7 @@
 #include "engine/audio.h"
 #include "engine/font.h"
 #include "engine/gfx.h"
+#include "engine/input.h"
 #include "game/palette.h"
 #include <stdio.h>
 #include <wiiuse/wpad.h>
@@ -60,6 +61,8 @@ void panel(float x, float y, float w, float h, Color c) {
     (void)c;
     glass(x, y, w, h, 18, 0);
 }
+
+void row(float x, float y, float w, float h, float anim) { glass(x, y, w, h, h / 2, anim); }
 
 void button(float cx, float cy, float w, float h, const char* label, float anim, bool enabled, const char* sub,
             Color accent) {
@@ -120,7 +123,107 @@ void formatTime(unsigned ms, char* out, int size) {
     else snprintf(out, size, "%u.%02u", s, c);
 }
 
+// ------------------------------------------------------------------ puntero
+static Pointer s_ptr;
+static bool s_ptrWanted = false;
+static float s_lastX[input::MAX_PADS], s_lastY[input::MAX_PADS];
+static const Color PTR_COLORS[input::MAX_PADS] = {rgba(0x2C, 0x9C, 0xE8), rgba(0xE8, 0x3A, 0x3A), rgba(0x3C, 0xB8, 0x48),
+                                                  rgba(0xF0, 0xB0, 0x20)};
+
+void updatePointer() {
+    s_ptrWanted = false;
+    // Manda el último mando que se movió o pulsó algo con el puntero en la pantalla
+    for (int i = 0; i < input::MAX_PADS; i++) {
+        const input::Pad& p = input::pad(i);
+        if (!p.connected || !p.irValid) continue;
+        float d = fabsf(p.irX - s_lastX[i]) + fabsf(p.irY - s_lastY[i]);
+        if (d > 3.0f || p.down) s_ptr.pad = i;
+        s_lastX[i] = p.irX;
+        s_lastY[i] = p.irY;
+    }
+    const input::Pad& a = input::pad(s_ptr.pad);
+    s_ptr.valid = a.connected && a.irValid;
+    if (!s_ptr.valid) {
+        for (int i = 0; i < input::MAX_PADS && !s_ptr.valid; i++)
+            if (input::pad(i).connected && input::pad(i).irValid) {
+                s_ptr.pad = i;
+                s_ptr.valid = true;
+            }
+    }
+    if (s_ptr.valid) {
+        s_ptr.x = input::pad(s_ptr.pad).irX;
+        s_ptr.y = input::pad(s_ptr.pad).irY;
+    }
+}
+
+const Pointer& pointer() { return s_ptr; }
+
+bool pointerOver(float x, float y, float w, float h) {
+    return s_ptr.valid && s_ptr.x >= x && s_ptr.x <= x + w && s_ptr.y >= y && s_ptr.y <= y + h;
+}
+
+void usePointer() { s_ptrWanted = true; }
+
+void hoverFeedback() {
+    audio::play(SFX_MOVE, 0.35f, 1.15f);
+    input::rumble(s_ptr.pad, 0.025f);
+}
+
+// Mano de Wii: dedo índice apuntando (la punta es el punto exacto), palma del color del jugador con su número
+static void hand(float x, float y, Color c, int num) {
+    const float k = 1.4f;
+    const Color white = UI_WHITE, line = rgba(0x30, 0x40, 0x50, 170), shadow = rgba(0, 0, 0, 55);
+    auto shape = [&](float dx, float dy, float grow, Color col) {
+        gfx::roundRect(x + dx - (4 + grow) * k, y + dy - grow * k, (11 + 2 * grow) * k, (26 + grow) * k, (5.5f + grow) * k, col);
+        gfx::circle(x + dx + 9 * k, y + dy + 30 * k, (14.5f + grow) * k, col, 22);
+        gfx::circle(x + dx - 4 * k, y + dy + 29 * k, (6 + grow) * k, col, 14);  // pulgar
+    };
+    shape(3, 4, 0, shadow);
+    shape(0, 0, 1.4f, line);
+    shape(0, 0, 0, white);
+    gfx::circle(x + 9 * k, y + 31 * k, 9.5f * k, c, 18);
+    char n[2] = {(char)('1' + num), 0};
+    font::plain(n, x + 9 * k, y + 22 * k, 15 * k, white, ALIGN_CENTER);
+}
+
+void drawPointers() {
+    if (!s_ptrWanted) return;
+    gfx::begin2D();
+    for (int i = input::MAX_PADS - 1; i >= 0; i--) {
+        const input::Pad& p = input::pad(i);
+        if (p.connected && p.irValid) hand(p.irX, p.irY, PTR_COLORS[i], i);
+    }
+}
+
+void ListMenu::place(int i, float x, float y, float w, float h) {
+    if (i < 0 || i >= 16) return;
+    rx[i] = x;
+    ry[i] = y;
+    rw[i] = w;
+    rh[i] = h;
+    placed[i] = true;
+}
+
+int ListMenu::hovered() const {
+    if (!s_ptr.valid) return -1;
+    for (int i = 0; i < count && i < 16; i++)
+        if (placed[i] && enabled[i] && pointerOver(rx[i], ry[i], rw[i], rh[i])) return i;
+    return -1;
+}
+
+void menuButton(ListMenu& m, int i, float cx, float cy, float w, float h, const char* label, const char* sub) {
+    m.place(i, cx - w / 2, cy - h / 2, w, h);
+    button(cx, cy, w, h, label, m.anim[i], m.enabled[i], sub);
+}
+
 int ListMenu::update(float dt, unsigned down) {
+    usePointer();
+    // El puntero elige la opción que tiene debajo
+    int hov = hovered();
+    if (hov >= 0 && hov != sel) {
+        sel = hov;
+        hoverFeedback();
+    }
     for (int i = 0; i < count && i < 16; i++) anim[i] = approach(anim[i], i == sel ? 1.0f : 0.0f, 14.0f, dt);
     unsigned prev = horizontal ? WPAD_BUTTON_LEFT : WPAD_BUTTON_UP;
     unsigned next = horizontal ? WPAD_BUTTON_RIGHT : WPAD_BUTTON_DOWN;

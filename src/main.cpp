@@ -74,6 +74,7 @@ static Scene* firstScene() {
 int main(int argc, char** argv) {
     gfx::init();
     input::init();
+    input::setPointerArea((int)gfx::screenW(), 480);
     audio::init();
     font::init();
     save::init(argc > 0 ? argv[0] : nullptr);
