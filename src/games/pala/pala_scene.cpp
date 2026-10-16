@@ -89,8 +89,9 @@ struct Player {
     bool pending = false;
     float pendingT = 0;
     HitInfo pendingHit;
-    // último golpe (HUD)
+    // último golpe (HUD) y estadísticas del partido
     HitInfo last;
+    int greats = 0, biparetas = 0;
     float lastShow = 0;
     // estela de la pala
     Vec3 swTip[SWOOSH_N], swMid[SWOOSH_N];
@@ -189,7 +190,7 @@ private:
     bool rally_ = false;    // la jugada está viva (se aplican las reglas)
     bool serving_ = false;  // la pelota en vuelo es un saque (tiene que botar entre falta y pasa)
     int server_ = 0, hitter_ = 0, mustHit_ = 0, lastWinner_ = -1;
-    int rallyHits_ = 0, streak_ = 0, best_ = 0;
+    int rallyHits_ = 0, streak_ = 0, best_ = 0, longestRally_ = 0;
     FloatLabel labels_[8];
     int numLabels_ = 0;
     Fx fx_[12];
@@ -428,6 +429,8 @@ void PalaScene::doHit(int i, const HitInfo& h) {
     p.lastShow = 1.0f;
     // Valoración y efectos
     Vec3 lp = P + Vec3(0, 0.7f, 0);
+    if (h.q >= Q_GREAT) p.greats++;
+    if (u < -1.05f && !serve) p.biparetas++;
     if (h.q >= Q_GREAT) addLabel(txt::GREAT, lp, UI_GOLD, 1.1f);
     else if (h.q >= Q_GOOD) addLabel(txt::GOOD, lp, UI_WHITE);
     else addLabel(txt::HIT_BAD, lp, rgba(0xC8, 0xC8, 0xD0), 0.9f);
@@ -438,6 +441,7 @@ void PalaScene::doHit(int i, const HitInfo& h) {
     float pan = clampv(P.x / 6.0f, -1.0f, 1.0f);
     audio::play(SFX_PALA, 0.5f + 0.5f * h.strength, frand(0.95f, 1.05f) + 0.12f * h.strength + (h.q < Q_GOOD ? -0.15f : 0), pan);
     if (!p.bot) input::rumble(padFor(p), 0.03f + 0.09f * h.strength * (0.5f + 0.5f * h.q));
+    if (h.q >= Q_GREAT && rallyHits_ >= 5) fronton_.clap(0.9f);  // el público aprecia el buen peloteo
     if (h.q >= Q_GREAT && h.strength > 0.55f) {
         hitstop_ = 0.035f + 0.04f * h.strength;
         shake_ = fmaxf(shake_, 0.03f * h.strength);
@@ -475,6 +479,7 @@ void PalaScene::endPoint(int loser, const char* why, const Vec3& at) {
     audio::play(SFX_BAD, 0.5f);
     state_ = ST_POINT;
     stateT_ = 0;
+    longestRally_ = rallyHits_ > longestRally_ ? rallyHits_ : longestRally_;
     checkRecords();
     if (cfg_.training) {
         streak_ = 0;
@@ -1225,22 +1230,26 @@ void PalaScene::drawResults() {
     char buf[64];
     float a = smooth01(resultsT_ / 0.4f);
     ui::fade(0.35f * a);
-    float pw = 560, ph = 70 + 2 * 56 + 52;
+    float pw = 560, ph = 70 + 2 * 66 + 84;
     float px = W / 2 - pw / 2, py = 60 + (1 - easeOutCubic(resultsT_ / 0.5f)) * 60;
     ui::panel(px, py, pw, ph);
     font::plain(txt::RESULTS, W / 2, py + 14, 36, UI_TEXT, ALIGN_CENTER);
     int first = n_ == 2 && pl_[1].score > pl_[0].score ? 1 : 0;
     for (int r = 0; r < n_; r++) {
         const Player& p = pl_[r == 0 ? first : 1 - first];
-        float y = py + 66 + r * 56;
-        if (r == 0) gfx::roundRect(px + 16, y - 4, pw - 32, 50, 16, rgba(0xFF, 0xF0, 0xB8));
+        float y = py + 66 + r * 66;
+        if (r == 0) gfx::roundRect(px + 16, y - 4, pw - 32, 62, 16, rgba(0xFF, 0xF0, 0xB8));
         snprintf(buf, sizeof(buf), "%d.", r + 1);
         font::plain(buf, px + 34, y + 4, 30, r == 0 ? rgba(0xD8, 0x98, 0x10) : UI_TEXT_LIGHT);
         ui::colorDot(px + 92, y + 21, 10, FAV_COLORS[p.prof->color % NUM_COLORS]);
         font::plain(p.prof->name, px + 114, y + 4, 30, UI_TEXT);
         snprintf(buf, sizeof(buf), "%d", p.score);
         font::plain(buf, px + pw - 36, y + 4, 30, UI_TEXT, ALIGN_RIGHT);
+        snprintf(buf, sizeof(buf), txt::STATS_LINE, p.greats, p.biparetas);
+        font::plain(buf, px + 114, y + 36, 17, UI_TEXT_LIGHT);
     }
+    snprintf(buf, sizeof(buf), txt::LONGEST_RALLY, longestRally_);
+    font::plain(buf, W / 2, py + ph - 80, 20, UI_TEXT_LIGHT, ALIGN_CENTER);
     snprintf(buf, sizeof(buf), "%s: %s!", txt::WINNER, pl_[first].prof->name);
     font::draw(buf, W / 2, py + ph - 50, 34, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, a);
     float by = fminf(430.0f, py + ph + 44);
