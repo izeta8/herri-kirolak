@@ -108,36 +108,36 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [ ] Probar la lehiaketa con 2-4 mandos reales
 - [x] Siguiente deporte elegido: **palas** (reglas y controles en SPEC §6 y DECISIONES)
 
-## Fase 5 — Pala
+## Fase 5 — Pala (rama `palas`)
 Diseño en `docs/SPEC.md` §6 (v2, habilidad). Código en `src/games/pala/`; constantes en `tuning.h` (sección Palas).
-**Cada paso es una sesión corta**: hacerlo, compilar, probar con la CPU en Dolphin (escenas 11 y 13), marcarlo aquí,
-commit + push en la rama `palas`. No hace falta la Wii hasta el paso 5.9.
+Escenas de prueba: 10 entrenamiento (con tutorial) · 11 CPU contra CPU · 12 jugador contra CPU · 13 entrenamiento de la
+CPU · 14 kolpe proba · 15 CPU Zaila a 2 tantos · 16 animaciones de cerca (ver `docs/HARNESS.md`).
 
-Hecho (prototipo v1):
-- [x] Frontón provisional, pelota con física y predicción, pelotari con pala, reglas, marcador 10/15/22, CPU básica
-- [x] Nunchuk obligatorio, choque entre pelotaris, sonidos, escenas 10–14, pantalla de prueba del latigazo
+Hecho:
+- [x] Frontón provisional (bloques, chapa, cuadros numerados, grada con público Mii, ikurriña, paneles, casas y montes)
+- [x] Pelota con física y predicción; reglas: chapa, gainetik, kanpora, luze, motz, bi bote, falta/pasa en el saque; la
+  pelota que rueda cuenta como bote; marcador a 10/15/22; saca el que gana el tanto
+- [x] Controles comunes mando/CPU (`Ctl`): Nunchuk para moverse (obligatorio), Z + stick = mira por el frontis y la
+  pared izquierda (biparetas), latigazo = golpe y fuerza, B dejada / nada media / A largo; saque A + latigazo
+- [x] Punto dulce (tiempo × sitio × altura) con ventanas más estrechas con fuerza y en volea / bote pronto; el golpe se
+  resuelve simulando la pelota; peloteo que se acelera
+- [x] CPU Erraza / Normala / Zaila (paso en el menú) con los mismos controles
+- [x] Cámara isométrica desde atrás-derecha con zoom según la pelota (abre el ángulo antes de alejarse; no pierde al
+  que golpea ni a los humanos; en el saque, a los dos); intro desde lo alto del frontis
+- [x] Pelotari Resort con piernas (huesos), carrera, plantado, golpe con preparación y final, saltito, celebración y
+  lamento; estela de pala y pelota, chispa, anillo en el frontis, anillo de bote
+- [x] HUD: marcador, tiempo/sitio del último golpe, tipo de golpe según los botones, mira; tarjeta "Nola jo" y tutorial
+  animado "Nola jokatu" (5 pasos); resultados con estadísticas; récords en save.dat v4 y página en Errekorrak
+- [x] Kolpe proba de la pala con grabación guiada (S/F/B) para calibrar
 
-Diseño v2 (en orden; trabajo autónomo del 16/10, ver SPEC §6):
-- [x] **5.1 Cámara isométrica cerca que sigue a la pelota** (`updateCamera`): dirección fija atrás-derecha, distancia
-  y posición a lo largo de la cancha según la z de la pelota, tirando hacia el humano.
-- [x] **5.2 Controles**: `Ctl` por jugador (stick, Z, A, B, latigazo) que rellena el mando o la CPU; Z + stick mueve
-  la mira (pared izquierda → txoko → frontis) y planta al pelotari; A/B/nada = largo/dejada/media. Mira 3D en la pared.
-- [x] **5.3 Golpe nuevo** (`doHit`): dirección hacia la mira (bipareta si es la pared), velocidad por la fuerza, altura
-  buscada simulando con `Ball` para que bote a la profundidad del tipo de golpe; punto dulce (tiempo × sitio) que da
-  error y pierde velocidad; ventanas más estrechas con la fuerza; volea / bote pronto; peloteo que se acelera.
-- [x] **5.4 CPU por niveles** (Erraza/Normala/Zaila) usando los mismos `Ctl` (se coloca, planta, apunta, A/B, golpea);
-  paso de nivel en `setup`.
-- [x] **5.5 HUD y efectos**: valoración del golpe (Bikain!/Ondo/Txarto, Bolea!, Bote pronto!, Bipareta!), estela de la
-  pelota, destello en el impacto, indicador de tipo de golpe y mira, "Nola jo" de la pala.
-- [x] **5.6 Estilo Resort**: frontón con más detalle (bloques, números de cuadro, grada con público Mii que reacciona,
-  fondo de monte), animaciones (preparado con saltito, carrera, giro de cuerpo en el golpe, celebración y bajón).
-- [x] Escena 15 (CPU Zaila, 2 tantos) para probar el final; repaso con capturas de 10/11/13/15 y aizkolaritza (6)
-- [x] Tutorial animado "Nola jokatu" de la pala (5 pasos) al empezar el entrenamiento
-- [x] Ikurriña, paneles de colores, intro de cámara desde lo alto del frontis, saltito de preparación
-- [ ] **5.7 Repaso**: escenas 11 y 13 con capturas, aizkolaritza (6), docs.
-- [ ] **5.9 Wii real**: calibrar el latigazo con la grabación guiada (escena 14) y probar el tacto con el usuario.
-- [x] Récords de la pala en save.dat v4 (mejor racha del entrenamiento, peloteo más largo) y página "Pala" en Errekorrak (←/→)
-- [ ] 5.11 Frontón de Zarautz (fotos del usuario) · 5.12 2v2
+Pendiente:
+- [ ] **Wii real** (lo primero): moverse, Z + stick, A/B al golpear, saque; ¿se nota el punto dulce o es demasiado
+  estrecho? (`SWEET_TIME`, `HIT_WINDOW`, `SWEET_DIST*`); ¿la cámara marea o está bien? (`CAM_*`); fluidez con el público
+- [ ] Calibrar el latigazo con datos (escena 14: grabación guiada) y medir el retraso del golpe
+- [ ] Ajustar el ritmo con el usuario: velocidades (`SHOT_SPEED`), profundidades (`SHOT_DEPTH`), nivel de la CPU
+- [ ] ¿Quitar la marca de bote (`SHOW_LANDING`) cuando se lea bien la pelota?
+- [ ] Frontón de Zarautz (fotos del usuario) · 2v2 (delantero y zaguero)
+- [ ] Juntar `palas` con `develop` cuando el usuario lo apruebe
 
 ## Más adelante
 - [ ] Cansancio bien diseñado (desactivado ahora)

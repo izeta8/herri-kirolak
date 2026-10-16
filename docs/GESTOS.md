@@ -53,6 +53,8 @@ resuelve 11–58 ms después del pico.
 ## El latigazo (pala) — sin calibrar
 Golpe de pala: un latigazo con el Wii Remote, **sin subirlo antes** (independiente del hachazo, en `stepWhip`).
 Decide el **momento** (el pico es el instante del golpe) y la **fuerza**; el lado (derecha/revés) lo pone el juego.
+Mientras se hace el latigazo, el botón pulsado decide el tipo de golpe (B = dejada, nada = media, A = largo): con B
+(gatillo) o A (pulgar) apretados la muñeca se mueve igual; comprobarlo con la grabación guiada.
 
 | Fase | Cómo se detecta | Constantes (`tuning.h`) |
 |---|---|---|
