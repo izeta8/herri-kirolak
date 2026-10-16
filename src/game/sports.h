@@ -15,6 +15,7 @@ struct MatchConfig {
     int profile[MAX_PLAYERS] = {0, 1, 2, 3};
     bool bot[MAX_PLAYERS] = {false, false, false, false};
     int level = 1;           // nivel de la CPU: 0 erraza, 1 normala, 2 zaila (deportes con botLevels)
+    bool demo = false;       // de fondo en el título: sin HUD, sin intro ni final, sin pausa
 };
 
 struct Sport {

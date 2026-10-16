@@ -41,7 +41,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 ## Común a los deportes (`src/game/`)
 - **`remote3d`** — malla del Wii Remote en 3D para los tutoriales animados (`remote3d::mesh()`).
 - **`sports.h/.cpp`** — registro de deportes y `MatchConfig` (deporte, entrenamiento/lehiaketa, jugadores, rondas,
-  perfiles, CPU). Cada `Sport` puede limitar los jugadores (`maxPlayers`), enseñar otros valores en las rondas
+  perfiles, CPU, nivel de la CPU, `demo` = de fondo sin HUD). Cada `Sport` puede limitar los jugadores (`maxPlayers`), enseñar otros valores en las rondas
   (`roundValues`, p. ej. 10/15/22 tantos) y cambiar el título de elegir personaje (`chooseChar`). El menú "preparar partida" se construye con esta lista. Ver `docs/NUEVO-JUEGO.md`.
 - **`character`** — Mii calcado a los de la Wii: cabeza de huevo con barbilla en punta, cara pintada con trazos sobre la
   superficie (`decalStroke`/`decalEllipse`: ojos, cejas, nariz de gancho, boca de raya), pelo de casco con flequillo en
@@ -88,7 +88,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 - **`text.h`** — **todos** los textos en euskera (nada de cadenas sueltas en el código).
 
 ## Menús (`src/scenes/`)
-`title` (demo de la CPU cortando) → `menu` (Jokatu / Jokalariak / Errekorrak / Irten) → `setup` (deporte → modo →
+`title` (de fondo, por turnos de 22 s: la CPU cortando y un partido de pala CPU contra CPU con `MatchConfig::demo`) → `menu` (Jokatu / Jokalariak / Errekorrak / Irten) → `setup` (deporte → modo →
 jugadores → rondas → personajes, con − para CPU) → escena del deporte. `profiles` (editor con teclado en pantalla),
 `records`, `swingtest` (Kolpe proba: gráficas del mando, grabación guiada), `common` (`drawCharacterPreview`).
 

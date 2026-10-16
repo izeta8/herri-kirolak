@@ -1,4 +1,4 @@
-// Pantalla de título: un aizkolari de la CPU corta troncos de fondo.
+// Pantalla de título: de fondo, por turnos, un aizkolari de la CPU cortando troncos y un partido de pala entre dos CPUs.
 #include "engine/audio.h"
 #include "engine/font.h"
 #include "engine/gfx.h"
@@ -15,17 +15,39 @@
 
 namespace {
 
+const float DEMO_TIME = 22.0f;  // s de cada demo de fondo
+
 class TitleScene : public Scene {
 public:
+    ~TitleScene() override { delete pala_; }
     TitleScene() {
+        MatchConfig cfg;
+        cfg.sport = 1;
+        cfg.training = false;
+        cfg.numPlayers = 2;
+        cfg.bot[0] = cfg.bot[1] = true;
+        cfg.profile[0] = 0;
+        cfg.profile[1] = 1;
+        cfg.demo = true;
+        pala_ = makePalaScene(cfg);
         chips_.init();
         log_.reset();
         aizk_.setup(Appearance::from(save::data().profiles[0]), &log_);
         aizk_.setReady();
     }
 
+    bool palaTurn() const { return ((int)(t_ / DEMO_TIME) & 1) == 1; }
+
     void update(float dt) override {
         t_ += dt;
+        if (t_ > 0.5f && (input::allDown() & (WPAD_BUTTON_A | WPAD_BUTTON_PLUS))) {
+            audio::play(SFX_OK);
+            scenes::go(makeMainMenu());
+        }
+        if (palaTurn()) {
+            pala_->update(dt);
+            return;
+        }
         sharedWorld().update(dt);
         // Demo: la CPU corta en V alternando lados
         if (log_.splitting()) {
@@ -66,14 +88,15 @@ public:
         }
         log_.update(dt);
         chips_.update(dt);
-
-        if (t_ > 0.5f && (input::allDown() & (WPAD_BUTTON_A | WPAD_BUTTON_PLUS))) {
-            audio::play(SFX_OK);
-            scenes::go(makeMainMenu());
-        }
     }
 
     void draw() override {
+        if (palaTurn()) pala_->draw();
+        else drawAizko();
+        drawTitle();
+    }
+
+    void drawAizko() {
         World& world = sharedWorld();
         gfx::begin2D();
         world.drawSky();
@@ -89,8 +112,14 @@ public:
         log_.draw();
         aizk_.draw();
         chips_.draw();
+    }
 
+    void drawTitle() {
         gfx::begin2D();
+        // Fundido en blanco al cambiar de demo
+        float ph = fmodf(t_, DEMO_TIME);
+        float flash = t_ > DEMO_TIME * 0.5f ? fmaxf(1.0f - ph / 0.5f, 1.0f - (DEMO_TIME - ph) / 0.5f) : 0;
+        if (flash > 0) ui::fade(clampv(flash, 0.0f, 1.0f), UI_WHITE);
         const float W = gfx::screenW();
         float in = easeOutBack(clampv((t_ - 0.2f) / 0.6f, 0.0f, 1.0f));
         float y = 70 + (1 - in) * -120;
@@ -112,6 +141,7 @@ public:
     }
 
 private:
+    Scene* pala_ = nullptr;
     float t_ = 0, botT_ = 1.0f;
     int last_ = 0;
     Log log_;

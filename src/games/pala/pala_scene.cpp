@@ -123,6 +123,7 @@ public:
 #if defined(START_SCENE) && START_SCENE == 15
         target_ = 2;  // prueba: partido corto para ver el final y los resultados
 #endif
+        if (cfg_.demo) target_ = 1000;  // de fondo en el título: no acaba nunca
         level_ = BOT_LEVELS[clampv(cfg_.level, 0, 2)];
         for (int i = 0; i < n_; i++) {
             Player& p = pl_[i];
@@ -134,8 +135,9 @@ public:
         }
         server_ = 0;
         resetPositions();
-        showHowTo_ = cfg_.training && !pl_[0].bot;
+        showHowTo_ = cfg_.training && !pl_[0].bot && !cfg_.demo;
         if (showHowTo_) howTo_.start();
+        if (cfg_.demo) state_ = ST_SERVE;
         camTarget_ = Vec3(0, 1, 16);
         camDist_ = 34;
     }
@@ -784,7 +786,7 @@ void PalaScene::update(float dt) {
         fronton_.update(dt);
         return;
     }
-    if (state_ != ST_RESULTS && (downAll & WPAD_BUTTON_PLUS)) {
+    if (state_ != ST_RESULTS && !cfg_.demo && (downAll & WPAD_BUTTON_PLUS)) {
         paused_ = true;
         pauseMenu_ = ui::ListMenu();
         pauseMenu_.count = 4;
@@ -976,7 +978,7 @@ void PalaScene::draw() {
         cam.target = lerpv(cam.target, t, k);
         cam.fov = lerpf(camFov_, 40.0f, k);
     }
-    if (state_ == ST_INTRO) {
+    if (state_ == ST_INTRO && !cfg_.demo) {
         // Presentación (estilo Resort): desde lo alto de la esquina del frontis, con la ikurriña, hasta el juego
         float k = smooth01(stateT_ / 2.3f);
         Vec3 e0(XR + 7.0f, 13.0f, -3.0f), t0(-1.0f, 1.0f, 17.0f);
@@ -1052,6 +1054,7 @@ void PalaScene::draw() {
     }
     fronton_.drawLabels();
     drawEffects2D();
+    if (cfg_.demo) return;
     drawHud();
     if (state_ == ST_RESULTS) drawResults();
     if (paused_) drawPause();
