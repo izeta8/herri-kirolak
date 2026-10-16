@@ -59,6 +59,12 @@ Añadir una línea cada vez que decida algo (aunque sea pequeño).
 | 2026-10-16 | Iterar solo (sin el usuario) hasta un resultado excelente en juego, cámara, estilo y animaciones de Resort | El usuario deja el PC encendido toda la noche |
 | 2026-10-16 | De momento **se queda la marca de bote**; sin valoración de calidad por puntos en entrenamiento | No los eligió |
 
+## Experiencia de uso
+| Fecha | Decisión | Motivo / detalle |
+|---|---|---|
+| 2026-10-16 | Repaso de la experiencia de uso de todo el juego hecho por Claude a petición del usuario (sin tocar el gameplay): puntero IR, confirmaciones, mandos desconectados, pilas, Aukerak, indicador de pasos | "Mira qué mejorarías y mejóralo tú mismo" |
+| 2026-10-16 | El tutorial "Nola jokatu" sale solo **la primera vez** de cada deporte (se puede saltar con +) y siempre está en la pausa | Decidido por Claude: salía en cada entrenamiento. Revisar con el usuario |
+
 ## Desarrollo
 | Fecha | Decisión | Motivo / detalle |
 |---|---|---|

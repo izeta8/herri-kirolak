@@ -4,6 +4,7 @@
 #include "engine/gfx.h"
 #include "engine/input.h"
 #include "game/palette.h"
+#include "game/text.h"
 #include <stdio.h>
 #include <wiiuse/wpad.h>
 
@@ -99,10 +100,47 @@ static float hintPill(float right, const char* letter, const char* label, Color 
     return pw;
 }
 
-void hints(const char* aLabel, const char* bLabel) {
+void hints(const char* aLabel, const char* bLabel, const char* plusLabel) {
     float x = gfx::screenW() - 20;
     if (bLabel) x -= hintPill(x, "B", bLabel, rgba(0x80, 0x88, 0x94)) + 12;
-    if (aLabel) hintPill(x, "A", aLabel, UI_BLUE);
+    if (aLabel) x -= hintPill(x, "A", aLabel, UI_BLUE) + 12;
+    if (plusLabel) hintPill(x, "+", plusLabel, rgba(0x80, 0x88, 0x94));
+}
+
+void Confirm::ask(int what) {
+    open = true;
+    action = what;
+    menu = ListMenu();
+    menu.count = 2;
+    menu.horizontal = true;
+    menu.sel = 1;
+}
+
+int Confirm::update(float dt, unsigned down) {
+    if (!open) return -1;
+    int r = menu.update(dt, down);
+    if (r == 0) {
+        open = false;
+        return 1;
+    }
+    if (r == 1 || r == -2) {
+        open = false;
+        return 0;
+    }
+    return -1;
+}
+
+void Confirm::draw(const char* question) {
+    if (!open) return;
+    float w = gfx::screenW();
+    gfx::begin2D();
+    fade(0.35f);
+    float pw = 500, ph = 200, py = 240 - ph / 2;
+    panel(w / 2 - pw / 2, py, pw, ph);
+    float size = fminf(30.0f, 30.0f * (pw - 40) / fmaxf(1.0f, font::width(question, 30)));
+    font::plain(question, w / 2, py + 34, size, UI_TEXT, ALIGN_CENTER);
+    menuButton(menu, 0, w / 2 - 110, py + 130, 180, 64, txt::YES);
+    menuButton(menu, 1, w / 2 + 110, py + 130, 180, 64, txt::NO);
 }
 
 void fade(float a, Color c) {

@@ -139,6 +139,9 @@ constexpr const char* RESTART = "Berriz hasi";
 
 constexpr const char* EXIT_QUESTION = "Homebrew Channel-era itzuli?";
 constexpr const char* BATTERY_LOW = "%d. Wii Remote-a: pila gutxi";
+constexpr const char* SKIP = "Saltatu";
+constexpr const char* SURE_RESTART = "Partida berriz hasi?";
+constexpr const char* SURE_QUIT = "Partida utzi eta menura itzuli?";
 
 // Jokalariak
 constexpr const char* EDIT = "Aldatu";

@@ -62,6 +62,10 @@ void HowTo::setStep(int s) {
 bool HowTo::update(float dt, unsigned down) {
     t_ += dt;
     total_ += dt;
+    if (t_ > 0.25f && (down & WPAD_BUTTON_PLUS)) {  // saltar el tutorial
+        audio::play(SFX_OK, 0.7f);
+        return true;
+    }
     if (t_ > 0.25f && (down & WPAD_BUTTON_A)) {
         touched_ = true;
         if (step_ == NUM_STEPS - 1) {
@@ -336,5 +340,6 @@ void HowTo::draw() {
             ui::buttonIcon(bX + 56, bY - 6, "B", 20 + 3 * pulse, rgba(0x80, 0x88, 0x94));
         }
     }
-    ui::hints(step_ == NUM_STEPS - 1 ? txt::GO : txt::HOWTO_NEXT, step_ > 0 ? txt::BACK : nullptr);
+    ui::hints(step_ == NUM_STEPS - 1 ? txt::GO : txt::HOWTO_NEXT, step_ > 0 ? txt::BACK : nullptr,
+              step_ < NUM_STEPS - 1 ? txt::SKIP : nullptr);
 }

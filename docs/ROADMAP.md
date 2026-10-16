@@ -150,6 +150,9 @@ Hallazgos y mejoras, en orden de impacto:
   Nunchuk en la pala)
 - [x] **Preparar partida**: indicador de pasos (kirola → modua → …) para saber dónde estás
 - [x] **Batería baja** del Wii Remote: aviso pequeño, y las pilas de cada mando en el diálogo de HOME
+- [x] Tutoriales "Nola jokatu": salen solos solo la primera vez (luego, en la pausa de los dos deportes) y se saltan
+  con +
+- [x] Pausa en la lehiaketa: "Berriz hasi" y "Menura itzuli" piden confirmación (`ui::Confirm`)
 - [x] **Aukerak** (ajustes) en el menú principal: vibración, marca de bote de la pala, sensibilidad e inversiones del
   hachazo, y dónde se guarda
 

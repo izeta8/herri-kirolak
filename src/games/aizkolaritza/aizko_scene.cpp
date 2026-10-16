@@ -80,8 +80,9 @@ public:
             p.aizk.setup(Appearance::from(*p.prof), &p.log);
             resetLog(p);
         }
-        showHowTo_ = cfg_.training && !cfg_.bot[0];
-    if (showHowTo_) howTo_.start();
+        // El tutorial sale solo la primera vez (luego, en la pausa: "Nola jokatu")
+        showHowTo_ = cfg_.training && !cfg_.bot[0] && !save::data().settings.seenHowTo[0];
+        if (showHowTo_) howTo_.start();
         camEye_ = Vec3(6, 3.5f, 9);
         camTarget_ = Vec3(0, 0.9f, 0);
     }
@@ -98,6 +99,13 @@ private:
     void updateBot(Player& p, float dt);
     void addLabel(const char* t, const Vec3& pos, Color c);
     void enterResults();
+    void closeHowTo() {
+        showHowTo_ = false;
+        if (!save::data().settings.seenHowTo[0]) {
+            save::data().settings.seenHowTo[0] = 1;
+            save::write();
+        }
+    }
     int missing() const {
         bool human[MAXP];
         for (int i = 0; i < n_; i++) human[i] = !pl_[i].bot;
@@ -123,6 +131,7 @@ private:
     float time_ = 0;
     bool paused_ = false;
     ui::ListMenu pauseMenu_, resultsMenu_;
+    ui::Confirm sure_;
     int order_[MAXP] = {0, 1, 2, 3};
     float resultsT_ = 0;
     bool showHowTo_ = false;
@@ -358,11 +367,31 @@ void AizkoScene::update(float dt) {
     World& world = sharedWorld();
     u32 downAll = input::allDown();
 
+    if (paused_ && sure_.open) {
+        int r = sure_.update(dt, downAll);
+        if (r == 1) scenes::go(sure_.action == 2 ? makeAizkoScene(cfg_) : makeMainMenu());
+        return;
+    }
     if (paused_) {
         int r = pauseMenu_.update(dt, downAll);
+        // En la lehiaketa, volver a empezar o salir pide confirmación (se pierde la partida)
+        if ((r == 2 || r == 3) && !cfg_.training) {
+            sure_.ask(r);
+            return;
+        }
         if (r == 0 || r == -2 || (downAll & WPAD_BUTTON_PLUS)) paused_ = false;
-        else if (r == 1) scenes::go(makeAizkoScene(cfg_));
-        else if (r == 2) scenes::go(makeMainMenu());
+        else if (r == 1) {
+            paused_ = false;  // repasar cómo se juega a mitad de partida
+            showHowTo_ = true;
+            howTo_.start();
+        }
+        else if (r == 2) scenes::go(makeAizkoScene(cfg_));
+        else if (r == 3) scenes::go(makeMainMenu());
+        return;
+    }
+    // Tutorial abierto desde la pausa (el del principio lo lleva ST_INTRO)
+    if (showHowTo_ && state_ != ST_INTRO) {
+        if (howTo_.update(dt, downAll)) closeHowTo();
         return;
     }
     // Sin el Wii Remote de un humano no se juega: todo quieto (también el tiempo) hasta que se conecte
@@ -373,7 +402,7 @@ void AizkoScene::update(float dt) {
     if (!showHowTo_ && state_ != ST_RESULTS && (downAll & WPAD_BUTTON_PLUS)) {
         paused_ = true;
         pauseMenu_ = ui::ListMenu();
-        pauseMenu_.count = 3;
+        pauseMenu_.count = 4;
         input::stopRumble();
         audio::play(SFX_OK, 0.6f);
         return;
@@ -385,7 +414,7 @@ void AizkoScene::update(float dt) {
             if (showHowTo_) {
                 howToT_ += dt;
                 stateT_ = 0;
-                if (howTo_.update(dt, downAll)) showHowTo_ = false;
+                if (howTo_.update(dt, downAll)) closeHowTo();
                 break;
             }
             if (stateT_ > 2.6f || (stateT_ > 0.6f && (downAll & WPAD_BUTTON_A))) {
@@ -504,6 +533,7 @@ void AizkoScene::draw() {
     }
     if (state_ == ST_RESULTS) drawResults();
     if (paused_) drawPause();
+    if (paused_) sure_.draw(sure_.action == 2 ? txt::SURE_RESTART : txt::SURE_QUIT);
     if (int m = missing()) {
         if (state_ != ST_RESULTS && !showHowTo_) {
             char buf[64];
@@ -764,11 +794,11 @@ void AizkoScene::drawResults() {
 void AizkoScene::drawPause() {
     const float W = gfx::screenW();
     ui::fade(0.5f);
-    float pw = 420, ph = 330;
+    float pw = 420, ph = 370;
     ui::panel(W / 2 - pw / 2, 240 - ph / 2, pw, ph);
-    font::plain(txt::PAUSE, W / 2, 240 - ph / 2 + 18, 38, UI_TEXT, ALIGN_CENTER);
-    const char* items[3] = {txt::CONTINUE, txt::RESTART, txt::TO_MENU};
-    for (int i = 0; i < 3; i++) ui::menuButton(pauseMenu_, i, W / 2, 175 + i * 76, 320, 62, items[i]);
+    font::plain(txt::PAUSE, W / 2, 240 - ph / 2 + 16, 36, UI_TEXT, ALIGN_CENTER);
+    const char* items[4] = {txt::CONTINUE, txt::HOWTO, txt::RESTART, txt::TO_MENU};
+    for (int i = 0; i < 4; i++) ui::menuButton(pauseMenu_, i, W / 2, 148 + i * 68, 320, 56, items[i]);
 }
 
 }  // namespace

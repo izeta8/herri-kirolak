@@ -136,7 +136,8 @@ public:
         }
         server_ = 0;
         resetPositions();
-        showHowTo_ = cfg_.training && !pl_[0].bot && !cfg_.demo;
+        // El tutorial sale solo la primera vez (luego, en la pausa: "Nola jokatu")
+        showHowTo_ = cfg_.training && !pl_[0].bot && !cfg_.demo && !save::data().settings.seenHowTo[1];
         if (showHowTo_) howTo_.start();
         if (cfg_.demo) state_ = ST_SERVE;
         camTarget_ = Vec3(0, 1, 16);
@@ -205,6 +206,7 @@ private:
     float camFov_ = CAM_FOV;
     bool paused_ = false;
     ui::ListMenu pauseMenu_, resultsMenu_;
+    ui::Confirm sure_;
     float resultsT_ = 0;
     bool showHowTo_ = false;
     PalaHowTo howTo_;
@@ -777,8 +779,18 @@ void PalaScene::update(float dt) {
     time_ += dt;
     u32 downAll = input::allDown();
 
+    if (paused_ && sure_.open) {
+        int r = sure_.update(dt, downAll);
+        if (r == 1) scenes::go(sure_.action == 2 ? makePalaScene(cfg_) : makeMainMenu());
+        return;
+    }
     if (paused_) {
         int r = pauseMenu_.update(dt, downAll);
+        // En la lehiaketa, volver a empezar o salir pide confirmación (se pierde la partida)
+        if ((r == 2 || r == 3) && !cfg_.training) {
+            sure_.ask(r);
+            return;
+        }
         if (r == 0 || r == -2 || (downAll & WPAD_BUTTON_PLUS)) paused_ = false;
         else if (r == 1) {
             paused_ = false;  // repasar los controles a mitad de partido
@@ -790,7 +802,13 @@ void PalaScene::update(float dt) {
         return;
     }
     if (showHowTo_) {
-        if (howTo_.update(dt, downAll)) showHowTo_ = false;
+        if (howTo_.update(dt, downAll)) {
+            showHowTo_ = false;
+            if (!save::data().settings.seenHowTo[1]) {
+                save::data().settings.seenHowTo[1] = 1;
+                save::write();
+            }
+        }
         fronton_.update(dt);
         return;
     }
@@ -1070,6 +1088,7 @@ void PalaScene::draw() {
     drawHud();
     if (state_ == ST_RESULTS) drawResults();
     if (paused_) drawPause();
+    if (paused_) sure_.draw(sure_.action == 2 ? txt::SURE_RESTART : txt::SURE_QUIT);
 }
 
 // Efectos en 2D sobre la escena: estela de la pala, anillos en el frontis, chispas del golpe y la mira

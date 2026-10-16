@@ -30,7 +30,8 @@ struct Settings {
     u8 raiseInverted; // 1 = "arriba" es -Y en vez de +Y
     u8 rumbleOff;     // 1 = sin vibración (desde el 16/10; en partidas viejas es 0: con vibración)
     u8 hideLanding;   // 1 = la pala sin la marca de dónde va a botar la pelota
-    u8 pad[11];
+    u8 seenHowTo[2];  // tutorial "Nola jokatu" ya visto: [0] aizkolaritza, [1] pala (sale solo la primera vez)
+    u8 pad[9];
 };
 
 // Récords de la pala (desde la versión 4)

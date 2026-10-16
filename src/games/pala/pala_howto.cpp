@@ -56,6 +56,10 @@ void PalaHowTo::setStep(int s) {
 bool PalaHowTo::update(float dt, unsigned down) {
     t_ += dt;
     total_ += dt;
+    if (t_ > 0.25f && (down & WPAD_BUTTON_PLUS)) {  // saltar el tutorial
+        audio::play(SFX_OK, 0.7f);
+        return true;
+    }
     if (t_ > 0.25f && (down & WPAD_BUTTON_A)) {
         touched_ = true;
         if (step_ == NUM_STEPS - 1) {
@@ -380,5 +384,6 @@ void PalaHowTo::draw() {
         case 3: drawShots(sx, sy); break;
         case 4: drawSweet(sx, sy); break;
     }
-    ui::hints(step_ == NUM_STEPS - 1 ? txt::GO : txt::HOWTO_NEXT, step_ > 0 ? txt::BACK : nullptr);
+    ui::hints(step_ == NUM_STEPS - 1 ? txt::GO : txt::HOWTO_NEXT, step_ > 0 ? txt::BACK : nullptr,
+              step_ < NUM_STEPS - 1 ? txt::SKIP : nullptr);
 }

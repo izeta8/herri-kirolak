@@ -17,7 +17,7 @@ void button(float cx, float cy, float w, float h, const char* label, float anim,
 // Icono redondo de botón del Wii Remote (A, B, +, 1...)
 void buttonIcon(float cx, float cy, const char* letter, float r = 15, Color c = 0x2C9CE8FF);
 // Barra inferior de ayuda: "(A) aukeratu   (B) atzera"
-void hints(const char* aLabel, const char* bLabel = nullptr);
+void hints(const char* aLabel, const char* bLabel = nullptr, const char* plusLabel = nullptr);
 void fade(float a, Color c = 0x000000FF);
 void colorDot(float cx, float cy, float r, Color c);
 // Pila del mando: 4 rayas (verde, amarillo con 1, rojo con 0)
@@ -54,6 +54,16 @@ struct ListMenu {
     int hovered() const;  // opción bajo el puntero, −1 si ninguna
     // Devuelve el índice elegido con A, -2 si se pulsa B, -1 en otro caso
     int update(float dt, unsigned down);
+};
+
+// Diálogo "¿Seguro?" (Bai / Ez) encima de la pantalla; empieza con "Ez" elegido
+struct Confirm {
+    bool open = false;
+    int action = 0;  // lo que se hará si dice que sí (lo decide quien lo usa)
+    ListMenu menu;
+    void ask(int what);
+    int update(float dt, unsigned down);  // 1 = sí, 0 = no (o B), −1 = sigue abierto
+    void draw(const char* question);
 };
 
 // Botón de una ListMenu: lo dibuja y apunta su rectángulo para el puntero

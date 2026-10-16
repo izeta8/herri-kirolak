@@ -141,6 +141,9 @@ jugadores → rondas → personajes, con − para CPU) → escena del deporte. `
   `usePointer()` ese frame (lo hace `ListMenu::update`). Para que un botón responda al puntero, dibujarlo con
   `ui::menuButton(menu, i, …)` o apuntar su rectángulo con `menu.place(i, …)`; pantallas con interacción propia usan
   `ui::pointerOver(x, y, w, h)` + A.
+- `ui::Confirm`: diálogo "¿Seguro?" (Bai/Ez, empieza en Ez) para acciones que tiran algo (pausa de la lehiaketa).
+- `Settings::seenHowTo[]`: el tutorial de cada deporte solo sale solo la primera vez; `ui::hints(a, b, plus)` admite
+  una tercera pastilla (+ Saltatu).
 - `scenes/common`: `missingRemote()` y `drawConnectOverlay()` — en partida, si falta el Wii Remote de un humano (o el
   Nunchuk en la pala), todo se para con el aviso. `scenes::frame` avisa una vez de las pilas bajas y el diálogo de HOME
   enseña las pilas de cada mando.
