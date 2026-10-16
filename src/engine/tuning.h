@@ -150,7 +150,7 @@ constexpr float CAM_DIST_FAR = 12.0f;      // pelota al fondo
 constexpr float CAM_DIST_MAX = 19.0f;      // tope al abrirse para no perder al pelotari
 constexpr float CAM_BALL_WEIGHT = 0.6f;    // el objetivo es la pelota con este peso; el resto, el pelotari que golpea
 constexpr float CAM_RATE = 2.6f;           // suavizado
-constexpr float CAM_MARGIN = 0.9f;         // fracción de la pantalla en la que tiene que caber el pelotari
+constexpr float CAM_MARGIN = 0.85f;        // fracción de la pantalla en la que tiene que caber el pelotari
 
 // --- Cuerpo de Mii (Wii Sports Resort, game/mii/body) ---
 // Unidades del modelo de Resort: hombros a 9.25 sobre los pies, cuello a 9.7

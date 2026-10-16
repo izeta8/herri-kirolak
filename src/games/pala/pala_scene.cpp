@@ -598,6 +598,15 @@ void PalaScene::updateBot(int i, float dt) {
             }
             for (int k = 0; k < path_.n && pick < 0; k++)
                 if (path_.ok[k] && path_.p[k].y > 0.4f && path_.p[k].y < 1.9f) pick = k;
+            // Bota muy bajo: a por lo más alto que llegue tras el bote (mejor intentarlo que dejarla)
+            if (pick < 0) {
+                float best = REACH_Y_MIN;
+                for (int k = 0; k < path_.n; k++)
+                    if (path_.ok[k] && path_.p[k].y > best && path_.p[k].z < COURT_LEN + 2) {
+                        best = path_.p[k].y;
+                        pick = k;
+                    }
+            }
             if (pick >= 0) {
                 p.botPlanned = true;
                 p.botStarted = false;
