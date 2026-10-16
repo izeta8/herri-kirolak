@@ -71,6 +71,7 @@ public:
     }
 
     void draw() override;
+    void drawSteps();
 
 private:
     void enter(Step s) {
@@ -281,9 +282,39 @@ void SetupScene::draw() {
             break;
         }
     }
+    drawSteps();
     ui::hints(step_ == STEP_CHARS ? txt::OK : txt::SELECT, txt::BACK);
 }
 
 }  // namespace
+
+// Indicador de pasos arriba a la derecha: un punto por paso de este recorrido y el nombre del actual
+void SetupScene::drawSteps() {
+    Step steps[6];
+    int n = 0;
+    steps[n++] = STEP_SPORT;
+    steps[n++] = STEP_MODE;
+    if (!cfg_.training || step_ == STEP_PLAYERS || step_ == STEP_ROUNDS || step_ == STEP_LEVEL) {
+        steps[n++] = STEP_PLAYERS;
+        steps[n++] = STEP_ROUNDS;
+        if (sport(cfg_.sport).botLevels) steps[n++] = STEP_LEVEL;
+    }
+    steps[n++] = STEP_CHARS;
+    int cur = 0;
+    for (int i = 0; i < n; i++)
+        if (steps[i] == step_) cur = i;
+    const float W = gfx::screenW();
+    const char* name = txt::STEP_NAMES[step_];
+    float tw = font::width(name, 22);
+    float pw = n * 22 + tw + 40, px = W - pw - 20, py = 22;
+    gfx::roundRectGrad(px, py, pw, 40, 20, UI_GLASS_TOP, UI_GLASS_BOTTOM);
+    for (int i = 0; i < n; i++) {
+        float cx = px + 22 + i * 22;
+        if (i < cur) gfx::circle(cx, py + 20, 6, UI_TEAL, 14);
+        else if (i == cur) gfx::circle(cx, py + 20, 8, UI_TEAL_GLOW, 16);
+        else gfx::circle(cx, py + 20, 5, rgba(0xB4, 0xC6, 0xD2), 12);
+    }
+    font::plain(name, px + n * 22 + 22, py + 7, 22, UI_TEAL);
+}
 
 Scene* makeSetupScene() { return new SetupScene(); }

@@ -194,6 +194,8 @@ constexpr const char* LATE = "Berandu";
 constexpr const char* WHIP_TEST = "Pala: kolpe proba";
 constexpr const char* CPU_LEVEL = "CPU-aren maila";
 constexpr const char* REMOTE_N = "%d. Wii Remote-a";
+// Pasos de "preparar partida" (indicador de arriba a la derecha)
+constexpr const char* STEP_NAMES[6] = {"Kirola", "Modua", "Jokalariak", "Partida", "Maila", "Jokalaria"};
 constexpr const char* NO_NUNCHUK = "Nunchuk-ik ez";
 constexpr const char* REMOTE_LOST = "Jokoa geldituta dago. Piztu eta konektatu mandoa.";
 constexpr const char* HIT_BAD = "Txarto";
