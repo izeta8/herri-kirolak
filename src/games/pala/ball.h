@@ -33,7 +33,9 @@ struct BallPath {
     static constexpr float DT = 0.01f;
     Vec3 p[MAX];
     bool ok[MAX];  // en ese instante se le puede dar
+    unsigned char bnc[MAX];  // botes desde el frontis en ese instante
+    float sinceB[MAX];       // s desde el último bote (o desde el frontis si aún no ha botado)
     int n = 0;
     int landing = -1;  // primer bote tras el frontis (índice), -1 si no lo hay
-    void predict(const Ball& b, float seconds);
+    void predict(const Ball& b, float seconds, float sinceBounce = 1.0f);
 };

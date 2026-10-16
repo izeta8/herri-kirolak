@@ -88,33 +88,68 @@ constexpr float WALL_E = 0.7f;          // pared izquierda
 constexpr float DROP_VY = -4.0f;        // saque: velocidad con la que el pelotari bota la pelota (m/s)
 constexpr float DROP_Y = 1.0f;          // altura desde la que la suelta
 
-// --- Palas: golpe ---
-constexpr float SHOT_SPEED_MIN = 13.0f; // velocidad hacia el frontis (m/s) con el golpe más suave…
-constexpr float SHOT_SPEED_MAX = 24.0f; // …y con el más fuerte
-constexpr float SHOT_DEPTH_MIN = 9.0f;  // dónde bota la pelota al volver (z) con el golpe más suave (dejada)…
-constexpr float SHOT_DEPTH_MAX = 26.0f; // …y con el más fuerte
-constexpr float SHOT_DEPTH_RAND = 1.8f;
-constexpr float SERVE_DEPTH_MIN = 15.5f;  // saque: entre falta y pasa según la fuerza
-constexpr float SERVE_DEPTH_MAX = 23.0f;
-constexpr float SHOT_X_MID = -0.5f;     // dónde bota en x con el golpe a tiempo…
-constexpr float SHOT_X_SPAN = 4.3f;     // …y cuánto se va hacia el ancho (pronto) o a la pared (tarde)
-constexpr float SHOT_X_RAND = 0.6f;
-constexpr float TIMING_WINDOW = 0.16f;  // s de adelanto/retraso que dan dirección completa
-constexpr float TIMING_MAX = 1.3f;      // tope de la dirección (más de 1 = puede salir fuera)
-constexpr float HIT_EARLY = 0.26f;      // s: latigazo como mucho así de pronto…
-constexpr float HIT_LATE = 0.2f;        // …o así de tarde respecto a cuando la pelota pasa a su lado
-constexpr float REACH = 1.35f;          // m: distancia horizontal máxima a la pelota para darle
+// --- Palas: golpe (diseño v2 de habilidad, SPEC §6) ---
+// Tipo de golpe según el botón pulsado al hacer el latigazo: 0 = B dejada, 1 = nada (media), 2 = A largo.
+// Velocidad horizontal hacia la mira (m/s) con la fuerza mínima y máxima, y dónde bota al volver (z)
+constexpr float SHOT_SPEED[3][2] = {{8.5f, 12.0f}, {13.0f, 19.0f}, {15.0f, 23.0f}};
+constexpr float SHOT_DEPTH[3][2] = {{4.5f, 7.0f}, {13.0f, 17.5f}, {24.0f, 28.5f}};
+constexpr float SERVE_DEPTH[3] = {15.5f, 19.0f, 23.0f};  // saque: siempre entre falta y pasa (más o menos al límite)
+constexpr float SHOT_MIN_SPEED_Q = 0.72f;  // con calidad 0 la pelota sale a este × la velocidad
+// Mira (Z + stick): recorrido continuo. u en [-1, 1] = frontis (de la esquina con la pared al lado abierto);
+// u en [-2, -1) = pared izquierda, hasta AIM_WALL_LEN m desde el frontis (biparetas)
+constexpr float AIM_WALL_LEN = 7.0f;
+constexpr float AIM_RATE = 14.0f;          // suavizado de la mira
+constexpr float AIM_ERR = 0.9f;            // error de la mira (en u) con calidad 0
+constexpr float AIM_ERR_TIMING = 0.5f;     // y cuánto lo desvía pegar pronto (hacia el ancho) o tarde (hacia la pared)
+constexpr float HEIGHT_ERR = 3.5f;         // error vertical (m/s) con calidad 0: puede acabar en la chapa o alta
+constexpr float PLANT_SPEED = 0.15f;       // apuntando con Z, el pelotari casi no se mueve (× velocidad)
+// Punto dulce: tiempo (pico del latigazo frente al momento en que la pelota pasa a su lado) y sitio (distancia)
+constexpr float HIT_WINDOW = 0.16f;        // s: fuera de esto, ni la toca
+constexpr float SWEET_TIME = 0.035f;       // s: dentro de esto, tiempo perfecto
+constexpr float SWEET_DIST = 0.78f;        // m: distancia ideal del cuerpo a la pelota (brazo + pala)
+constexpr float SWEET_DIST_TOL = 0.2f;     // m: dentro de esto, sitio perfecto
+constexpr float SWEET_DIST_FALL = 0.5f;    // m más allá de la tolerancia hasta calidad mínima
+constexpr float SWEET_DIST_MIN_Q = 0.15f;  // calidad de sitio al límite del alcance
+constexpr float REACH = 1.4f;              // m: más lejos, no llega
 constexpr float REACH_Y_MIN = 0.1f, REACH_Y_MAX = 2.4f;
-constexpr float PLAYER_SPEED = 6.5f;    // m/s corriendo con el stick
-constexpr float PLAYER_ACCEL = 14.0f;   // suavizado de la carrera
-constexpr float PLAYER_GAP = 0.8f;      // m: los dos pelotaris no se acercan más que esto
-constexpr bool SHOW_LANDING = true;     // marca dónde va a botar la pelota (ayuda del prototipo)
-// CPU
-constexpr float BOT_TIMING_NOISE = 0.09f;  // s de error en el momento del golpe
-constexpr float BOT_MISTAKE = 0.18f;    // probabilidad de un golpe a destiempo (puede salir fuera o a la chapa)
-constexpr float BOT_MISTAKE_NOISE = 0.24f;
-constexpr float BOT_SPEED = 0.85f;      // × PLAYER_SPEED
-constexpr float BOT_DROP_SHOT = 0.15f;  // probabilidad de dejada
+constexpr float SWEET_Y_LO = 0.35f, SWEET_Y_HI = 1.55f;  // alturas cómodas; fuera, peor calidad
+constexpr float WINDOW_STRONG = 0.7f;      // con fuerza máxima las ventanas se estrechan a esto…
+constexpr float WINDOW_SOFT = 1.25f;       // …y con la mínima se ensanchan a esto
+constexpr float WINDOW_VOLLEY = 0.75f;     // volea y bote pronto: ventana más corta…
+constexpr float SPEED_VOLLEY = 1.12f;      // …pero la pelota sale más rápida
+constexpr float BOTE_PRONTO_T = 0.09f;     // s tras el bote que cuentan como bote pronto
+constexpr float Q_GREAT = 0.85f, Q_GOOD = 0.5f;  // Bikain! / Ondo / Txarto
+// Peloteo que se acelera
+constexpr float RALLY_SPEEDUP = 0.03f;     // por golpe bueno
+constexpr float RALLY_SPEEDUP_MAX = 0.3f;
+constexpr float PLAYER_SPEED = 6.5f;       // m/s corriendo con el stick
+constexpr float PLAYER_ACCEL = 14.0f;      // suavizado de la carrera
+constexpr float PLAYER_GAP = 0.8f;         // m: los dos pelotaris no se acercan más que esto
+constexpr bool SHOW_LANDING = true;        // marca dónde va a botar la pelota (ayuda)
+// CPU por niveles (0 erraza, 1 normala, 2 zaila)
+struct BotLevel {
+    float timingNoise;  // s de error en el momento del golpe
+    float distNoise;    // m de error al colocarse
+    float speed;        // × PLAYER_SPEED
+    float mistake;      // probabilidad de un golpe muy a destiempo
+    float risk;         // 0..1: cuánto busca la pared, el ancho y las dejadas
+};
+constexpr BotLevel BOT_LEVELS[3] = {
+    {0.07f, 0.35f, 0.75f, 0.14f, 0.15f},
+    {0.045f, 0.2f, 0.88f, 0.07f, 0.45f},
+    {0.025f, 0.1f, 1.0f, 0.03f, 0.8f},
+};
+constexpr float BOT_MISTAKE_NOISE = 0.13f;
+// Cámara isométrica (desde atrás a la derecha, en alto) con zoom según la distancia de la pelota al frontis
+constexpr float CAM_DIR_X = 0.42f, CAM_DIR_Y = 0.38f, CAM_DIR_Z = 0.78f;  // del objetivo a la cámara (se normaliza)
+constexpr float CAM_FOV = 32.0f;
+constexpr float CAM_LOOK_UP = 1.6f;       // m por encima del objetivo a los que mira (para ver el frontis)
+constexpr float CAM_DIST_NEAR = 8.5f;      // pelota junto al frontis
+constexpr float CAM_DIST_FAR = 15.0f;      // pelota al fondo
+constexpr float CAM_DIST_MAX = 22.0f;      // tope al abrirse para no perder al pelotari
+constexpr float CAM_BALL_WEIGHT = 0.6f;    // el objetivo es la pelota con este peso; el resto, el pelotari que golpea
+constexpr float CAM_RATE = 2.6f;           // suavizado
+constexpr float CAM_MARGIN = 0.82f;        // fracción de la pantalla en la que tiene que caber el pelotari
 
 // --- Cuerpo de Mii (Wii Sports Resort, game/mii/body) ---
 // Unidades del modelo de Resort: hombros a 9.25 sobre los pies, cuello a 9.7

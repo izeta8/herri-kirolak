@@ -265,6 +265,7 @@ void draw(const Body& b, const Pose& p, Xf* head, Xf* waist) {
     // Pose de cada hueso como transformación en espacio del modelo (P), de padres a hijos (vienen en ese orden)
     std::vector<Xf> P(nb);
     int chest = def.find("chest"), headB = def.find("head");
+    int legL1 = def.find("leg_l1"), legR1 = def.find("leg_r1"), legL2 = def.find("leg_l2"), legR2 = def.find("leg_r2");
     for (size_t i = 0; i < nb; i++) {
         const BoneDef& bd = def.bones[i];
         Xf parent = bd.parent >= 0 ? P[bd.parent] : Xf();
@@ -273,6 +274,11 @@ void draw(const Body& b, const Pose& p, Xf* head, Xf* waist) {
             P[i] = parent * translation(bd.pos) * Xf().rotateX(p.lean).rotateZ(p.side) * translation(-bd.pos);
         } else if ((int)i == headB) {
             P[i] = parent * translation(bd.pos) * Xf().rotateX(p.headPitch) * translation(-bd.pos);
+        } else if ((int)i == legL1 || (int)i == legR1) {
+            // rotateX positivo lleva el pie hacia atrás: el muslo hacia delante es negativo
+            P[i] = parent * translation(bd.pos) * Xf().rotateX(-((int)i == legL1 ? p.legL : p.legR)) * translation(-bd.pos);
+        } else if ((int)i == legL2 || (int)i == legR2) {
+            P[i] = parent * translation(bd.pos) * Xf().rotateX((int)i == legL2 ? p.kneeL : p.kneeR) * translation(-bd.pos);
         }
     }
     // Público (sin pecho): todo se inclina desde la base, y sus manos van a handL/handR

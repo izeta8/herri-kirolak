@@ -178,6 +178,20 @@ constexpr const char* BEST = "Onena";
 constexpr const char* EARLY = "Goiz";
 constexpr const char* LATE = "Berandu";
 constexpr const char* WHIP_TEST = "Pala: kolpe proba";
+constexpr const char* CPU_LEVEL = "CPU-aren maila";
+constexpr const char* HIT_BAD = "Txarto";
+constexpr const char* VOLLEY = "Bolea!";
+constexpr const char* BOTE_PRONTO = "Bote pronto!";
+constexpr const char* BIPARETA = "Bipareta!";
+constexpr const char* SHOT_NAMES[3] = {"Dejada", "Erdira", "Luzea"};
+constexpr const char* PLACE = "Tokia";
+constexpr const char* AIMING = "Zuzentzen";
+// Tarjeta "Nola jo" de la pala: tecla y qué hace
+constexpr const char* PALA_HOW[6][2] = {
+    {"Nunchuk", "mugitu"}, {"Z + makila", "zuzendu"}, {"Wii Remote", "jo: zenbat eta bizkorrago, indartsuago"},
+    {"B + jo", "dejada"}, {"jo", "erdira"}, {"A + jo", "luzea"},
+};
+constexpr const char* LEVELS[3] = {"Erraza", "Normala", "Zaila"};
 constexpr const char* WHIP_GUIDE[3] = {"LEUN eskuinetik", "GOGOR eskuinetik", "EZKERRETIK"};
 constexpr const char* WHIP_GUIDE_SHORT[3] = {"Leun", "Gogor", "Ezker"};
 

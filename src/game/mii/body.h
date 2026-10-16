@@ -30,6 +30,8 @@ struct Body {
 struct Pose {
     Xf root;               // pies, con la orientación del personaje
     float lean = 0, side = 0, headPitch = 0, squash = 0;
+    // Piernas (rad): muslo hacia delante (+) y rodilla doblada (+). 0 = de pie, como en el modelo
+    float legL = 0, legR = 0, kneeL = 0, kneeR = 0;
     Vec3 handL, handR;     // centros de las manos en el mundo (izquierda de la pantalla = -X del personaje)
     bool handsVisible = true;
 };

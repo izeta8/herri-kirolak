@@ -47,6 +47,8 @@ struct CharacterPose {
     bool blink = false;
     Vec3 handL, handR;     // posiciones absolutas de las manos
     bool handsVisible = true;
+    // Piernas (solo el cuerpo de Resort): muslo hacia delante (+) y rodilla doblada (+), en rad
+    float legL = 0, legR = 0, kneeL = 0, kneeR = 0;
 };
 
 // Altura de los hombros sobre los pies (para colocar manos)

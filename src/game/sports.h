@@ -14,6 +14,7 @@ struct MatchConfig {
     int rounds = 1;          // rondas: 1..maxRounds (en aizkolaritza: troncos; en pala, 10/15/22 tantos)
     int profile[MAX_PLAYERS] = {0, 1, 2, 3};
     bool bot[MAX_PLAYERS] = {false, false, false, false};
+    int level = 1;           // nivel de la CPU: 0 erraza, 1 normala, 2 zaila (deportes con botLevels)
 };
 
 struct Sport {
@@ -26,6 +27,7 @@ struct Sport {
     int maxPlayers = 4;                       // lehiaketa: jugadores humanos como mucho
     const int* roundValues = nullptr;         // lo que se enseña en cada opción de rondas (nullptr = 1, 2, 3)
     const char* chooseChar = nullptr;         // "Aukeratu aizkolaria" (nullptr = el de aizkolaritza)
+    bool botLevels = false;                   // lehiaketa: preguntar el nivel de la CPU
 };
 
 int sportCount();

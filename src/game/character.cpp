@@ -414,6 +414,10 @@ static void drawResortCharacter(const CharacterModel& m, const CharacterPose& p)
     bp.handL = p.handL;
     bp.handR = p.handR;
     bp.handsVisible = p.handsVisible;
+    bp.legL = p.legL;
+    bp.legR = p.legR;
+    bp.kneeL = p.kneeL;
+    bp.kneeR = p.kneeR;
     Xf head, waist;
     miibody::draw(m.body, bp, &head, &waist);
     if (m.sash.valid()) {

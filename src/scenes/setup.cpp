@@ -14,7 +14,7 @@
 
 namespace {
 
-enum Step { STEP_SPORT, STEP_MODE, STEP_PLAYERS, STEP_ROUNDS, STEP_CHARS };
+enum Step { STEP_SPORT, STEP_MODE, STEP_PLAYERS, STEP_ROUNDS, STEP_LEVEL, STEP_CHARS };
 
 class SetupScene : public Scene {
 public:
@@ -59,6 +59,10 @@ public:
                 break;
             case STEP_ROUNDS:
                 cfg_.rounds = r + 1;
+                enter(sport(cfg_.sport).botLevels ? STEP_LEVEL : STEP_CHARS);
+                break;
+            case STEP_LEVEL:
+                cfg_.level = r;
                 enter(STEP_CHARS);
                 break;
             default:
@@ -93,6 +97,11 @@ private:
                 menu_.horizontal = true;
                 menu_.sel = cfg_.rounds - 1;
                 break;
+            case STEP_LEVEL:
+                menu_.count = 3;
+                menu_.horizontal = true;
+                menu_.sel = cfg_.level;
+                break;
             case STEP_CHARS:
                 charIdx_ = 0;
                 for (int i = 0; i < 4; i++) {
@@ -109,9 +118,10 @@ private:
             case STEP_MODE: enter(STEP_SPORT); break;
             case STEP_PLAYERS: enter(STEP_MODE); break;
             case STEP_ROUNDS: enter(STEP_PLAYERS); break;
+            case STEP_LEVEL: enter(STEP_ROUNDS); break;
             case STEP_CHARS:
                 if (charIdx_ > 0) charIdx_--;
-                else enter(cfg_.training ? STEP_MODE : STEP_ROUNDS);
+                else enter(cfg_.training ? STEP_MODE : sport(cfg_.sport).botLevels ? STEP_LEVEL : STEP_ROUNDS);
                 break;
         }
     }
@@ -215,6 +225,13 @@ void SetupScene::draw() {
                 snprintf(buf, sizeof(buf), "%d", values ? values[i] : i + 1);
                 ui::button(W / 2 + (i - (menu_.count - 1) * 0.5f) * 180 + slide, 270, 140, 120, buf, menu_.anim[i]);
             }
+            break;
+        }
+        case STEP_LEVEL: {
+            ui::header(txt::COMPETITION);
+            font::plain(txt::CPU_LEVEL, W / 2, 130, 36, UI_TEXT, ALIGN_CENTER);
+            for (int i = 0; i < 3; i++)
+                ui::button(W / 2 + (i - 1) * 200 + slide, 270, 180, 100, txt::LEVELS[i], menu_.anim[i]);
             break;
         }
         case STEP_CHARS: {
