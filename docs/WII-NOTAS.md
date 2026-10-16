@@ -92,3 +92,9 @@
   `\n` usar la herramienta Edit o un script Python escrito con Write.
 - `Set-Content` de PowerShell 5 escribe con BOM; gcc lo acepta, pero mejor `[IO.File]::WriteAllText`.
 - El receptor de telemetría corre en segundo plano y se reconecta solo; si se cae, relanzarlo.
+
+## Memoria: mallas dentro de una escena
+- `Mesh` no tiene destructor (a propósito): una malla que es miembro de una escena **se queda en memoria** cuando se
+  cambia de escena. Cada "Berriro jokatu" crea otra escena → fuga. Solución: liberar en el destructor del objeto que la
+  tiene (como `Fronton`, sin copias) o hacerla `static`. Aizkolaritza (`Log`, `Chips`) todavía tiene esta fuga.
+

@@ -8,6 +8,15 @@
 
 class Fronton {
 public:
+    // Las mallas no tienen destructor: sin esto, cada partida nueva dejaría la anterior en memoria. La escena se borra
+    // antes de dibujar el fotograma siguiente, así que liberar aquí es seguro. (No copiar un Fronton.)
+    Fronton() = default;
+    Fronton(const Fronton&) = delete;
+    Fronton& operator=(const Fronton&) = delete;
+    ~Fronton() {
+        mesh_.release();
+        far_.release();
+    }
     void build();
     void update(float dt);
     void draw();

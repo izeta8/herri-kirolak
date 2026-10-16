@@ -139,6 +139,10 @@ Pendiente:
 - [ ] Frontón de Zarautz (fotos del usuario) · 2v2 (delantero y zaguero)
 - [ ] Juntar `palas` con `develop` cuando el usuario lo apruebe
 
+## Arreglos pendientes
+- [ ] Aizkolaritza: las mallas de `Log` (y `Chips`) no se liberan al cambiar de escena (fuga en cada "Berriro jokatu";
+  ver WII-NOTAS)
+
 ## Más adelante
 - [ ] Cansancio bien diseñado (desactivado ahora)
 - [ ] Música
