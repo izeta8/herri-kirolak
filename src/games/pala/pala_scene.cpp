@@ -885,18 +885,22 @@ void PalaScene::updateCamera(float dt) {
         camFovTry_ = fov;
         bool ok = inView(eye, pl_[focus].pel.pos) && inView(eye, pl_[focus].pel.pos + Vec3(0, 1.7f, 0)) &&
                   inView(eye, ball);
+        // Los humanos siempre; al sacar, los dos (que se vea al que resta)
         for (int i = 0; i < n_; i++)
-            if (!pl_[i].bot) ok = ok && inView(eye, pl_[i].pel.pos) && inView(eye, pl_[i].pel.pos + Vec3(0, 1.7f, 0));
+            if (!pl_[i].bot || state_ == ST_SERVE) ok = ok && inView(eye, pl_[i].pel.pos) && inView(eye, pl_[i].pel.pos + Vec3(0, 1.7f, 0));
         if (ok) break;
         if (fov < CAM_FOV_MAX) fov += 2.0f;
         else dist += 0.5f;
     }
     if (state_ == ST_INTRO) {
-        float k = smooth01(stateT_ / 2.2f);
-        dist += (1 - k) * 18.0f;
-        target = target + Vec3(0, 0, -(1 - k) * 6.0f);
+        // la presentación la hace draw(); aquí la cámara ya espera en su sitio de juego
+        camTarget_ = target;
+        camDist_ = dist;
+        camFov_ = fov;
+        return;
     } else if (state_ == ST_FINISH || state_ == ST_RESULTS) {
         dist = CAM_DIST_NEAR + 2.0f;
+        fov = CAM_FOV;
         target = pl_[pl_[0].score >= pl_[n_ - 1].score ? 0 : n_ - 1].pel.pos + Vec3(0, 0.9f, 0);
     }
     camTarget_ = approachv(camTarget_, target, CAM_RATE, dt);
@@ -914,6 +918,14 @@ void PalaScene::draw() {
     cam.eye = camTarget_ + dir * camDist_ + jitter;
     cam.target = camTarget_ + Vec3(0, CAM_LOOK_UP, 0) + jitter * 0.5f;
     cam.fov = camFov_;
+    if (state_ == ST_INTRO) {
+        // Presentación (estilo Resort): desde lo alto de la esquina del frontis, con la ikurriña, hasta el juego
+        float k = smooth01(stateT_ / 2.3f);
+        Vec3 e0(XR + 7.0f, 13.0f, -3.0f), t0(-1.0f, 1.0f, 17.0f);
+        cam.eye = lerpv(e0, cam.eye, k);
+        cam.target = lerpv(t0, cam.target, k);
+        cam.fov = lerpf(46.0f, camFov_, k);
+    }
     cam.zfar = 400;
     gfx::begin3D(cam);
     gfx::setFog(true, 70.0f, 260.0f, World::HORIZON);
@@ -925,8 +937,29 @@ void PalaScene::draw() {
         world.drawShadow(Vec3(ball_.pos.x, 0, ball_.pos.z), 0.1f, 0.1f);
         // Ayuda: dónde va a botar
         if (SHOW_LANDING && rally_ && path_.landing >= 0) {
+            static Mesh ring;
+            if (!ring.valid()) {
+                MeshBuilder b;
+                const int N = 28;
+                const Color c = rgba(0xFF, 0xFF, 0xFF, 170);
+                for (int i = 0; i < N; i++) {
+                    float a0 = i * 2 * PI / N, a1 = (i + 1) * 2 * PI / N;
+                    Vec3 i0(cosf(a0) * 0.75f, 0, sinf(a0) * 0.75f), o0(cosf(a0), 0, sinf(a0));
+                    Vec3 i1(cosf(a1) * 0.75f, 0, sinf(a1) * 0.75f), o1(cosf(a1), 0, sinf(a1));
+                    b.tri(i0, o0, o1, c, Vec3(0, 1, 0));
+                    b.tri(i0, o1, i1, c, Vec3(0, 1, 0));
+                }
+                b.build(ring);
+            }
             const Vec3& l = path_.p[path_.landing];
-            world.drawShadow(Vec3(l.x, 0, l.z), 0.3f, 0.3f);
+            float r = 0.32f * (1.0f + 0.12f * sinf(time_ * 9));
+            gfx::setLighting(false);
+            gfx::setBlend(true);
+            gfx::setDepth(true, false);
+            gfx::drawMesh(ring, Xf().translate(Vec3(l.x, 0.02f, l.z)).scale(r));
+            gfx::setDepth(true, true);
+            gfx::setBlend(false);
+            gfx::setLighting(true);
         }
     }
     for (int i = 0; i < n_; i++) pl_[i].pel.draw();

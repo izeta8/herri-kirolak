@@ -60,13 +60,15 @@ void Fronton::build() {
     // Suelo de la cancha en tiras, más oscuro junto al frontis y la pared izquierda (oclusión suave)
     const Vec3 up(0, 1, 0);
     const int NX = 10, NZ = 17;
+    unsigned floorSeed = 5;
     for (int iz = 0; iz < NZ; iz++)
         for (int ix = 0; ix < NX; ix++) {
             float x0 = XL + COURT_W * ix / NX, x1 = XL + COURT_W * (ix + 1) / NX;
             float z0 = back * iz / NZ, z1 = back * (iz + 1) / NZ;
+            Color tile = jitter(FLOOR, floorSeed, 0.025f);  // cemento algo moteado
             auto col = [&](float x, float z) {
                 float ao = fminf(1.0f, fminf((x - XL) / 1.6f, z / 1.6f));
-                return shade(FLOOR, 0.78f + 0.22f * smooth01(ao));
+                return shade(tile, 0.78f + 0.22f * smooth01(ao));
             };
             quadGrad(b, Vec3(x0, 0, z0), Vec3(x0, 0, z1), Vec3(x1, 0, z1), Vec3(x1, 0, z0), col(x0, z0), col(x0, z1),
                      col(x1, z1), col(x1, z0), up);
