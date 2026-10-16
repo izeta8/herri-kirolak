@@ -756,8 +756,13 @@ void PalaScene::update(float dt) {
     if (paused_) {
         int r = pauseMenu_.update(dt, downAll);
         if (r == 0 || r == -2 || (downAll & WPAD_BUTTON_PLUS)) paused_ = false;
-        else if (r == 1) scenes::go(makePalaScene(cfg_));
-        else if (r == 2) scenes::go(makeMainMenu());
+        else if (r == 1) {
+            paused_ = false;  // repasar los controles a mitad de partido
+            showHowTo_ = true;
+            howTo_.start();
+        }
+        else if (r == 2) scenes::go(makePalaScene(cfg_));
+        else if (r == 3) scenes::go(makeMainMenu());
         return;
     }
     if (showHowTo_) {
@@ -768,7 +773,7 @@ void PalaScene::update(float dt) {
     if (state_ != ST_RESULTS && (downAll & WPAD_BUTTON_PLUS)) {
         paused_ = true;
         pauseMenu_ = ui::ListMenu();
-        pauseMenu_.count = 3;
+        pauseMenu_.count = 4;
         input::stopRumble();
         audio::play(SFX_OK, 0.6f);
         return;
@@ -1206,7 +1211,6 @@ void PalaScene::drawHud() {
         float tw = font::width(txt::SERVE_HOW, 24);
         font::draw(txt::SERVE_HOW, cx + 13, cy + 52, 24, UI_WHITE, rgba(0x20, 0x30, 0x40), ALIGN_CENTER);
         ui::buttonIcon(cx - tw / 2 - 6, cy + 66, "A", 13);
-        (void)howTo;
     }
     if (howTo) drawHowTo();
     if (state_ == ST_POINT && !cfg_.training && lastWinner_ >= 0 && stateT_ > 0.5f) {
@@ -1285,11 +1289,11 @@ void PalaScene::drawResults() {
 void PalaScene::drawPause() {
     const float W = gfx::screenW();
     ui::fade(0.5f);
-    float pw = 420, ph = 330;
+    float pw = 420, ph = 370;
     ui::panel(W / 2 - pw / 2, 240 - ph / 2, pw, ph);
-    font::plain(txt::PAUSE, W / 2, 240 - ph / 2 + 18, 38, UI_TEXT, ALIGN_CENTER);
-    const char* items[3] = {txt::CONTINUE, txt::RESTART, txt::TO_MENU};
-    for (int i = 0; i < 3; i++) ui::button(W / 2, 175 + i * 76, 320, 62, items[i], pauseMenu_.anim[i]);
+    font::plain(txt::PAUSE, W / 2, 240 - ph / 2 + 16, 36, UI_TEXT, ALIGN_CENTER);
+    const char* items[4] = {txt::CONTINUE, txt::HOWTO, txt::RESTART, txt::TO_MENU};
+    for (int i = 0; i < 4; i++) ui::button(W / 2, 148 + i * 68, 320, 56, items[i], pauseMenu_.anim[i]);
 }
 
 }  // namespace
