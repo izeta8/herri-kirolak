@@ -677,6 +677,20 @@ void PalaScene::updatePlayer(int i, float dt) {
         else readHuman(i);
     } else {
         p.ctl = Ctl();
+        // Al acabar, el perdedor se aparta (detrás del ganador, hacia la derecha de la pantalla) para no taparlo
+        if ((state_ == ST_FINISH || state_ == ST_RESULTS) && n_ == 2) {
+            int w = pl_[0].score >= pl_[1].score ? 0 : 1;
+            if (i != w) {
+                Vec3 d = pl_[w].pel.pos + Vec3(-1.5f, 0, 1.8f) - pel.pos;
+                d.y = 0;
+                float len = length(d);
+                if (len > 0.1f) {
+                    float k = fminf(len * 2.0f, 2.5f) / len;
+                    p.ctl.mx = d.x * k / PLAYER_SPEED;
+                    p.ctl.my = -d.z * k / PLAYER_SPEED;
+                }
+            }
+        }
     }
     const Ctl& c = p.ctl;
 
@@ -952,6 +966,16 @@ void PalaScene::draw() {
     cam.eye = camTarget_ + dir * camDist_ + jitter;
     cam.target = camTarget_ + Vec3(0, CAM_LOOK_UP, 0) + jitter * 0.5f;
     cam.fov = camFov_;
+    if (state_ == ST_FINISH || state_ == ST_RESULTS) {
+        // Final (estilo Resort): de frente al ganador, desde el frontis; en los resultados, a la izquierda del panel
+        const Vec3 w = pl_[pl_[0].score >= pl_[n_ - 1].score ? 0 : n_ - 1].pel.pos;
+        float k = smooth01((state_ == ST_FINISH ? stateT_ : 3.0f + resultsT_) / 1.2f);
+        float side = state_ == ST_RESULTS ? smooth01(resultsT_ / 0.6f) : 0;
+        Vec3 e(w.x + 0.8f, 1.5f, w.z - 3.6f), t = w + Vec3(-1.1f * side, 0.85f, 0);  // mirando a +Z: la derecha es −X
+        cam.eye = lerpv(cam.eye, e, k);
+        cam.target = lerpv(cam.target, t, k);
+        cam.fov = lerpf(camFov_, 40.0f, k);
+    }
     if (state_ == ST_INTRO) {
         // Presentación (estilo Resort): desde lo alto de la esquina del frontis, con la ikurriña, hasta el juego
         float k = smooth01(stateT_ / 2.3f);
@@ -1220,7 +1244,10 @@ void PalaScene::drawHud() {
         // El kantaria: el tanteo cantado, primero el que va ganando
         int hi = pl_[0].score >= pl_[1].score ? pl_[0].score : pl_[1].score;
         int lo = pl_[0].score >= pl_[1].score ? pl_[1].score : pl_[0].score;
-        snprintf(buf, sizeof(buf), txt::CHANT, txt::NUMBERS[clampv(hi, 0, 22)], txt::NUMBERS[clampv(lo, 0, 22)]);
+        char second[24];
+        snprintf(second, sizeof(second), "%s", txt::NUMBERS[clampv(lo, 0, 22)]);
+        second[0] = (char)(second[0] - 'A' + 'a');  // "Bi eta zero!": la segunda, en minúscula (todas empiezan por A-Z)
+        snprintf(buf, sizeof(buf), txt::CHANT, txt::NUMBERS[clampv(hi, 0, 22)], second);
         float s = 1.0f + 0.04f * sinf(time_ * 5);
         font::draw(buf, W / 2, 196, 32 * s, UI_GOLD, rgba(0x60, 0x30, 0x10), ALIGN_CENTER, smooth01((stateT_ - 0.8f) / 0.3f));
     }
@@ -1262,35 +1289,36 @@ void PalaScene::drawHowTo() {
 }
 
 void PalaScene::drawResults() {
+    // Panel a la derecha: a la izquierda, el ganador celebrándolo (la cámara lo pone ahí)
     const float W = gfx::screenW();
     char buf[64];
     float a = smooth01(resultsT_ / 0.4f);
-    ui::fade(0.35f * a);
-    float pw = 560, ph = 70 + 2 * 66 + 84;
-    float px = W / 2 - pw / 2, py = 60 + (1 - easeOutCubic(resultsT_ / 0.5f)) * 60;
+    ui::fade(0.2f * a);
+    float pw = fminf(500.0f, W * 0.6f), ph = 70 + 2 * 66 + 84;
+    float px = W - pw - 24 + (1 - easeOutCubic(resultsT_ / 0.5f)) * 80, py = 46;
     ui::panel(px, py, pw, ph);
-    font::plain(txt::RESULTS, W / 2, py + 14, 36, UI_TEXT, ALIGN_CENTER);
+    font::plain(txt::RESULTS, px + pw / 2, py + 14, 34, UI_TEXT, ALIGN_CENTER);
     int first = n_ == 2 && pl_[1].score > pl_[0].score ? 1 : 0;
     for (int r = 0; r < n_; r++) {
         const Player& p = pl_[r == 0 ? first : 1 - first];
-        float y = py + 66 + r * 66;
-        if (r == 0) gfx::roundRect(px + 16, y - 4, pw - 32, 62, 16, rgba(0xFF, 0xF0, 0xB8));
+        float y = py + 64 + r * 66;
+        if (r == 0) gfx::roundRect(px + 14, y - 4, pw - 28, 62, 16, rgba(0xFF, 0xF0, 0xB8));
         snprintf(buf, sizeof(buf), "%d.", r + 1);
-        font::plain(buf, px + 34, y + 4, 30, r == 0 ? rgba(0xD8, 0x98, 0x10) : UI_TEXT_LIGHT);
-        ui::colorDot(px + 92, y + 21, 10, FAV_COLORS[p.prof->color % NUM_COLORS]);
-        font::plain(p.prof->name, px + 114, y + 4, 30, UI_TEXT);
+        font::plain(buf, px + 28, y + 4, 28, r == 0 ? rgba(0xD8, 0x98, 0x10) : UI_TEXT_LIGHT);
+        ui::colorDot(px + 76, y + 20, 10, FAV_COLORS[p.prof->color % NUM_COLORS]);
+        font::plain(p.prof->name, px + 96, y + 4, 28, UI_TEXT);
         snprintf(buf, sizeof(buf), "%d", p.score);
-        font::plain(buf, px + pw - 36, y + 4, 30, UI_TEXT, ALIGN_RIGHT);
+        font::plain(buf, px + pw - 30, y + 4, 30, UI_TEXT, ALIGN_RIGHT);
         snprintf(buf, sizeof(buf), txt::STATS_LINE, p.greats, p.biparetas);
-        font::plain(buf, px + 114, y + 36, 17, UI_TEXT_LIGHT);
+        font::plain(buf, px + 96, y + 36, 16, UI_TEXT_LIGHT);
     }
     snprintf(buf, sizeof(buf), txt::LONGEST_RALLY, longestRally_);
-    font::plain(buf, W / 2, py + ph - 80, 20, UI_TEXT_LIGHT, ALIGN_CENTER);
+    font::plain(buf, px + pw / 2, py + ph - 78, 19, UI_TEXT_LIGHT, ALIGN_CENTER);
     snprintf(buf, sizeof(buf), "%s: %s!", txt::WINNER, pl_[first].prof->name);
-    font::draw(buf, W / 2, py + ph - 50, 34, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, a);
-    float by = fminf(430.0f, py + ph + 44);
-    ui::button(W / 2 - 150, by, 260, 60, txt::PLAY_AGAIN, resultsMenu_.anim[0]);
-    ui::button(W / 2 + 150, by, 260, 60, txt::TO_MENU, resultsMenu_.anim[1]);
+    font::draw(buf, px + pw / 2, py + ph - 48, 32, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, a);
+    float bw = (pw - 16) / 2, by = py + ph + 42;
+    ui::button(px + bw / 2, by, bw, 58, txt::PLAY_AGAIN, resultsMenu_.anim[0]);
+    ui::button(px + pw - bw / 2, by, bw, 58, txt::TO_MENU, resultsMenu_.anim[1]);
 }
 
 void PalaScene::drawPause() {
