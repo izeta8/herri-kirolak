@@ -100,7 +100,8 @@
 
 ## Nunchuk (pala)
 - El stick se lee de `WPADData::exp.nunchuk.js` (`ang` en grados desde arriba en el sentido del reloj, `mag` 0..1):
-  `stickX = sin(ang)`, `stickY = cos(ang)` (en `input.cpp`). **Sin comprobar en la Wii real**: en "Pala: kolpe proba"
+  `stickX = sin(ang)`, `stickY = cos(ang)` (en `input.cpp`); la cabecera de wiiuse lo confirma ("hacia arriba 0°, a
+la derecha 90°"). **Sin probar en la Wii real**: en "Pala: kolpe proba"
   (escena 14) el punto del stick tiene que ir hacia donde se empuja y Z/C/A/B se encienden al pulsarlos. Si va girado,
   cambiar ahí la fórmula.
 - Z y C llegan en `WPAD_ButtonsHeld` como `WPAD_NUNCHUK_BUTTON_Z/C` (bits altos).

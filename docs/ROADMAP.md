@@ -139,6 +139,19 @@ Pendiente:
 - [ ] Frontón de Zarautz (fotos del usuario) · 2v2 (delantero y zaguero)
 - [ ] Juntar `palas` con `develop` cuando el usuario lo apruebe
 
+## Experiencia de uso de todo el juego (16/10, repaso pedido por el usuario; no toca el gameplay)
+Hallazgos y mejoras, en orden de impacto:
+- [ ] **Puntero IR en todos los menús** (decisión del usuario: cruceta Y puntero): mano de cada jugador, el botón bajo
+  el puntero se resalta con una vibración corta, A lo elige; la cruceta sigue funcionando igual
+- [ ] **Jokalariak**: confirmar antes de borrar (ahora borra al instante); avisar al salir con cambios sin guardar;
+  lista con el mismo estilo de cristal que el resto; teclado con puntero
+- [ ] **Mandos en partida**: si se apaga el Wii Remote de un humano, pausa con "Konektatu N. Wii Remote-a" (ahora el
+  mando 1 pasa a controlar a los dos sin avisar); en "Aukeratu" se ve qué mando es de cada jugador y si falta (y el
+  Nunchuk en la pala)
+- [ ] **Preparar partida**: indicador de pasos (kirola → modua → …) para saber dónde estás
+- [ ] **Batería baja** del Wii Remote: aviso pequeño, y las pilas de cada mando en el diálogo de HOME
+- [ ] **Aukerak** (ajustes) en el menú principal: sensibilidad e inversiones, que hoy solo están dentro de Kolpe proba
+
 ## Arreglos pendientes
 - [x] Aizkolaritza: las mallas de `Log` y `Chips` se liberan al cambiar de escena (antes, fuga en cada "Berriro
   jokatu"; ver WII-NOTAS)
