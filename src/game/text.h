@@ -163,6 +163,7 @@ constexpr const char* DELETE_Q = "%s ezabatu?";
 constexpr const char* UNSAVED_Q = "Aldaketak gorde?";
 constexpr const char* DONT_SAVE = "Ez gorde";
 constexpr const char* DELETED = "Ezabatuta";
+constexpr const char* CHANGE_HINT = "Gurutzea ezker/eskuin edo geziak: aldatu";
 
 constexpr const char* NO_RECORD = "Errekorrik ez";
 constexpr const char* REC_TRAINING = "Entrenamendua";

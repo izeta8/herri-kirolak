@@ -382,6 +382,12 @@ void ProfilesScene::draw() {
                 gfx::triangle(vx + 32, y + 18, vx + 22, y + 10, vx + 22, y + 26, UI_BLUE);
             }
         }
+        // Cómo se cambian los valores (cruceta o, con el puntero, las flechas)
+        {
+            float hy = py + 22 + nFields_ * 38 + 10, hw = font::width(txt::CHANGE_HINT, 17) + 30;
+            gfx::roundRect(px, hy, hw, 28, 14, rgba(255, 255, 255, 190));
+            font::plain(txt::CHANGE_HINT, px + 15, hy + 4, 17, UI_TEXT_LIGHT);
+        }
         if (mode_ == MODE_CONFIRM) {
             // Diálogo de confirmación encima del editor
             ui::fade(0.4f);
@@ -430,7 +436,7 @@ void ProfilesScene::draw() {
             gfx::roundRect(x, y, sw, kh, 14, bg);
             font::plain(special[c], x + sw / 2, y + 9, 30, sel ? UI_WHITE : UI_TEXT, ALIGN_CENTER);
         }
-        ui::hints(txt::SELECT, "<");
+        ui::hints(txt::SELECT, "<", txt::OK);
     }
     if (msgT_ > 0) font::draw(msg_, W / 2, 392, 26, UI_WHITE, UI_BLUE_DARK, ALIGN_CENTER, clampv(msgT_ * 2, 0.0f, 1.0f));
 }
