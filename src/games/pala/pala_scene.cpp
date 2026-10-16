@@ -20,6 +20,7 @@
 #include "game/world.h"
 #include "games/pala/ball.h"
 #include "games/pala/fronton.h"
+#include "games/pala/pala_howto.h"
 #include "games/pala/pelotari.h"
 #include "scenes/scenes.h"
 
@@ -132,6 +133,8 @@ public:
         }
         server_ = 0;
         resetPositions();
+        showHowTo_ = cfg_.training && !pl_[0].bot;
+        if (showHowTo_) howTo_.start();
         camTarget_ = Vec3(0, 1, 16);
         camDist_ = 34;
     }
@@ -198,6 +201,8 @@ private:
     bool paused_ = false;
     ui::ListMenu pauseMenu_, resultsMenu_;
     float resultsT_ = 0;
+    bool showHowTo_ = false;
+    PalaHowTo howTo_;
 };
 
 bool PalaScene::needsNunchuk() const {
@@ -738,6 +743,11 @@ void PalaScene::update(float dt) {
         else if (r == 2) scenes::go(makeMainMenu());
         return;
     }
+    if (showHowTo_) {
+        if (howTo_.update(dt, downAll)) showHowTo_ = false;
+        fronton_.update(dt);
+        return;
+    }
     if (state_ != ST_RESULTS && (downAll & WPAD_BUTTON_PLUS)) {
         paused_ = true;
         pauseMenu_ = ui::ListMenu();
@@ -986,6 +996,10 @@ void PalaScene::draw() {
     }
 
     gfx::begin2D();
+    if (showHowTo_) {
+        howTo_.draw();
+        return;
+    }
     fronton_.drawLabels();
     drawEffects2D();
     drawHud();

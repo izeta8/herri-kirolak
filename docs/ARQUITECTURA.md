@@ -39,6 +39,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 | `updater` | Actualización en caliente (TCP 4301) y salto al cargador `tools/booter` | `updater::open/poll/ready/launch` |
 
 ## Común a los deportes (`src/game/`)
+- **`remote3d`** — malla del Wii Remote en 3D para los tutoriales animados (`remote3d::mesh()`).
 - **`sports.h/.cpp`** — registro de deportes y `MatchConfig` (deporte, entrenamiento/lehiaketa, jugadores, rondas,
   perfiles, CPU). Cada `Sport` puede limitar los jugadores (`maxPlayers`), enseñar otros valores en las rondas
   (`roundValues`, p. ej. 10/15/22 tantos) y cambiar el título de elegir personaje (`chooseChar`). El menú "preparar partida" se construye con esta lista. Ver `docs/NUEVO-JUEGO.md`.
@@ -129,6 +130,9 @@ jugadores → rondas → personajes, con − para CPU) → escena del deporte. `
   - Efectos 2D: estela de la pala, anillo en el frontis, chispa del golpe, mira; HUD con marcador, tiempo/sitio del
     último golpe, tipo de golpe según los botones y tarjeta "Nola jo" (entrenamiento).
 - `whiptest` — "Pala: kolpe proba": el latigazo en directo y grabación guiada para calibrarlo.
+- `pala_howto` — "Nola jokatu" animado (estilo Resort, como el de aizkolaritza) al empezar el entrenamiento: moverse,
+  apuntar con Z (bipareta), latigazo (Wii Remote 3D de `game/remote3d`), tipos de golpe y punto dulce.
+- `showcase` — escena de prueba 16: un pelotari de cerca repitiendo todas sus animaciones.
 
 ## Convenciones
 - Caras en orden antihorario → `GX_CULL_FRONT`; `MeshBuilder::tri()` orienta las caras solo con un vector "hacia fuera".

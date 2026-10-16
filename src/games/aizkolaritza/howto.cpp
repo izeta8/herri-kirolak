@@ -5,55 +5,15 @@
 #include "engine/gfx.h"
 #include "engine/ui.h"
 #include "game/palette.h"
+#include "game/remote3d.h"
 #include "game/text.h"
 
 namespace {
 
+using remote3d::RL;
+using remote3d::RD;
 const int NUM_STEPS = 5;
 const float PERIOD[NUM_STEPS] = {2.6f, 2.8f, 2.4f, 3.4f, 3.2f};
-
-// Wii Remote en metros: largo (Y, la punta con el sensor arriba), ancho (X) y grueso (Z, botones en +Z)
-const float RL = 0.148f, RW = 0.036f, RD = 0.03f;
-Mesh s_remote;
-
-void buildRemote() {
-    if (s_remote.valid()) return;
-    MeshBuilder b;
-    const Color body = rgba(0xF6, 0xF6, 0xF4), grey = rgba(0xDC, 0xDE, 0xE2), dark = rgba(0x5A, 0x5E, 0x66);
-    const float r = 0.008f, hx = RW / 2, hz = RD / 2;
-    // Cuerpo con las aristas largas redondeadas
-    b.box(Vec3(0, 0, 0), Vec3(hx - r, RL / 2, hz), body);
-    b.box(Vec3(0, 0, 0), Vec3(hx, RL / 2, hz - r), body);
-    for (int sx = -1; sx <= 1; sx += 2)
-        for (int sz = -1; sz <= 1; sz += 2)
-            b.cylinder(Vec3(sx * (hx - r), -RL / 2, sz * (hz - r)), r, r, RL, body, body, 10, true);
-    // Sensor negro en la punta
-    b.box(Vec3(0, RL / 2 + 0.0008f, 0), Vec3(hx - 0.002f, 0.0012f, hz - 0.002f), rgba(0x1C, 0x1C, 0x22));
-    Xf saved = b.xf;
-    b.xf = Xf().rotateX(PI / 2);  // discos y cilindros (eje +Y) pasan a mirar a +Z, la cara de los botones
-    auto button = [&](float y, float rad, float h, Color c) {
-        // rotateX(90°) lleva (x, y, z) a (x, −z, y): para que quede en (0, y, hz) hay que construir en (0, hz, −y)
-        b.cylinder(Vec3(0, hz - 0.0005f, -y), rad, rad * 0.92f, h, c, shade(c, 1.04f), 16, true);
-    };
-    button(RL / 2 - 0.012f, 0.003f, 0.0012f, rgba(0xB8, 0x30, 0x30));  // encendido
-    button(RL / 2 - 0.062f, 0.0078f, 0.0025f, grey);                    // A
-    button(-0.012f, 0.0028f, 0.0012f, grey);                            // HOME
-    button(-0.046f, 0.0056f, 0.002f, grey);                             // 1
-    button(-0.062f, 0.0056f, 0.002f, grey);                             // 2
-    b.xf = saved;
-    // Cruceta
-    b.box(Vec3(0, RL / 2 - 0.032f, hz + 0.001f), Vec3(0.011f, 0.0035f, 0.0015f), dark);
-    b.box(Vec3(0, RL / 2 - 0.032f, hz + 0.001f), Vec3(0.0035f, 0.011f, 0.0015f), dark);
-    // − y +, y las luces de jugador abajo
-    b.box(Vec3(-0.011f, -0.012f, hz + 0.0006f), Vec3(0.0028f, 0.0028f, 0.001f), grey);
-    b.box(Vec3(0.011f, -0.012f, hz + 0.0006f), Vec3(0.0028f, 0.0028f, 0.001f), grey);
-    for (int i = 0; i < 4; i++)
-        b.box(Vec3(-0.0105f + i * 0.007f, -RL / 2 + 0.011f, hz + 0.0004f), Vec3(0.0018f, 0.0012f, 0.0006f),
-              i == 0 ? rgba(0x40, 0x9C, 0xF0) : rgba(0xB0, 0xB4, 0xBC));
-    // Gatillo B por detrás
-    b.box(Vec3(0, RL / 2 - 0.05f, -hz - 0.003f), Vec3(0.0085f, 0.012f, 0.0035f), grey);
-    b.build(s_remote);
-}
 
 HowTo::Pose lerpPose(const HowTo::Pose& a, const HowTo::Pose& b, float t) {
     return {lerpf(a.x, b.x, t), lerpf(a.y, b.y, t), lerpf(a.roll, b.roll, t), lerpf(a.pitch, b.pitch, t), lerpf(a.yaw, b.yaw, t)};
@@ -81,7 +41,6 @@ void strip(float x0, float y0, float x1, float y1, float w0, float w1, Color c0,
 }  // namespace
 
 void HowTo::start() {
-    buildRemote();
     total_ = 0;
     touched_ = false;
     setStep(0);
@@ -330,7 +289,7 @@ void HowTo::draw() {
     cam.znear = 0.05f;
     gfx::begin3D(cam);
     Xf xf = Xf().translate(Vec3(pose_.x, pose_.y, 0)).rotateY(pose_.yaw).rotateZ(pose_.roll).rotateX(pose_.pitch).translate(Vec3(0, 0.045f, 0));
-    gfx::drawMesh(s_remote, xf);
+    gfx::drawMesh(remote3d::mesh(), xf);
     float tipX, tipY, b12X, b12Y, bX, bY;
     gfx::project(xf.apply(Vec3(0, RL / 2, 0)), tipX, tipY);
     gfx::project(xf.apply(Vec3(0, -0.054f, RD / 2)), b12X, b12Y);

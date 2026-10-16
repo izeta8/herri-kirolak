@@ -189,6 +189,14 @@ constexpr const char* BIPARETA = "Bipareta!";
 constexpr const char* SHOT_NAMES[3] = {"Dejada", "Erdira", "Luzea"};
 constexpr const char* PLACE = "Tokia";
 constexpr const char* AIMING = "Zuzentzen";
+// Tutorial animado "Nola jokatu" de la pala: título y dos líneas por paso
+constexpr const char* PALA_HOWTO_STEPS[5][3] = {
+    {"Mugitu", "Nunchuk-aren makilarekin kokatu:", "pilota zure ondotik pasa dadin."},
+    {"Zuzendu Z-rekin", "Z sakatuta geldi zaude, eta makilarekin", "aukeratu non jo: frontisa edo horma."},
+    {"Jo", "Egin kolpe bizkor bat Wii Remote-arekin:", "zenbat eta bizkorrago, indartsuago."},
+    {"Kolpe motak", "B sakatuta: dejada. Ezer ez: erdira.", "A sakatuta: luzea, beste muturrera."},
+    {"Puntu gozoa", "Jo pilota zure ondora iristen denean,", "ez goizegi eta ez beranduegi!"},
+};
 // Tarjeta "Nola jo" de la pala: tecla y qué hace
 constexpr const char* PALA_HOW[6][2] = {
     {"Nunchuk", "mugitu"}, {"Z + makila", "zuzendu"}, {"Wii Remote", "jo (indarra)"},

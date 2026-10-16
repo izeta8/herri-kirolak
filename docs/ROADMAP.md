@@ -127,11 +127,13 @@ Diseño v2 (en orden; trabajo autónomo del 16/10, ver SPEC §6):
   error y pierde velocidad; ventanas más estrechas con la fuerza; volea / bote pronto; peloteo que se acelera.
 - [x] **5.4 CPU por niveles** (Erraza/Normala/Zaila) usando los mismos `Ctl` (se coloca, planta, apunta, A/B, golpea);
   paso de nivel en `setup`.
-- [ ] **5.5 HUD y efectos**: valoración del golpe (Bikain!/Ondo/Txarto, Bolea!, Bote pronto!, Bipareta!), estela de la
+- [x] **5.5 HUD y efectos**: valoración del golpe (Bikain!/Ondo/Txarto, Bolea!, Bote pronto!, Bipareta!), estela de la
   pelota, destello en el impacto, indicador de tipo de golpe y mira, "Nola jo" de la pala.
-- [ ] **5.6 Estilo Resort**: frontón con más detalle (bloques, números de cuadro, grada con público Mii que reacciona,
+- [x] **5.6 Estilo Resort**: frontón con más detalle (bloques, números de cuadro, grada con público Mii que reacciona,
   fondo de monte), animaciones (preparado con saltito, carrera, giro de cuerpo en el golpe, celebración y bajón).
 - [x] Escena 15 (CPU Zaila, 2 tantos) para probar el final; repaso con capturas de 10/11/13/15 y aizkolaritza (6)
+- [x] Tutorial animado "Nola jokatu" de la pala (5 pasos) al empezar el entrenamiento
+- [x] Ikurriña, paneles de colores, intro de cámara desde lo alto del frontis, saltito de preparación
 - [ ] **5.7 Repaso**: escenas 11 y 13 con capturas, aizkolaritza (6), docs.
 - [ ] **5.9 Wii real**: calibrar el latigazo con la grabación guiada (escena 14) y probar el tacto con el usuario.
 - [x] Récords de la pala en save.dat v4 (mejor racha del entrenamiento, peloteo más largo) y página "Pala" en Errekorrak (←/→)
