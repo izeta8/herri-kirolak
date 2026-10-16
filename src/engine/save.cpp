@@ -8,7 +8,7 @@
 namespace save {
 
 static const u32 MAGIC = 0x484B5331;  // "HKS1"
-static const u16 VERSION = 3;
+static const u16 VERSION = 4;
 
 static SaveData s_data;
 static char s_path[256] = "";
@@ -72,13 +72,14 @@ void init(const char* argv0) {
     memset(&tmp, 0, sizeof(tmp));
     size_t got = fread(&tmp, 1, sizeof(tmp), f);
     fclose(f);
-    const size_t v1Size = sizeof(SaveData) - sizeof(Settings);
+    const size_t v3Size = sizeof(SaveData) - sizeof(PalaRecords);  // v2 y v3: sin récords de la pala
+    const size_t v1Size = v3Size - sizeof(Settings);
     if (tmp.magic != MAGIC) return;
     if (tmp.version == VERSION && got == sizeof(tmp)) s_data = tmp;
-    else if (tmp.version == 2 && got == sizeof(tmp)) {
-        s_data = tmp;  // en la v2 "arriba" estaba invertido por defecto
+    else if ((tmp.version == 3 || tmp.version == 2) && got >= v3Size) {
+        memcpy(&s_data, &tmp, v3Size);  // los récords de la pala, a cero
+        if (tmp.version == 2) s_data.settings.raiseInverted = 0;  // en la v2 "arriba" estaba invertido por defecto
         s_data.version = VERSION;
-        s_data.settings.raiseInverted = 0;
     }
     else if (tmp.version == 1 && got >= v1Size) {
         memcpy(&s_data, &tmp, v1Size);  // la versión 1 no tenía ajustes

@@ -31,7 +31,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 | `font` | Texto con contorno (Nunito OFL, atlas IA8, Latin-1: ñ, tildes) | `font::draw(txt, x, y, size, relleno, contorno, align, alpha)`, `font::plain(...)`, `font::width` |
 | `input` | 4 Wii Remotes: botones, acelerómetro a ~100 lecturas/s, **detector de hachazo**, **latigazo** (pala) y **stick del Nunchuk** | `input::pad(i)` → `Pad` (`down`, `held`, `accel`, `grav`, `raise`, `state`, `chop`, `swingStart`, `swingTilt`, `whip`, `whipStart`, `nunchuk`, `stickX/Y`…); `allDown()`, `rumble(i, s)` |
 | `audio` | Efectos con ASND (PCM 16 bits BE 32 kHz) | `audio::play(SFX_x, volumen, tono, pan)` |
-| `save` | `save.dat` junto al `boot.dol` (USB o SD), versión 3 con migración | `save::data()` (`profiles`, `records`, `settings`), `save::write()`, `save::directory()` |
+| `save` | `save.dat` junto al `boot.dol` (USB o SD), versión 4 con migración (v1–v3 se leen) | `save::data()` (`profiles`, `records` de aizkolaritza, `settings`, `pala`), `save::write()`, `save::directory()` |
 | `ui` | Elementos estilo Wii manejados con cruceta | `background`, `header`, `panel`, `button`, `buttonIcon`, `hints`, `fade`, `colorDot`, `formatTime`, `ListMenu` |
 | `scene` | Escenas con fundido y diálogo de HOME global | `class Scene { update(dt); draw(); }`, `scenes::go(new X)`, `scenes::openExitDialog()` |
 | `tuning.h` | **Todas** las constantes ajustables (gesto, juego) | — |

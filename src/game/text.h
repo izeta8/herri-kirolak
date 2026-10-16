@@ -151,6 +151,9 @@ constexpr const char* SAVED = "Gordeta!";
 constexpr const char* NO_RECORD = "Errekorrik ez";
 constexpr const char* REC_TRAINING = "Entrenamendua";
 constexpr const char* REC_COMP = "Lehiaketa - %d enbor";
+constexpr const char* REC_PALA_STREAK = "Entrenamendua: jarraian";
+constexpr const char* REC_PALA_RALLY = "Lehiaketa: peloteo luzeena";
+constexpr const char* REC_HITS = "%d kolpe";
 
 // Pala
 constexpr const char* PALA = "Pala";

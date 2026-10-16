@@ -153,6 +153,7 @@ private:
     Vec3 solveShot(const Vec3& P, const Vec3& A, float vh, float depth) const;
     void onBallEvent(const BallEvent& e);
     void endPoint(int loser, const char* why, const Vec3& at);
+    void checkRecords();
     void addLabel(const char* t, const Vec3& pos, Color c, float size = 1);
     void addFx(int kind, const Vec3& pos, Color c, float size);
     void enterResults();
@@ -189,7 +190,7 @@ private:
     FloatLabel labels_[8];
     int numLabels_ = 0;
     Fx fx_[12];
-    float shake_ = 0, hitstop_ = 0;
+    float shake_ = 0, hitstop_ = 0, newRecord_ = 0;
     Vec3 camTarget_;
     float camDist_ = 12;
     mutable float camDistTry_ = 12, camFovTry_ = CAM_FOV;
@@ -437,6 +438,30 @@ void PalaScene::doHit(int i, const HitInfo& h) {
     }
 }
 
+void PalaScene::checkRecords() {
+    PalaRecords& r = save::data().pala;
+    const Player* human = nullptr;
+    for (int i = 0; i < n_ && !human; i++)
+        if (!pl_[i].bot) human = &pl_[i];
+    if (!human) return;
+    bool better = false;
+    if (cfg_.training && streak_ > r.bestStreak) {
+        r.bestStreak = (u16)streak_;
+        memcpy(r.streakName, human->prof->name, NAME_LEN + 1);
+        better = true;
+    }
+    if (!cfg_.training && rallyHits_ > r.bestRally) {
+        r.bestRally = (u16)rallyHits_;
+        memcpy(r.rallyName, human->prof->name, NAME_LEN + 1);
+        better = true;
+    }
+    if (better && (cfg_.training ? streak_ : rallyHits_) >= 3) {
+        newRecord_ = 2.5f;
+        save::write();
+        audio::play(SFX_BELL, 0.5f);
+    }
+}
+
 void PalaScene::endPoint(int loser, const char* why, const Vec3& at) {
     if (!rally_) return;
     rally_ = false;
@@ -444,6 +469,7 @@ void PalaScene::endPoint(int loser, const char* why, const Vec3& at) {
     audio::play(SFX_BAD, 0.5f);
     state_ = ST_POINT;
     stateT_ = 0;
+    checkRecords();
     if (cfg_.training) {
         streak_ = 0;
         pl_[0].pel.setMood(Pelotari::MOOD_SAD);
@@ -819,6 +845,7 @@ void PalaScene::update(float dt) {
         numLabels_--;
     }
     for (Fx& f : fx_) f.t += dt;
+    newRecord_ = fmaxf(0.0f, newRecord_ - dt);
     shake_ = approach(shake_, 0, 10, dt);
     updateCamera(dt);
 }
@@ -1117,6 +1144,10 @@ void PalaScene::drawHud() {
         font::draw(buf, W / 2, 130, 52 * s + 1, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER);
     }
 
+    if (newRecord_ > 0) {
+        float s = 1 + 0.05f * sinf(time_ * 8);
+        font::draw(txt::NEW_RECORD, W / 2, 200, 40 * s, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, smooth01(newRecord_ * 2));
+    }
     if (needsNunchuk()) {
         ui::fade(0.45f);
         ui::panel(W / 2 - 260, 170, 520, 130);

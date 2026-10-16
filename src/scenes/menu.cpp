@@ -1,5 +1,6 @@
 // Menú principal, récords
 #include <stdio.h>
+#include "engine/audio.h"
 #include "engine/font.h"
 #include "engine/gfx.h"
 #include "engine/input.h"
@@ -55,7 +56,12 @@ class RecordsScene : public Scene {
 public:
     void update(float dt) override {
         t_ += dt;
-        if (input::allDown() & (WPAD_BUTTON_B | WPAD_BUTTON_A)) scenes::go(makeMainMenu(2));
+        u32 down = input::allDown();
+        if (down & (WPAD_BUTTON_B | WPAD_BUTTON_A)) scenes::go(makeMainMenu(2));
+        if (down & (WPAD_BUTTON_LEFT | WPAD_BUTTON_RIGHT)) {
+            page_ = 1 - page_;
+            audio::play(SFX_MOVE, 0.6f);
+        }
     }
 
     void draw() override {
@@ -66,7 +72,30 @@ public:
         float pw = 600, px = W / 2 - pw / 2;
         ui::panel(px, 100, pw, 300);
         char buf[64], tbuf[32];
-        for (int i = 0; i < REC_COUNT; i++) {
+        // Página: ← aizkolaritza / pala →
+        font::draw(page_ == 0 ? txt::AIZKOLARITZA : txt::PALA, W / 2, 66, 30, UI_WHITE, UI_BLUE_DARK, ALIGN_CENTER);
+        float pulse = 4 * sinf(t_ * 6);
+        gfx::triangle(W / 2 - 150 - pulse, 84, W / 2 - 134 - pulse, 72, W / 2 - 134 - pulse, 96, UI_BLUE);
+        gfx::triangle(W / 2 + 150 + pulse, 84, W / 2 + 134 + pulse, 72, W / 2 + 134 + pulse, 96, UI_BLUE);
+        if (page_ == 1) {
+            const PalaRecords& r = save::data().pala;
+            const char* names[2] = {txt::REC_PALA_STREAK, txt::REC_PALA_RALLY};
+            int vals[2] = {r.bestStreak, r.bestRally};
+            const char* who[2] = {r.streakName, r.rallyName};
+            for (int i = 0; i < 2; i++) {
+                float y = 140 + i * 100;
+                font::plain(names[i], px + 30, y, 26, UI_TEXT);
+                if (vals[i]) {
+                    snprintf(tbuf, sizeof(tbuf), txt::REC_HITS, vals[i]);
+                    font::plain(tbuf, px + pw - 30, y + 36, 34, UI_BLUE_DARK, ALIGN_RIGHT);
+                    font::plain(who[i], px + 30, y + 42, 22, UI_TEXT_LIGHT);
+                } else {
+                    font::plain(txt::NO_RECORD, px + pw - 30, y + 42, 22, UI_TEXT_LIGHT, ALIGN_RIGHT);
+                }
+                if (i == 0) gfx::rect(px + 24, y + 84, pw - 48, 2, rgba(0xE0, 0xE8, 0xF0));
+            }
+        }
+        for (int i = 0; i < REC_COUNT && page_ == 0; i++) {
             float y = 124 + i * 66;
             if (i == REC_TRAINING) snprintf(buf, sizeof(buf), "%s", txt::REC_TRAINING);
             else snprintf(buf, sizeof(buf), txt::REC_COMP, i);
@@ -87,6 +116,7 @@ public:
 
 private:
     float t_ = 0;
+    int page_ = 0;
 };
 
 }  // namespace

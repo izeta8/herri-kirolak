@@ -31,6 +31,15 @@ struct Settings {
     u8 pad[13];
 };
 
+// Récords de la pala (desde la versión 4)
+struct PalaRecords {
+    u16 bestStreak;  // entrenamiento: golpes buenos seguidos
+    u16 bestRally;   // lehiaketa: golpes del peloteo más largo (con algún humano)
+    char streakName[NAME_LEN + 1];
+    char rallyName[NAME_LEN + 1];
+    u8 pad[4];
+};
+
 struct SaveData {
     u32 magic;
     u16 version;
@@ -38,6 +47,7 @@ struct SaveData {
     Profile profiles[MAX_PROFILES];
     Record records[REC_COUNT];
     Settings settings;  // desde la versión 2
+    PalaRecords pala;   // desde la versión 4
 };
 
 namespace save {

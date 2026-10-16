@@ -55,7 +55,7 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [x] Documentación para IA: CLAUDE.md índice + docs/ARQUITECTURA, NUEVO-JUEGO, GESTOS, DECISIONES, WII-NOTAS, HARNESS
 - [x] Skills del proyecto (.claude/skills): probar-en-dolphin, mandar-a-wii, calibrar-gesto, nuevo-juego
 - [x] Registro de deportes (`src/game/sports.cpp`) y `MatchConfig` común
-- [ ] Récords por deporte en save.dat (ahora son de aizkolaritza)
+- [x] Récords por deporte en save.dat: v4 añade los de la pala al final (los de aizkolaritza siguen en `records`)
 
 ## Estilo Wii (rama `estilo-wii-sports-resort`, pendiente de que el usuario lo vea en la Wii)
 - [x] UI y menús estilo Wii Sports Resort; fondo de menús = escenario 3D
@@ -134,7 +134,7 @@ Diseño v2 (en orden; trabajo autónomo del 16/10, ver SPEC §6):
 - [x] Escena 15 (CPU Zaila, 2 tantos) para probar el final; repaso con capturas de 10/11/13/15 y aizkolaritza (6)
 - [ ] **5.7 Repaso**: escenas 11 y 13 con capturas, aizkolaritza (6), docs.
 - [ ] **5.9 Wii real**: calibrar el latigazo con la grabación guiada (escena 14) y probar el tacto con el usuario.
-- [ ] 5.10 Entrenamendua y Lehiaketa completos + resultados + récord (récords por deporte en save.dat)
+- [x] Récords de la pala en save.dat v4 (mejor racha del entrenamiento, peloteo más largo) y página "Pala" en Errekorrak (←/→)
 - [ ] 5.11 Frontón de Zarautz (fotos del usuario) · 5.12 2v2
 
 ## Más adelante
