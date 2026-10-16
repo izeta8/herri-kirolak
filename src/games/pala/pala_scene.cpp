@@ -1214,8 +1214,15 @@ void PalaScene::drawHud() {
     }
     if (howTo) drawHowTo();
     if (state_ == ST_POINT && !cfg_.training && lastWinner_ >= 0 && stateT_ > 0.5f) {
+        float a = smooth01((stateT_ - 0.5f) / 0.3f);
         snprintf(buf, sizeof(buf), txt::POINT_FOR, pl_[lastWinner_].prof->name);
-        font::draw(buf, W / 2, 140, 44, UI_WHITE, UI_TEAL, ALIGN_CENTER, smooth01((stateT_ - 0.5f) / 0.3f));
+        font::draw(buf, W / 2, 140, 44, UI_WHITE, UI_TEAL, ALIGN_CENTER, a);
+        // El kantaria: el tanteo cantado, primero el que va ganando
+        int hi = pl_[0].score >= pl_[1].score ? pl_[0].score : pl_[1].score;
+        int lo = pl_[0].score >= pl_[1].score ? pl_[1].score : pl_[0].score;
+        snprintf(buf, sizeof(buf), txt::CHANT, txt::NUMBERS[clampv(hi, 0, 22)], txt::NUMBERS[clampv(lo, 0, 22)]);
+        float s = 1.0f + 0.04f * sinf(time_ * 5);
+        font::draw(buf, W / 2, 196, 32 * s, UI_GOLD, rgba(0x60, 0x30, 0x10), ALIGN_CENTER, smooth01((stateT_ - 0.8f) / 0.3f));
     }
     if (state_ == ST_INTRO) {
         float a = smooth01(stateT_ / 0.4f) * (1 - smooth01((stateT_ - 2.0f) / 0.4f));

@@ -135,6 +135,9 @@ un poco hacia el pelotari humano para que no se pierda de vista.
 
 Se mantiene la **marca de bote** (ayuda) de momento.
 
+**8. Detalles de pelota de verdad.** Tras cada tanto, el *kantaria* canta el tanteo en euskera («Lau eta bi!», primero
+el que va ganando). El público aplaude los buenos peloteos y salta en los tantos largos.
+
 ### Reglas (sin cambios)
 - Tanto perdido si la pelota: da en la chapa o por debajo, por encima de la línea de arriba, fuera de la cancha o del
   lado abierto antes de botar, bota dos veces, o no llega al frontis.

@@ -156,6 +156,11 @@ constexpr const char* REC_PALA_RALLY = "Lehiaketa: peloteo luzeena";
 constexpr const char* REC_HITS = "%d kolpe";
 constexpr const char* STATS_LINE = "Bikain: %d   Bipareta: %d";
 constexpr const char* LONGEST_RALLY = "Peloteo luzeena: %d kolpe";
+// El kantaria canta el tanteo (primero el que va ganando): "Lau eta bi!"
+constexpr const char* NUMBERS[23] = {"Zero", "Bat", "Bi", "Hiru", "Lau", "Bost", "Sei", "Zazpi", "Zortzi", "Bederatzi",
+                                     "Hamar", "Hamaika", "Hamabi", "Hamahiru", "Hamalau", "Hamabost", "Hamasei",
+                                     "Hamazazpi", "Hemezortzi", "Hemeretzi", "Hogei", "Hogeita bat", "Hogeita bi"};
+constexpr const char* CHANT = "%s eta %s!";
 
 // Pala
 constexpr const char* PALA = "Pala";
