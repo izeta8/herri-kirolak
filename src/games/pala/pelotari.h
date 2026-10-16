@@ -22,6 +22,7 @@ public:
     // Golpe: la pala llega a la pelota dentro de `contactIn` s (si ya estaba golpeando, solo se reajusta el momento)
     void swing(int side, float height, float contactIn, float strength);
     void dropBall();  // saque: suelta la pelota con la mano izquierda
+    void splitStep() { splitT_ = 0; }  // saltito de preparación cuando golpea el rival
     void setPlanted(bool on) { planted_ = on; }  // apuntando: quieto, agachado
     enum Mood { MOOD_NONE, MOOD_HAPPY, MOOD_SAD };
     void setMood(Mood m) { mood_ = m; moodT_ = 0; }
@@ -44,6 +45,6 @@ private:
     float dropT_ = -1;
     Mood mood_ = MOOD_NONE;
     float moodT_ = 0;
-    float hop_ = 0, blinkT_ = 2;
+    float hop_ = 0, blinkT_ = 2, splitT_ = -1;
     Vec3 tip_, mid_;
 };

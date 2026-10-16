@@ -14,6 +14,7 @@ Scene* makeMiiGalleryScene();  // prueba: Miis de cerca
 Scene* makeAizkoScene(const MatchConfig& cfg);
 Scene* makePalaScene(const MatchConfig& cfg);
 Scene* makeWhipTestScene();  // pala: prueba del latigazo
+Scene* makePelotariShowcase();  // prueba: animaciones del pelotari de cerca
 
 // Escenario compartido (se construye una vez)
 World& sharedWorld();

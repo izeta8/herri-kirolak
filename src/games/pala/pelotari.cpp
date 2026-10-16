@@ -10,7 +10,7 @@ static const float FOLLOW_TIME = 0.32f;   // del impacto al final del golpe
 static const float THETA_BACK = -1.45f;   // pala atrás (preparada)
 static const float THETA_CONTACT = 0.1f;  // a la altura de la pelota, un poco por delante
 static const float THETA_END = 2.1f;      // final del golpe, cruzada por delante del cuerpo
-static const float THETA_REST = 0.75f;    // en reposo, delante
+static const float THETA_REST = 1.15f;    // en reposo, delante
 static const float ARM = 0.42f;           // del hombro a la mano
 static const float DROP_TIME = 0.35f;
 // Piernas del cuerpo de Resort (m): muslo y espinilla, para saber cuánto baja la cadera al doblarlas
@@ -102,8 +102,14 @@ void Pelotari::update(float dt) {
     }
     // Saltitos: celebrar, golpe fuerte (justo después del impacto) y el botecito de la espera
     float hopSwing = swingT_ > contactAt_ && strength_ > 0.7f ? sinf(PI * clampv((swingT_ - contactAt_) / 0.3f, 0.0f, 1.0f)) * 0.06f : 0;
+    float split = 0;
+    if (splitT_ >= 0) {
+        splitT_ += dt;
+        split = sinf(PI * clampv(splitT_ / 0.28f, 0.0f, 1.0f)) * 0.09f;
+        if (splitT_ > 0.28f) splitT_ = -1;
+    }
     if (mood_ == MOOD_HAPPY) hop_ = fabsf(sinf(moodT_ * 7.0f)) * 0.28f;
-    else hop_ = hopSwing + fabsf(sinf(runPhase_)) * 0.04f * run_;
+    else hop_ = hopSwing + split + fabsf(sinf(runPhase_)) * 0.04f * run_;
     blinkT_ -= dt;
     if (blinkT_ < -0.12f) blinkT_ = frand(1.5f, 4.0f);
 }
@@ -150,14 +156,16 @@ void Pelotari::computePose(CharacterPose& pose, Xf& palaXf) {
     // En el espacio del personaje: delante = +Z, su derecha = -X
     Vec3 fwd(0, 0, 1), sideDir(side_ > 0 ? -1.0f : 1.0f, 0, 0);
     float hy = clampv(height_ - pose.pos.y + pos.y, 0.3f, 2.0f);
-    float handY = lerpf(0.72f, hy, swingT_ >= 0 ? 1.0f : prep_);
+    float handY = lerpf(0.8f, hy, swingT_ >= 0 ? 1.0f : prep_);
     Vec3 shoulder = sideDir * 0.16f + Vec3(0, tuning::MII_BODY_UNIT * 9.25f, 0);
     Vec3 radial = sideDir * cosf(theta_) + fwd * sinf(theta_);
     Vec3 tangent = normalize(sideDir * -sinf(theta_) + fwd * cosf(theta_));
     Vec3 hand = shoulder + radial * ARM;
     hand.y = handY;
     // La hoja sale hacia fuera y hacia arriba; la cara mira hacia donde va el golpe
-    Vec3 axis = normalize(radial * 0.8f + Vec3(0, 0.55f, 0));
+    // en reposo, más levantada (lista); al prepararla atrás, más plana
+    float upK = swingT_ >= 0 ? 0.5f : lerpf(1.1f, 0.3f, prep_);
+    Vec3 axis = normalize(radial * 0.8f + Vec3(0, upK, 0));
     if (happy) {
         hand = Vec3(-0.22f, 1.35f + 0.08f * sinf(moodT_ * 7), 0.12f);
         axis = normalize(Vec3(-0.2f, 1, 0.1f));

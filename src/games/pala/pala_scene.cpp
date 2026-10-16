@@ -412,6 +412,7 @@ void PalaScene::doHit(int i, const HitInfo& h) {
     serving_ = serve;
     hitter_ = i;
     mustHit_ = other(i);
+    if (mustHit_ != i) pl_[mustHit_].pel.splitStep();
     rallyHits_++;
     trailN_ = 0;
     for (int k = 0; k < n_; k++) pl_[k].botPlanned = false;
@@ -1126,7 +1127,6 @@ void PalaScene::drawHud() {
 
 // Tarjeta "Nola jo" del entrenamiento: los controles de la pala
 void PalaScene::drawHowTo() {
-    const float W = gfx::screenW();
     float pw = HOWTO_W, ph = 36 + 6 * 32, px = 20, py = 112;
     gfx::roundRectGrad(px, py, pw, ph, 20, UI_GLASS_TOP, UI_GLASS_BOTTOM);
     font::plain(txt::HOW_TO, px + pw / 2, py + 6, 26, UI_TEAL, ALIGN_CENTER);
