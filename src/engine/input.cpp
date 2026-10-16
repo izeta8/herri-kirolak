@@ -27,7 +27,9 @@ static int s_vresW = 640, s_vresH = 480;
 
 void init() {
     WPAD_Init();
-    WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);  // con IR: el puntero de los menús
+    // Sin IR al principio: si se enciende la cámara IR nada más conectar, el Nunchuk no llega a detectarse (visto en
+    // Dolphin). El IR se activa en cada mando un segundo después de conectarse (update)
+    WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC);
     WPAD_SetVRes(WPAD_CHAN_ALL, s_vresW, s_vresH);
     WPAD_SetIdleTimeout(300);
     s_t0 = gettime();
@@ -226,6 +228,7 @@ void update(float dt) {
             p.held = p.down = 0;
             p.state = SW_IDLE;
             p.irValid = false;
+            p.irOn = false;
             p.nunchuk = false;
             p.stickX = p.stickY = 0;
             continue;
@@ -233,10 +236,12 @@ void update(float dt) {
         p.held = WPAD_ButtonsHeld(i);
         p.down = WPAD_ButtonsDown(i);
         WPADData* wd = WPAD_Data(i);
-        if (!wasConnected) {
-            // Un mando que se acaba de conectar: su formato y el tamaño del puntero
+        if (!wasConnected) p.connT = 0;
+        p.connT += dt;
+        if (p.connT >= 1.0f && !p.irOn) {
             WPAD_SetDataFormat(i, WPAD_FMT_BTNS_ACC_IR);
             WPAD_SetVRes(i, s_vresW, s_vresH);
+            p.irOn = true;
         }
         p.irValid = wd && wd->ir.valid;
         if (p.irValid) {
@@ -326,6 +331,13 @@ void stopRumble() {
         s_pads[i].rumbleT = 0;
         WPAD_Rumble(i, 0);
     }
+}
+
+void refreshExpansion(int chan) {
+    if (chan < 0 || chan >= MAX_PADS || !s_pads[chan].connected) return;
+    WPAD_SetDataFormat(chan, WPAD_FMT_BTNS_ACC);
+    s_pads[chan].irOn = false;
+    s_pads[chan].connT = 0;
 }
 
 int connectedCount() {

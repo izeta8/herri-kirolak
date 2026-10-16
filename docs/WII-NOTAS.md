@@ -105,6 +105,10 @@ la derecha 90°"). **Sin probar en la Wii real**: en "Pala: kolpe proba"
   (escena 14) el punto del stick tiene que ir hacia donde se empuja y Z/C/A/B se encienden al pulsarlos. Si va girado,
   cambiar ahí la fórmula.
 - Z y C llegan en `WPAD_ButtonsHeld` como `WPAD_NUNCHUK_BUTTON_Z/C` (bits altos).
+- **IR y Nunchuk**: si se pone `WPAD_FMT_BTNS_ACC_IR` nada más arrancar, el Nunchuk **no se detecta** (Dolphin:
+  `WPAD_Probe` da tipo 0). Por eso `input` arranca sin IR y se lo pone a cada mando 1 s después de conectarse; y la pala,
+  mientras espera un Nunchuk, llama cada 3 s a `input::refreshExpansion()` (quita el IR un momento) por si lo enchufan
+  con el juego en marcha. Comprobar en la Wii real.
 
 ## Puntero IR y pilas
 - `WPADData::battery_level` ya viene en **% (0..100)** en libogc (Dolphin da 100 con pilas llenas), no el byte crudo

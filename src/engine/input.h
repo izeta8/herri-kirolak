@@ -61,6 +61,8 @@ struct Pad {
     float swingX[64];  // aceleración X de la bajada (para decidir el lado)
     int swingN = 0;
     float rumbleT = 0;
+    float connT = 0;     // s desde que se conectó
+    bool irOn = false;   // ya se le ha puesto el formato con IR
     int whipSt = 0;
     float whipT = 0, whipPeak = 0;
 };
@@ -89,6 +91,9 @@ void rumble(int chan, float seconds);
 void setRumbleEnabled(bool on);  // ajuste "Bibrazioa"
 void stopRumble();
 int connectedCount();
+// Vuelve a empezar el mando sin IR (y le pone el IR al segundo): para que detecte un Nunchuk enchufado con el IR
+// encendido (con la cámara IR activa, el Nunchuk puede no llegar a detectarse)
+void refreshExpansion(int chan);
 // Ajustes del jugador (se guardan en save.dat)
 void setTiltInverted(bool inv);
 void setSensitivity(int level);  // 0 = suave (golpes flojos cuentan), 1 = normal, 2 = hay que dar fuerte

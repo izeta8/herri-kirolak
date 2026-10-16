@@ -97,8 +97,8 @@ public:
         if (save::available()) snprintf(buf, sizeof(buf), txt::SAVE_WHERE, save::location());
         else snprintf(buf, sizeof(buf), "%s", txt::NO_SAVE);
         float tw = font::width(buf, 17) + 36;
-        gfx::roundRect(W / 2 - tw / 2, 388, tw, 28, 14, rgba(255, 255, 255, 200));
-        font::plain(buf, W / 2, 392, 17, save::available() ? UI_TEXT_LIGHT : UI_RED, ALIGN_CENTER);
+        gfx::roundRect(W / 2 - tw / 2, 380, tw, 28, 14, rgba(255, 255, 255, 200));
+        font::plain(buf, W / 2, 384, 17, save::available() ? UI_TEXT_LIGHT : UI_RED, ALIGN_CENTER);
         ui::hints(txt::EDIT, txt::BACK);
     }
 

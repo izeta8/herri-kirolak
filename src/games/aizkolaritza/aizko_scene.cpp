@@ -786,7 +786,7 @@ void AizkoScene::drawResults() {
         snprintf(buf, sizeof(buf), "%s: %s!", txt::WINNER, pl_[order_[0]].prof->name);
         font::draw(buf, W / 2, py + ph - 50, 34, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, a);
     }
-    float by = fminf(430.0f, py + ph + 44);
+    float by = fminf(418.0f, py + ph + 44);
     ui::menuButton(resultsMenu_, 0, W / 2 - 150, by, 260, 60, txt::PLAY_AGAIN);
     ui::menuButton(resultsMenu_, 1, W / 2 + 150, by, 260, 60, txt::TO_MENU);
 }

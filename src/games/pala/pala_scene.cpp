@@ -199,7 +199,7 @@ private:
     FloatLabel labels_[8];
     int numLabels_ = 0;
     Fx fx_[12];
-    float shake_ = 0, hitstop_ = 0, newRecord_ = 0;
+    float shake_ = 0, hitstop_ = 0, newRecord_ = 0, waitNunchuk_ = 0;
     Vec3 camTarget_, camEyeDraw_, camTargetDraw_;
     float camDist_ = 12;
     mutable float camDistTry_ = 12, camFovTry_ = CAM_FOV;
@@ -824,8 +824,16 @@ void PalaScene::update(float dt) {
     // Sin el Wii Remote de un humano, o sin Nunchuk, no se juega: todo quieto hasta que se conecte
     if (state_ != ST_RESULTS && (missing() || needsNunchuk())) {
         input::stopRumble();
+        // Mientras falte el Nunchuk, cada 3 s se reinicia ese mando sin IR por si lo acaban de enchufar
+        waitNunchuk_ += dt;
+        if (needsNunchuk() && waitNunchuk_ > 3.0f) {
+            waitNunchuk_ = 0;
+            for (int i = 0; i < n_; i++)
+                if (!pl_[i].bot && !input::pad(padFor(pl_[i])).nunchuk) input::refreshExpansion(padFor(pl_[i]));
+        }
         return;
     }
+    waitNunchuk_ = 0;
 
     if (hitstop_ > 0) {
         hitstop_ -= dt;
@@ -1192,7 +1200,7 @@ void PalaScene::drawHud() {
             font::plain(p.prof->name, nx, py + 12, 26, UI_TEXT, left ? ALIGN_LEFT : ALIGN_RIGHT);
             if (p.bot) {
                 snprintf(buf, sizeof(buf), "%s · %s", txt::CPU, txt::LEVELS[clampv(cfg_.level, 0, 2)]);
-                font::plain(buf, nx, py + 44, 16, UI_TEXT_LIGHT, left ? ALIGN_LEFT : ALIGN_RIGHT);
+                font::plain(buf, nx, py + 43, 17, UI_TEXT_LIGHT, left ? ALIGN_LEFT : ALIGN_RIGHT);
             }
             if (server_ == i) gfx::circle(left ? px + 22 : px + pw - 22, py + 68, 6, rgba(0xF6, 0xF4, 0xEC), 12);
             snprintf(buf, sizeof(buf), "%d", p.score);
@@ -1221,15 +1229,15 @@ void PalaScene::drawHud() {
         const Player& p = pl_[i];
         if (p.bot || p.lastShow <= 0) continue;
         float a = smooth01(p.lastShow * 3);
-        float cx = n_ == 1 ? W / 2 : (i == 0 ? W * 0.27f : W * 0.73f), cy = 432, w = 200;
+        float cx = n_ == 1 ? W / 2 : (i == 0 ? W * 0.27f : W * 0.73f), cy = 420, w = 200;
         gfx::roundRect(cx - w / 2 - 70, cy - 30, w + 140, 60, 18, withAlpha(rgba(0x10, 0x30, 0x48, 150), a));
         auto bar = [&](float y, float v, float good, const char* lo, const char* hi, const char* name) {
             gfx::roundRect(cx - w / 2, y - 4, w, 8, 4, withAlpha(rgba(255, 255, 255, 120), a));
             gfx::roundRect(cx - good * w / 2, y - 4, good * w, 8, 4, withAlpha(UI_GREEN, a));
             float mx = cx + clampv(v, -1.0f, 1.0f) * w / 2;
             gfx::circle(mx, y, 7, withAlpha(UI_GOLD, a), 14);
-            font::plain(lo, cx - w / 2 - 8, y - 9, 15, withAlpha(UI_WHITE, a), ALIGN_RIGHT);
-            font::plain(hi, cx + w / 2 + 8, y - 9, 15, withAlpha(UI_WHITE, a), ALIGN_LEFT);
+            font::plain(lo, cx - w / 2 - 8, y - 10, 17, withAlpha(UI_WHITE, a), ALIGN_RIGHT);
+            font::plain(hi, cx + w / 2 + 8, y - 10, 17, withAlpha(UI_WHITE, a), ALIGN_LEFT);
             (void)name;
         };
         float hw = HIT_WINDOW * lerpf(WINDOW_SOFT, WINDOW_STRONG, p.last.strength);
@@ -1243,7 +1251,7 @@ void PalaScene::drawHud() {
             const Player& p = pl_[i];
             if (p.bot || p.lastShow > 0.3f) continue;
             int type = shotTypeOf(p.ctl);
-            float cx = n_ == 1 ? W / 2 : (i == 0 ? W * 0.27f : W * 0.73f), cy = 440;
+            float cx = n_ == 1 ? W / 2 : (i == 0 ? W * 0.27f : W * 0.73f), cy = 428;
             const char* keys[3] = {"B", "", "A"};
             for (int t = 0; t < 3; t++) {
                 float x = cx + (t - 1) * 104;
@@ -1344,7 +1352,7 @@ void PalaScene::drawResults() {
         snprintf(buf, sizeof(buf), "%d", p.score);
         font::plain(buf, px + pw - 30, y + 4, 30, UI_TEXT, ALIGN_RIGHT);
         snprintf(buf, sizeof(buf), txt::STATS_LINE, p.greats, p.biparetas);
-        font::plain(buf, px + 96, y + 36, 16, UI_TEXT_LIGHT);
+        font::plain(buf, px + 96, y + 35, 17, UI_TEXT_LIGHT);
     }
     snprintf(buf, sizeof(buf), txt::LONGEST_RALLY, longestRally_);
     font::plain(buf, px + pw / 2, py + ph - 78, 19, UI_TEXT_LIGHT, ALIGN_CENTER);

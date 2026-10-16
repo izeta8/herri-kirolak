@@ -92,16 +92,17 @@ void buttonIcon(float cx, float cy, const char* letter, float r, Color c) {
 
 // Pastilla de cristal de la barra inferior (como "Back" / "Settings" en Resort); devuelve su ancho
 static float hintPill(float right, const char* letter, const char* label, Color iconCol) {
+    // Dentro de la zona segura de la tele (las teles recortan los bordes): 22 px por encima del borde de abajo
     float tw = font::width(label, 22);
     float pw = tw + 64, x = right - pw;
-    glass(x, 430, pw, 40, 20, 0);
-    buttonIcon(x + 24, 450, letter, 14, iconCol);
-    font::plain(label, x + 44, 438, 22, UI_TEXT);
+    glass(x, 418, pw, 40, 20, 0);
+    buttonIcon(x + 24, 438, letter, 14, iconCol);
+    font::plain(label, x + 44, 426, 22, UI_TEXT);
     return pw;
 }
 
 void hints(const char* aLabel, const char* bLabel, const char* plusLabel) {
-    float x = gfx::screenW() - 20;
+    float x = gfx::screenW() - 30;
     if (bLabel) x -= hintPill(x, "B", bLabel, rgba(0x80, 0x88, 0x94)) + 12;
     if (aLabel) x -= hintPill(x, "A", aLabel, UI_BLUE) + 12;
     if (plusLabel) hintPill(x, "+", plusLabel, rgba(0x80, 0x88, 0x94));
