@@ -369,7 +369,7 @@ void AizkoScene::update(float dt) {
 
     if (paused_ && sure_.open) {
         int r = sure_.update(dt, downAll);
-        if (r == 1) scenes::go(sure_.action == 2 ? makeAizkoScene(cfg_) : makeMainMenu());
+        if (r == 1) (sure_.action == 2 ? scenes::goMatch(makeAizkoScene, cfg_) : scenes::go(makeMainMenu()));
         return;
     }
     if (paused_) {
@@ -385,7 +385,7 @@ void AizkoScene::update(float dt) {
             showHowTo_ = true;
             howTo_.start();
         }
-        else if (r == 2) scenes::go(makeAizkoScene(cfg_));
+        else if (r == 2) scenes::goMatch(makeAizkoScene, cfg_);
         else if (r == 3) scenes::go(makeMainMenu());
         return;
     }
@@ -446,7 +446,7 @@ void AizkoScene::update(float dt) {
             resultsT_ += dt;
             if (resultsT_ > 0.8f) {
                 int r = resultsMenu_.update(dt, downAll);
-                if (r == 0) scenes::go(makeAizkoScene(cfg_));
+                if (r == 0) scenes::goMatch(makeAizkoScene, cfg_);
                 else if (r == 1 || r == -2) scenes::go(makeMainMenu());
             }
             break;

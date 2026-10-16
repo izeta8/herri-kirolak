@@ -781,7 +781,7 @@ void PalaScene::update(float dt) {
 
     if (paused_ && sure_.open) {
         int r = sure_.update(dt, downAll);
-        if (r == 1) scenes::go(sure_.action == 2 ? makePalaScene(cfg_) : makeMainMenu());
+        if (r == 1) (sure_.action == 2 ? scenes::goMatch(makePalaScene, cfg_) : scenes::go(makeMainMenu()));
         return;
     }
     if (paused_) {
@@ -797,7 +797,7 @@ void PalaScene::update(float dt) {
             showHowTo_ = true;
             howTo_.start();
         }
-        else if (r == 2) scenes::go(makePalaScene(cfg_));
+        else if (r == 2) scenes::goMatch(makePalaScene, cfg_);
         else if (r == 3) scenes::go(makeMainMenu());
         return;
     }
@@ -879,7 +879,7 @@ void PalaScene::update(float dt) {
             resultsT_ += dt;
             if (resultsT_ > 0.8f) {
                 int r = resultsMenu_.update(dt, downAll);
-                if (r == 0) scenes::go(makePalaScene(cfg_));
+                if (r == 0) scenes::goMatch(makePalaScene, cfg_);
                 else if (r == 1 || r == -2) scenes::go(makeMainMenu());
             }
             break;

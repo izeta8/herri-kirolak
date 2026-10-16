@@ -186,7 +186,7 @@ private:
                 spin_ = 1;
             } else {
                 s_last = cfg_;
-                scenes::go(sport(cfg_.sport).makeMatch(cfg_));
+                scenes::goMatch(sport(cfg_.sport).makeMatch, cfg_);
             }
         } else if (down & WPAD_BUTTON_B) {
             audio::play(SFX_BACK, 0.7f);

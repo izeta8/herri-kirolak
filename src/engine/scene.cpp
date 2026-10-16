@@ -5,6 +5,7 @@
 #include "engine/gfx.h"
 #include "engine/input.h"
 #include "engine/ui.h"
+#include "game/sports.h"
 #include "game/palette.h"
 #include "game/text.h"
 
@@ -24,13 +25,25 @@ void start(Scene* first) {
     s_fade = 1.0f;
 }
 
+static Scene* (*s_make)(const MatchConfig&) = nullptr;
+static MatchConfig s_makeCfg;
+
 void go(Scene* next) {
     if (s_next) delete s_next;
     s_next = next;
+    s_make = nullptr;
     s_fadingOut = true;
 }
 
-bool transitioning() { return s_fadingOut || s_next; }
+void goMatch(Scene* (*make)(const MatchConfig&), const MatchConfig& cfg) {
+    if (s_next) delete s_next;
+    s_next = nullptr;
+    s_make = make;
+    s_makeCfg = cfg;
+    s_fadingOut = true;
+}
+
+bool transitioning() { return s_fadingOut || s_next || s_make; }
 
 static void drawHome() {
     float w = gfx::screenW();
@@ -125,6 +138,10 @@ bool frame(float dt) {
         s_fade = fminf(1.0f, s_fade + dt * 4.0f);
         if (s_fade >= 1.0f) {
             s_fadingOut = false;
+            if (s_make) {  // en negro: ahora se construye la partida
+                s_next = s_make(s_makeCfg);
+                s_make = nullptr;
+            }
             if (s_next) {
                 delete s_cur;
                 s_cur = s_next;

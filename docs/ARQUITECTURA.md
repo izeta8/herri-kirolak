@@ -33,7 +33,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 | `audio` | Efectos con ASND (PCM 16 bits BE 32 kHz) | `audio::play(SFX_x, volumen, tono, pan)` |
 | `save` | `save.dat` junto al `boot.dol` (USB o SD), versión 4 con migración (v1–v3 se leen) | `save::data()` (`profiles`, `records` de aizkolaritza, `settings`, `pala`), `save::write()`, `save::directory()` |
 | `ui` | Elementos estilo Wii manejados con cruceta **y puntero IR** (mano por mando, vibración al pasar por un botón) | `background`, `header`, `panel`, `row`, `button`, `menuButton(ListMenu&, i, …)`, `buttonIcon`, `hints`, `fade`, `colorDot`, `battery`, `formatTime`, `ListMenu` (`place` para el puntero), `pointer()`, `usePointer()` |
-| `scene` | Escenas con fundido y diálogo de HOME global | `class Scene { update(dt); draw(); }`, `scenes::go(new X)`, `scenes::openExitDialog()` |
+| `scene` | Escenas con fundido y diálogo de HOME global | `class Scene { update(dt); draw(); }`, `scenes::go(new X)`, `scenes::goMatch(make, cfg)` (la partida se construye con la pantalla en negro), `scenes::openExitDialog()` |
 | `tuning.h` | **Todas** las constantes ajustables (gesto, juego) | — |
 | `telemetry` | Hilo de red único: telemetría TCP 4300 + servidor de actualización | `telemetry::push`, `note`, `status`, `ip`, `netListen`, `readable` |
 | `updater` | Actualización en caliente (TCP 4301) y salto al cargador `tools/booter` | `updater::open/poll/ready/launch` |
