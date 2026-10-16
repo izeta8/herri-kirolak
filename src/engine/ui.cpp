@@ -116,6 +116,15 @@ void colorDot(float cx, float cy, float r, Color c) {
     gfx::circle(cx, cy, r, c, 20);
 }
 
+void battery(float x, float y, int bars) {
+    Color c = bars >= 2 ? UI_GREEN : bars == 1 ? UI_GOLD : UI_RED;
+    gfx::roundRect(x, y, 40, 18, 4, rgba(0x30, 0x40, 0x50));
+    gfx::rect(x + 40, y + 5, 3, 8, rgba(0x30, 0x40, 0x50));
+    gfx::roundRect(x + 2, y + 2, 36, 14, 3, UI_WHITE);
+    for (int i = 0; i < 4; i++)
+        if (i < bars || (bars == 0 && i == 0)) gfx::rect(x + 4 + i * 8.5f, y + 4, 7, 10, c);
+}
+
 void formatTime(unsigned ms, char* out, int size) {
     unsigned cs = ms / 10;
     unsigned s = cs / 100, c = cs % 100;

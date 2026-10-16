@@ -32,7 +32,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 | `input` | 4 Wii Remotes: botones, acelerómetro a ~100 lecturas/s, **detector de hachazo**, **latigazo** (pala) y **stick del Nunchuk** | `input::pad(i)` → `Pad` (`down`, `held`, `accel`, `grav`, `raise`, `state`, `chop`, `swingStart`, `swingTilt`, `whip`, `whipStart`, `nunchuk`, `stickX/Y`…); `allDown()`, `rumble(i, s)` |
 | `audio` | Efectos con ASND (PCM 16 bits BE 32 kHz) | `audio::play(SFX_x, volumen, tono, pan)` |
 | `save` | `save.dat` junto al `boot.dol` (USB o SD), versión 4 con migración (v1–v3 se leen) | `save::data()` (`profiles`, `records` de aizkolaritza, `settings`, `pala`), `save::write()`, `save::directory()` |
-| `ui` | Elementos estilo Wii manejados con cruceta | `background`, `header`, `panel`, `button`, `buttonIcon`, `hints`, `fade`, `colorDot`, `formatTime`, `ListMenu` |
+| `ui` | Elementos estilo Wii manejados con cruceta **y puntero IR** (mano por mando, vibración al pasar por un botón) | `background`, `header`, `panel`, `row`, `button`, `menuButton(ListMenu&, i, …)`, `buttonIcon`, `hints`, `fade`, `colorDot`, `battery`, `formatTime`, `ListMenu` (`place` para el puntero), `pointer()`, `usePointer()` |
 | `scene` | Escenas con fundido y diálogo de HOME global | `class Scene { update(dt); draw(); }`, `scenes::go(new X)`, `scenes::openExitDialog()` |
 | `tuning.h` | **Todas** las constantes ajustables (gesto, juego) | — |
 | `telemetry` | Hilo de red único: telemetría TCP 4300 + servidor de actualización | `telemetry::push`, `note`, `status`, `ip`, `netListen`, `readable` |
@@ -90,7 +90,7 @@ nueva → `scenes::frame(dt)` (actualiza y dibuja la escena, fundidos y diálogo
 ## Menús (`src/scenes/`)
 `title` (de fondo, por turnos de 22 s: la CPU cortando y un partido de pala CPU contra CPU con `MatchConfig::demo`) → `menu` (Jokatu / Jokalariak / Errekorrak / Irten) → `setup` (deporte → modo →
 jugadores → rondas → personajes, con − para CPU) → escena del deporte. `profiles` (editor con teclado en pantalla),
-`records`, `swingtest` (Kolpe proba: gráficas del mando, grabación guiada), `common` (`drawCharacterPreview`).
+`records` (páginas aizkolaritza / pala), `settings` (Aukerak), `swingtest` (Kolpe proba: gráficas del mando, grabación guiada), `common` (`drawCharacterPreview`).
 
 ## Aizkolaritza (`src/games/aizkolaritza/`)
 - `log` — `Log`: tronco tumbado sobre X con dos V (delante +Z, detrás −Z), malla regenerada al cambiar la profundidad,
@@ -133,6 +133,17 @@ jugadores → rondas → personajes, con − para CPU) → escena del deporte. `
 - `pala_howto` — "Nola jokatu" animado (estilo Resort, como el de aizkolaritza) al empezar el entrenamiento: moverse,
   apuntar con Z (bipareta), latigazo (Wii Remote 3D de `game/remote3d`), tipos de golpe y punto dulce.
 - `showcase` — escena de prueba 16: un pelotari de cerca repitiendo todas sus animaciones.
+
+## Puntero y mandos (experiencia de uso)
+- `input`: el IR se lee de todos los mandos (`WPAD_FMT_BTNS_ACC_IR`, `setPointerArea` con el tamaño de la pantalla
+  virtual); `Pad::irValid/irX/irY`, pilas en % (`battery`, `batteryBars`, `batteryLow`).
+- `ui`: `updatePointer()` y `drawPointers()` los llama `scenes::frame`; la mano solo se dibuja si la escena llamó a
+  `usePointer()` ese frame (lo hace `ListMenu::update`). Para que un botón responda al puntero, dibujarlo con
+  `ui::menuButton(menu, i, …)` o apuntar su rectángulo con `menu.place(i, …)`; pantallas con interacción propia usan
+  `ui::pointerOver(x, y, w, h)` + A.
+- `scenes/common`: `missingRemote()` y `drawConnectOverlay()` — en partida, si falta el Wii Remote de un humano (o el
+  Nunchuk en la pala), todo se para con el aviso. `scenes::frame` avisa una vez de las pilas bajas y el diálogo de HOME
+  enseña las pilas de cada mando.
 
 ## Convenciones
 - Caras en orden antihorario → `GX_CULL_FRONT`; `MeshBuilder::tri()` orienta las caras solo con un vector "hacia fuera".

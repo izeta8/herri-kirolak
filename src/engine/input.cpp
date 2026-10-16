@@ -41,8 +41,10 @@ void setPointerArea(int w, int h) {
 
 int batteryBars(int chan) {
     if (chan < 0 || chan >= MAX_PADS || !s_pads[chan].connected) return -1;
-    return clampv((int)s_pads[chan].battery / 0x30, 0, 4);
+    return clampv(((int)s_pads[chan].battery + 12) / 25, 0, 4);
 }
+
+bool batteryLow(int chan) { return chan >= 0 && chan < MAX_PADS && s_pads[chan].connected && s_pads[chan].battery < 20; }
 
 void setTiltInverted(bool inv) { s_tiltSign = inv ? -1.0f : 1.0f; }
 void setSensitivity(int level) { s_chopMinG = tuning::CHOP_MIN_G[clampv(level, 0, 2)]; }

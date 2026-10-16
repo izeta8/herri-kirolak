@@ -20,6 +20,8 @@ void buttonIcon(float cx, float cy, const char* letter, float r = 15, Color c = 
 void hints(const char* aLabel, const char* bLabel = nullptr);
 void fade(float a, Color c = 0x000000FF);
 void colorDot(float cx, float cy, float r, Color c);
+// Pila del mando: 4 rayas (verde, amarillo con 1, rojo con 0)
+void battery(float x, float y, int bars);
 // Formatea un tiempo en ms como "12.34" o "1:02.34"
 void formatTime(unsigned ms, char* out, int size);
 

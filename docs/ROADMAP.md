@@ -104,7 +104,7 @@ Tareas medianas, en orden. Marcar `[x]` al terminar (con commit + push).
 - [ ] Juntar `develop` con `main` cuando lo apruebe (tras probarlo en la Wii real)
 
 ## Próximo
-- [ ] **Puntero IR en los menús** (además de la cruceta)
+- [x] **Puntero IR en los menús** (además de la cruceta)
 - [ ] Probar la lehiaketa con 2-4 mandos reales
 - [x] Siguiente deporte elegido: **palas** (reglas y controles en SPEC §6 y DECISIONES)
 
@@ -141,16 +141,17 @@ Pendiente:
 
 ## Experiencia de uso de todo el juego (16/10, repaso pedido por el usuario; no toca el gameplay)
 Hallazgos y mejoras, en orden de impacto:
-- [ ] **Puntero IR en todos los menús** (decisión del usuario: cruceta Y puntero): mano de cada jugador, el botón bajo
+- [x] **Puntero IR en todos los menús** (decisión del usuario: cruceta Y puntero): mano de cada jugador, el botón bajo
   el puntero se resalta con una vibración corta, A lo elige; la cruceta sigue funcionando igual
-- [ ] **Jokalariak**: confirmar antes de borrar (ahora borra al instante); avisar al salir con cambios sin guardar;
+- [x] **Jokalariak**: confirmar antes de borrar (ahora borra al instante); avisar al salir con cambios sin guardar;
   lista con el mismo estilo de cristal que el resto; teclado con puntero
-- [ ] **Mandos en partida**: si se apaga el Wii Remote de un humano, pausa con "Konektatu N. Wii Remote-a" (ahora el
+- [x] **Mandos en partida**: si se apaga el Wii Remote de un humano, pausa con "Konektatu N. Wii Remote-a" (ahora el
   mando 1 pasa a controlar a los dos sin avisar); en "Aukeratu" se ve qué mando es de cada jugador y si falta (y el
   Nunchuk en la pala)
-- [ ] **Preparar partida**: indicador de pasos (kirola → modua → …) para saber dónde estás
-- [ ] **Batería baja** del Wii Remote: aviso pequeño, y las pilas de cada mando en el diálogo de HOME
-- [ ] **Aukerak** (ajustes) en el menú principal: sensibilidad e inversiones, que hoy solo están dentro de Kolpe proba
+- [x] **Preparar partida**: indicador de pasos (kirola → modua → …) para saber dónde estás
+- [x] **Batería baja** del Wii Remote: aviso pequeño, y las pilas de cada mando en el diálogo de HOME
+- [x] **Aukerak** (ajustes) en el menú principal: vibración, marca de bote de la pala, sensibilidad e inversiones del
+  hachazo, y dónde se guarda
 
 ## Arreglos pendientes
 - [x] Aizkolaritza: las mallas de `Log` y `Chips` se liberan al cambiar de escena (antes, fuga en cada "Berriro

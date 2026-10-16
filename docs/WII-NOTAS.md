@@ -106,3 +106,9 @@ la derecha 90°"). **Sin probar en la Wii real**: en "Pala: kolpe proba"
   cambiar ahí la fórmula.
 - Z y C llegan en `WPAD_ButtonsHeld` como `WPAD_NUNCHUK_BUTTON_Z/C` (bits altos).
 
+## Puntero IR y pilas
+- `WPADData::battery_level` ya viene en **% (0..100)** en libogc (Dolphin da 100 con pilas llenas), no el byte crudo
+  del mando.
+- En Dolphin el IR sale del ratón aunque la ventana no tenga el foco: si el ratón está encima de la imagen, la mano
+  aparece y los menús responden (útil para probar el puntero; las teclas, en cambio, necesitan el foco).
+

@@ -138,6 +138,7 @@ constexpr const char* CONTINUE = "Jarraitu";
 constexpr const char* RESTART = "Berriz hasi";
 
 constexpr const char* EXIT_QUESTION = "Homebrew Channel-era itzuli?";
+constexpr const char* BATTERY_LOW = "%d. Wii Remote-a: pila gutxi";
 
 // Jokalariak
 constexpr const char* EDIT = "Aldatu";
