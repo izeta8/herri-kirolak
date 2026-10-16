@@ -195,6 +195,7 @@ constexpr const char* WHIP_TEST = "Pala: kolpe proba";
 constexpr const char* CPU_LEVEL = "CPU-aren maila";
 constexpr const char* REMOTE_N = "%d. Wii Remote-a";
 constexpr const char* NO_NUNCHUK = "Nunchuk-ik ez";
+constexpr const char* REMOTE_LOST = "Jokoa geldituta dago. Piztu eta konektatu mandoa.";
 constexpr const char* HIT_BAD = "Txarto";
 constexpr const char* VOLLEY = "Bolea!";
 constexpr const char* BOTE_PRONTO = "Bote pronto!";

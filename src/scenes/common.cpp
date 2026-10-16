@@ -1,7 +1,11 @@
 #include "scenes/common.h"
+#include <ogc/lwp_watchdog.h>
 #include <string.h>
+#include "engine/font.h"
 #include "engine/gfx.h"
+#include "engine/input.h"
 #include "engine/save.h"
+#include "engine/ui.h"
 #include "game/mii/mii.h"
 #include "game/palette.h"
 #include "game/world.h"
@@ -58,6 +62,32 @@ void linkProfilesToMiis() {
         changed = true;
     }
     if (changed) save::write();
+}
+
+int missingRemote(const bool* human, int n) {
+    int humans = 0;
+    for (int i = 0; i < n; i++) humans += human[i];
+    if (humans == 0) return 0;
+    if (humans == 1) return input::connectedCount() > 0 ? 0 : 1;
+    for (int i = 0; i < n; i++)
+        if (human[i] && !input::pad(i).connected) return i + 1;
+    return 0;
+}
+
+void drawConnectOverlay(const char* title, const char* sub) {
+    const float W = gfx::screenW();
+    gfx::begin2D();
+    ui::fade(0.45f);
+    ui::panel(W / 2 - 280, 160, 560, 150);
+    // Un Wii Remote dibujado, con su luz de jugador parpadeando
+    float pulse = 0.5f + 0.5f * sinf(gettime() / (float)TB_TIMER_CLOCK / 1000.0f * 6.0f);
+    gfx::roundRect(W / 2 - 262, 182, 34, 104, 12, rgba(0xF6, 0xF6, 0xF4));
+    gfx::roundRect(W / 2 - 262, 182, 34, 104, 12, rgba(0, 0, 0, 25));
+    gfx::roundRect(W / 2 - 258, 186, 26, 96, 10, rgba(0xF6, 0xF6, 0xF4));
+    gfx::circle(W / 2 - 245, 210, 7, rgba(0xC8, 0xCC, 0xD4), 14);
+    gfx::rect(W / 2 - 252, 270, 14, 4, withAlpha(rgba(0x40, 0x9C, 0xF0), pulse));
+    font::plain(title, W / 2 + 26, 186, 34, UI_TEXT, ALIGN_CENTER);
+    font::plain(sub, W / 2 + 26, 242, 19, UI_TEXT_LIGHT, ALIGN_CENTER);
 }
 
 void drawMenuBackdrop(float t) {

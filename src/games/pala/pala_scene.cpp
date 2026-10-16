@@ -22,6 +22,7 @@
 #include "games/pala/fronton.h"
 #include "games/pala/pala_howto.h"
 #include "games/pala/pelotari.h"
+#include "scenes/common.h"
 #include "scenes/scenes.h"
 
 using namespace tuning;
@@ -149,6 +150,7 @@ private:
     int padFor(const Player& p) const { return input::pad(p.pad).connected ? p.pad : 0; }
     int other(int i) const { return n_ == 1 ? i : 1 - i; }
     bool needsNunchuk() const;
+    int missing() const;  // Wii Remote de un humano que no está (1..4), 0 si están todos
     void resetPositions();
     void startDrop(int i);
     void readHuman(int i);
@@ -207,6 +209,12 @@ private:
     bool showHowTo_ = false;
     PalaHowTo howTo_;
 };
+
+int PalaScene::missing() const {
+    bool human[MAXP];
+    for (int i = 0; i < n_; i++) human[i] = !pl_[i].bot;
+    return missingRemote(human, n_);
+}
 
 bool PalaScene::needsNunchuk() const {
     for (int i = 0; i < n_; i++)
@@ -795,7 +803,11 @@ void PalaScene::update(float dt) {
         return;
     }
     // Sin Nunchuk no se juega: todo quieto hasta que se conecte
-    if (state_ != ST_RESULTS && needsNunchuk()) return;
+    // Sin el Wii Remote de un humano, o sin Nunchuk, no se juega: todo quieto hasta que se conecte
+    if (state_ != ST_RESULTS && (missing() || needsNunchuk())) {
+        input::stopRumble();
+        return;
+    }
 
     if (hitstop_ > 0) {
         hitstop_ -= dt;
@@ -1271,11 +1283,11 @@ void PalaScene::drawHud() {
         float s = 1 + 0.05f * sinf(time_ * 8);
         font::draw(txt::NEW_RECORD, W / 2, 200, 40 * s, UI_GOLD, rgba(0x80, 0x30, 0x10), ALIGN_CENTER, smooth01(newRecord_ * 2));
     }
-    if (needsNunchuk()) {
-        ui::fade(0.45f);
-        ui::panel(W / 2 - 260, 170, 520, 130);
-        font::plain(txt::CONNECT_NUNCHUK, W / 2, 190, 36, UI_TEXT, ALIGN_CENTER);
-        font::plain(txt::NUNCHUK_NEEDED, W / 2, 246, 22, UI_TEXT_LIGHT, ALIGN_CENTER);
+    if (int m = missing()) {
+        snprintf(buf, sizeof(buf), txt::CONNECT_REMOTE, m);
+        drawConnectOverlay(buf, txt::REMOTE_LOST);
+    } else if (needsNunchuk()) {
+        drawConnectOverlay(txt::CONNECT_NUNCHUK, txt::NUNCHUK_NEEDED);
     }
 }
 

@@ -17,6 +17,7 @@
 #include "games/aizkolaritza/aizkolari.h"
 #include "games/aizkolaritza/howto.h"
 #include "games/aizkolaritza/log.h"
+#include "scenes/common.h"
 #include "scenes/scenes.h"
 
 using namespace tuning;
@@ -97,6 +98,11 @@ private:
     void updateBot(Player& p, float dt);
     void addLabel(const char* t, const Vec3& pos, Color c);
     void enterResults();
+    int missing() const {
+        bool human[MAXP];
+        for (int i = 0; i < n_; i++) human[i] = !pl_[i].bot;
+        return missingRemote(human, n_);
+    }
     void updateCamera(float dt);
     void drawTrainingHud();
     void drawMultiHud();
@@ -359,6 +365,11 @@ void AizkoScene::update(float dt) {
         else if (r == 2) scenes::go(makeMainMenu());
         return;
     }
+    // Sin el Wii Remote de un humano no se juega: todo quieto (también el tiempo) hasta que se conecte
+    if (state_ != ST_RESULTS && !showHowTo_ && missing()) {
+        input::stopRumble();
+        return;
+    }
     if (!showHowTo_ && state_ != ST_RESULTS && (downAll & WPAD_BUTTON_PLUS)) {
         paused_ = true;
         pauseMenu_ = ui::ListMenu();
@@ -493,6 +504,13 @@ void AizkoScene::draw() {
     }
     if (state_ == ST_RESULTS) drawResults();
     if (paused_) drawPause();
+    if (int m = missing()) {
+        if (state_ != ST_RESULTS && !showHowTo_) {
+            char buf[64];
+            snprintf(buf, sizeof(buf), txt::CONNECT_REMOTE, m);
+            drawConnectOverlay(buf, txt::REMOTE_LOST);
+        }
+    }
 }
 
 // Etiquetas flotantes, mensajes de estado y tiempo
